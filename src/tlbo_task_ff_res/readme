@@ -1,0 +1,7 @@
+使用教学法用于task序列的搜索 使用果蝇算法的气味搜索和视觉搜索用于资源序列的搜索
+
+程序改变地方 
+Individual 目标计算过程中资源序列的生成 采用生成多个果蝇的方法  然后选择最佳的返回  
+因为改变了目标的计算规则  所以之前的教学与遗传算法随之改变   计算算法使用包genetic_algorithm下的算法
+伪代码实现：参考A knowledge-based fruit fly optimization algorithm for multi-skill
+resource-constrained project scheduling problem
