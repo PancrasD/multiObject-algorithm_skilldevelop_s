@@ -5,7 +5,7 @@ public class TLBO {
 	public static final int populationSize = 200;
 
 	// 任务序列变异概率
-	public static final double probp = 0.15;
+	public static final double probp = 0.15;//变异
 	
 	// 老师个体强化次数
 	public static final double rein = 50;

@@ -1,23 +1,20 @@
 package genetic_algorithm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
- * 定义一个资源类，包含属性：
- * 资源ID，每小时的薪水，掌握的技能
- * @author 熊凯
+ * 锟斤拷锟斤拷一锟斤拷锟斤拷源锟洁，锟斤拷锟斤拷锟斤拷锟皆ｏ拷
+ * 锟斤拷源ID锟斤拷每小时锟斤拷薪水锟斤拷锟斤拷锟秸的硷拷锟斤拷
+ * @author 锟杰匡拷
  *
  */
 public class Resource {
-	//资源ID
+	//锟斤拷源ID
 	private int resourceID;
-	//员工每小时的薪水
+	//员锟斤拷每小时锟斤拷薪水
 	private double salary;
-	//员工掌握的技能
+	//员锟斤拷锟斤拷锟秸的硷拷锟斤拷
 	private String skils;
-	//资源学习能力
+	//锟斤拷源学习锟斤拷锟斤拷
 	private double learnbility;
 		
 	@SuppressWarnings("null")

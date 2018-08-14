@@ -65,14 +65,20 @@ public class NumericalTest {
     		}
     		if (args[0].trim().toLowerCase().equals("tf")){
     			for(int j = 0; j < 10; j++){
-                for(int i = 0; i<fl.length; i++){
-                	 String _fn =  "case_def/" + fl[i];
-                	 String _fo = "data/TLBO_F/tlbo_f"+j+"/TLBO_F"+fl[i]+".txt";
-                	 TLBO_F_algorithm(_fn,_fo);
-                }
-    			}
-                System.out.println(fl.length +"个案例教学优化果蝇算法计算完成"); 
-                return;
+    				 String dic = "data/TLBO_F/tlbo_f"+j;
+    				 File f=new File(dic);
+                	 if(f.exists()) {
+                		 f.delete();
+                	 }
+                	 f.mkdirs();
+	                for(int i = 0; i<fl.length; i++){
+	                	 String _fn =  "case_def/" + fl[i];
+	                	 String _fo = "data/TLBO_F/tlbo_f"+j+"/TLBO_F"+fl[i]+".txt";
+	                	 TLBO_F_algorithm(_fn,_fo);
+	                }
+	    			}
+	                System.out.println(fl.length +"个案例教学优化果蝇算法计算完成"); 
+	                return;
     		}
 
         }else{

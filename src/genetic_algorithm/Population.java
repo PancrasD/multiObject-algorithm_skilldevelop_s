@@ -166,6 +166,7 @@ public class Population {
 		for(int i=0; i<TLBO.populationSize; i++){
 			Individual result = this.getPopulation()[i];
 			if(result.getTeacher()){
+				//引入强化次数
 				result.mutationPopulation(TLBO.probp, 0);
 				result = result.binaryTournament(this.getPopulation()[i], result);
 			}
@@ -591,6 +592,21 @@ public class Population {
 
 	public void setProject(Case project) {
 		this.project = project;
+	}
+
+	public Population getOffSpring_TLBO_F() {
+		// TODO Auto-generated method stub
+		Population OffSpring = new Population(TLBO.populationSize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Population teachers = selectTeachers();
+		//teacher时期
+		Population teacherPhase = crossTeachers(teachers);
+		//student时期
+		Population studentPhase = teacherPhase.crossStudents();
+		//reinforcement时期
+		OffSpring = studentPhase.reinforcement();
+
+		return OffSpring;
 	}
 	
 }

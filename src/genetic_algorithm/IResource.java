@@ -31,7 +31,6 @@ public class IResource {
 				this.skillTimetable.put(skillInfo[0], table);
 			}
 		}
-		
 		//
 		public HashMap<String, Double> getSkillsInfo(){
 			return skillsInfo;

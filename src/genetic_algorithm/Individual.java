@@ -454,7 +454,6 @@ public class Individual {
 
 		return ;
 	}
-	
 	public void learnObjCompute() {
 		List<Integer> resourceList = new ArrayList<Integer>();
 		List<Integer> taskList = this.chromosome.get(0);
@@ -474,7 +473,7 @@ public class Individual {
 			int resourceid = list.get(B);
 			resourceList.add( resourceid );
 			
-			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res);
+			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res);//动态计算
 		}
 		this.chromosomeDNA.add(_list2);
 		this.chromosome.add(resourceList);
@@ -527,7 +526,7 @@ public class Individual {
 		}
 		
 		//设置当前任务的开始时间及完成时间
-		taskslist.get(tid-1).setstarttime(endtime +1,qinit);
+		taskslist.get(tid-1).setstarttime(endtime,qinit);//间隔1可以取消
 		//更新当前任务资源的最后完工时间
 		endtime_res[rid-1] = taskslist.get(tid-1).finishTime;
 	}
@@ -572,7 +571,7 @@ public class Individual {
 		return false;
 	}
 	
-	//紧前调度
+	//紧前调度  是否可以左移调度 ？ 但是未将时间表排序判断
 	public boolean canInsert(IResource resource, ITask task){
 		@SuppressWarnings("rawtypes")
 		String skillType = task.getSkill().split(":")[0].trim();
@@ -580,12 +579,12 @@ public class Individual {
 		HashMap<String,HashMap<int[],Double>> timetable = resource.getSkillTimetable();
 		double skillLevel = Double.valueOf(task.getSkill().split(":")[1]);
 		//得到资源执行时间表
-		HashMap<int[],Double> skilltime = timetable.get(skillType);
+		HashMap<int[],Double> skilltime = timetable.get(skillType);//int[] 为什么迭代没问题
 		@SuppressWarnings("rawtypes")
 		Iterator timeline = skilltime.keySet().iterator();
 		int[] lasttime = (int[])timeline.next();
-
-		//遍历时间表
+        
+		//遍历时间表  +需要排序
 		while(timeline.hasNext()){
 			int[] time = (int[])timeline.next();
 			double rightskill = skilltime.get(lasttime);

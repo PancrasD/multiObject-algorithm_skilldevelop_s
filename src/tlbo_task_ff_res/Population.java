@@ -28,7 +28,6 @@ public class Population {
 		this.populationsize = populationSize;
 		this.project = project;
 		this.population = new Individual[populationSize];
-		System.out.println("进来了");
 		if (initial) {
 			for (int i = 0; i < populationSize; i++) {
 				Individual individual = new Individual(project);
@@ -606,7 +605,7 @@ public class Population {
 		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
 		Population teachers = selectTeachers();
 		//teacher时期
-		Population teacherPhase = crossTeachers(teachers);
+		Population teacherPhase = crossTeachers(teachers);//貌似有问题
 		//student时期
 		Population studentPhase = teacherPhase.crossStudents();
 		//reinforcement时期
