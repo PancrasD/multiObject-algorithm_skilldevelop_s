@@ -190,8 +190,8 @@ public class NumericalTest {
 			generationCount++;
 		}
 		//获取前两层的精英个体的操作序列 进行资源搜索 种群扩充 以增加最优种群的多样性
-		Population elite = Tools.getbestsolution(P,2,project);	
-		Population expandPop=elite.serchMoreSpaceByRes(TLBOF.s1);
+		//Population elite = Tools.getbestsolution(P,2,project);	
+		Population expandPop=P.serchMoreSpaceByRes(TLBOF.s1);
 		//从最后得到种群中获取最优解集
 		Population solutions = Tools.getbestsolution(expandPop,1, project);		
 		
