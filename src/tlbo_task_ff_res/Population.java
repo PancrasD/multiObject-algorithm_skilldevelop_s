@@ -1,6 +1,7 @@
 package tlbo_task_ff_res;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -172,7 +173,7 @@ public class Population {
 			Individual result = this.getPopulation()[i];
 			if(result.getTeacher()){
 				//引入强化次数
-				result.mutationPopulation(TLBO.probp, 0);
+				result.mutationPopulation(TLBOF.probp, 0);
 				result = result.binaryTournament(this.getPopulation()[i], result);
 			}
 			rein.setIndividual(i, result);
@@ -212,6 +213,7 @@ public class Population {
 			}
 			students.setIndividual(i, resultIndividual);
 		}
+		//融合筛选
 		return students;
 	}
 	
@@ -612,6 +614,26 @@ public class Population {
 		OffSpring = studentPhase.reinforcement();
 
 		return OffSpring;
+	}
+	/*
+	 * 通过一系列迭代过后已经获取到近最优的操作序列染色体部分，但是针对精英染色体对应的资源分配序列搜索不足，仅匹配了一条合适的资源序列染色体
+	 * 而限制了最终解的多样性，一条精英操作序列染色体可以匹配多种情形的资源序列 因此在最终针对此加强资源序列的搜索以加强解的多样性
+	 */
+	public Population serchMoreSpaceByRes(int s1) {
+		Individual[] indivs=this.getPopulation();
+		List<Individual> expands=new ArrayList<>();
+		expands.addAll(Arrays.asList(indivs));
+		for(int i=0;i<indivs.length;i++) {
+			Individual indiv=indivs[i];
+			Individual[] expand=indiv.Smell_basedSearch(s1, indiv.getChromosome(), indiv.getchromosomeDNA(), project);
+			expands.addAll(Arrays.asList(expand));
+		}
+		Individual[] population=new Individual[expands.size()];
+		for(int i=0;i<expands.size();i++) {
+			population[i]=expands.get(i);
+		}
+		Population pop=new Population(population,project);
+		return pop;
 	}
 	
 }

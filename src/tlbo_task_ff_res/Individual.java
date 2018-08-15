@@ -137,7 +137,7 @@ public class Individual {
 	
 
 	//»ùÓÚÆøÎ¶ËÑË÷
-	private Individual[] Smell_basedSearch(int s, List<List<Integer>> son_chromosome, List<List<Double>> son_chromosomeDNA, Case project) {
+	public Individual[] Smell_basedSearch(int s, List<List<Integer>> son_chromosome, List<List<Double>> son_chromosomeDNA, Case project) {
 		Individual[] smells=new Individual[s];
 		for(int i=0;i<s;i++) {
 			Individual son = new Individual(son_chromosome, son_chromosomeDNA, project);

@@ -65,7 +65,8 @@ public class NumericalTest {
     		}
     		if (args[0].trim().toLowerCase().equals("tf")){
     			for(int j = 0; j < 10; j++){
-    				 String dic = "data/TLBO_F/tlbo_f"+j;
+    				long time=System.currentTimeMillis();
+    				 String dic = "data/TLBO_F"+time+"/tlbo_f"+j;
     				 File f=new File(dic);
                 	 if(f.exists()) {
                 		 f.delete();
@@ -73,7 +74,7 @@ public class NumericalTest {
                 	 f.mkdirs();
 	                for(int i = 0; i<fl.length; i++){
 	                	 String _fn =  "case_def/" + fl[i];
-	                	 String _fo = "data/TLBO_F/tlbo_f"+j+"/TLBO_F"+fl[i]+".txt";
+	                	 String _fo = "data/TLBO_F"+time+"/tlbo_f"+j+"/TLBO_F"+fl[i]+".txt";
 	                	 TLBO_F_algorithm(_fn,_fo);
 	                }
 	    			}
@@ -106,7 +107,7 @@ public class NumericalTest {
 			generationCount++;
 		}
 		//从最后得到种群中获取最优解集
-		Population solutions = Tools.getbestsolution(P, project);		
+		Population solutions = Tools.getbestsolution(P,1, project);		
 		
 		 File f = new File(datafile);
 		 PrintStream ps = null;
@@ -145,7 +146,7 @@ public class NumericalTest {
 				generationCount++;
 			}
 			//从最后得到种群中获取最优解集
-			Population solutions = Tools.getbestsolution(P, project);
+			Population solutions = Tools.getbestsolution(P,1, project);
 			
 		    //输出最优解集
 			//Tools.printsolutions(solutions,startTime,datafile);		
@@ -182,14 +183,17 @@ public class NumericalTest {
 		int generationCount = 0;
 		//List<Integer> best=P.getPopulation().
        //循环迭代 算法指定的次数
-		while (generationCount < TLBO.maxGenerations ) {
+		while (generationCount < TLBOF.maxGenerations ) {
 
 			P = P.getOffSpring_TLBO_F();
 
 			generationCount++;
 		}
+		//获取前两层的精英个体的操作序列 进行资源搜索 种群扩充 以增加最优种群的多样性
+		Population elite = Tools.getbestsolution(P,2,project);	
+		Population expandPop=elite.serchMoreSpaceByRes(TLBOF.s1);
 		//从最后得到种群中获取最优解集
-		Population solutions = Tools.getbestsolution(P, project);		
+		Population solutions = Tools.getbestsolution(expandPop,1, project);		
 		
 		 File f = new File(datafile);
 		 PrintStream ps = null;
@@ -225,7 +229,7 @@ public class NumericalTest {
 				generationCount++;
 			}
 			//从最后得到种群中获取最优解集
-			Population solutions = Tools.getbestsolution(P, project);
+			Population solutions = Tools.getbestsolution(P,1, project);
 			
 	
 			 File f = new File(datafile);

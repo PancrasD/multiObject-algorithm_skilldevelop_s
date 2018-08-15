@@ -407,10 +407,10 @@ public class Tools {
 	 * @param m
 	 * @return
 	 */
-	public static Population getbestsolution(Population p,Case project) {
+	public static Population getbestsolution(Population p,int le,Case project) {
 		Population solutions;
 		// P种群进行非支配排序
-		List<List<Integer>> indivIndexRank = non_Dominated_Sort(p,1, project);
+		List<List<Integer>> indivIndexRank = non_Dominated_Sort(p,le, project);
 		if (indivIndexRank.get(0).size() != 0) {
 			// 算法求得的最优解集
 			solutions = new Population(indivIndexRank.get(0).size(),project);
