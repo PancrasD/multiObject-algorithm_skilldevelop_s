@@ -9,28 +9,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * ¶¨ÒåÒ»¸ö¹¤¾ßÀà£¬Ö÷Òª¹¦ÄÜÓĞ: 1.¼ÆËã¸÷paretoÇ°ÑØÖĞÃ¿¸ö½âµÄÓµ¼·¶È 2.·ÇÖ§ÅäÅÅĞò
+ * å®šä¹‰ä¸€ä¸ªå·¥å…·ç±»ï¼Œä¸»è¦åŠŸèƒ½æœ‰: 1.è®¡ç®—å„paretoå‰æ²¿ä¸­æ¯ä¸ªè§£çš„æ‹¥æŒ¤åº¦ 2.éæ”¯é…æ’åº
  * 
- * @author ĞÜ¿­ 2017Äê3ÔÂ28ÈÕ
+ * @author ç†Šå‡¯ 2017å¹´3æœˆ28æ—¥
  *
  */
 public class Tools {
 
 	/**
-	 * ¶ÔÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò£¬½«½â·Ö³É²»Í¬µÄ·ÇÖ§Åä¼¶ ´Ë´¦ÎªÁË±ãÓÚ´¦Àí£¬ÓÃ¸öÌåÔÚÖÖÈºÖĞµÄĞòÁĞºÅ½øĞĞÒ»ÏµÁĞ¼ÆËã
-	 * Í¬Ê±¶ÔÃ¿Ò»µÈ¼¶µÄ¸öÌå£¬¼ÆËãÆäÔÚ¸ÃµÈ¼¶ÖĞµÄÓµ¼·¶ÈÖµ¡£
+	 * å¯¹ç§ç¾¤è¿›è¡Œéæ”¯é…æ’åºï¼Œå°†è§£åˆ†æˆä¸åŒçš„éæ”¯é…çº§ æ­¤å¤„ä¸ºäº†ä¾¿äºå¤„ç†ï¼Œç”¨ä¸ªä½“åœ¨ç§ç¾¤ä¸­çš„åºåˆ—å·è¿›è¡Œä¸€ç³»åˆ—è®¡ç®—
+	 * åŒæ—¶å¯¹æ¯ä¸€ç­‰çº§çš„ä¸ªä½“ï¼Œè®¡ç®—å…¶åœ¨è¯¥ç­‰çº§ä¸­çš„æ‹¥æŒ¤åº¦å€¼ã€‚
 	 * @param population
-	 *            ÖÖÈº
-	 * @return ·µ»ØÖÖÈº·Ö³É²»Í¬·ÇÖ§ÅäµÈ¼¶ºó£¬Ã¿¸ö¸öÌåÔÚ¶ÔÓ¦ÖÖÈºÖĞĞòÁĞºÅ¼¯ºÏ
+	 *            ç§ç¾¤
+	 * @return è¿”å›ç§ç¾¤åˆ†æˆä¸åŒéæ”¯é…ç­‰çº§åï¼Œæ¯ä¸ªä¸ªä½“åœ¨å¯¹åº”ç§ç¾¤ä¸­åºåˆ—å·é›†åˆ
 	 */
 	
 	public static List<List<Integer>> setRankAndCrowD (Population population,Case project) {
 		int populationSize = population.size();
 		Individual[] individuals = population.getPopulation();
 
-		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // °´·ÇÖ§ÅäµÈ¼¶ÅÅĞòºó£¬¸÷¸öÌåÔÚÖÖÈºÖĞ¶ÔÓ¦µÄĞòÁĞºÅµÄ¼¯ºÏ
-		// Ã¿¸ö½â¶¼¿ÉÒÔ·Ö³ÉÁ½¸öÊµÌå²¿·Ö:1¡¢Ö§Åä¸Ã½âµÄÆäËû½âµÄÊıÁ¿np;2¡¢±»¸Ã½âÖ§ÅäµÄ½â¼¯ºÏSp
-		List<List<Integer>> spList = new ArrayList<List<Integer>>();// ´æ´¢µÄÊÇ¸öÌåÔÚÖÖÈºÖĞµÄĞòÁĞºÅ
+		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // æŒ‰éæ”¯é…ç­‰çº§æ’åºåï¼Œå„ä¸ªä½“åœ¨ç§ç¾¤ä¸­å¯¹åº”çš„åºåˆ—å·çš„é›†åˆ
+		// æ¯ä¸ªè§£éƒ½å¯ä»¥åˆ†æˆä¸¤ä¸ªå®ä½“éƒ¨åˆ†:1ã€æ”¯é…è¯¥è§£çš„å…¶ä»–è§£çš„æ•°é‡np;2ã€è¢«è¯¥è§£æ”¯é…çš„è§£é›†åˆSp
+		List<List<Integer>> spList = new ArrayList<List<Integer>>();// å­˜å‚¨çš„æ˜¯ä¸ªä½“åœ¨ç§ç¾¤ä¸­çš„åºåˆ—å·
 		for (int i = 0; i < populationSize; i++) {
 			spList.add(new ArrayList<Integer>());
 		}
@@ -39,48 +39,48 @@ public class Tools {
 			for (int j = i+1; j < populationSize; j++) {
 
 				int flag=Dominated(individuals[i], individuals[j],project);
-				if (flag == 1) { // Ç°ÕßÖ§ÅäºóÕß
-					spList.get(i).add(j); // ½«¸öÌåj¼ÓÈë¸öÌåiµÄÖ§Åä¸öÌå¶ÓÁĞ
-					np[j]++;  // Ö§Åä¸öÌåjµÄ¸öÌåÊı+1
+				if (flag == 1) { // å‰è€…æ”¯é…åè€…
+					spList.get(i).add(j); // å°†ä¸ªä½“jåŠ å…¥ä¸ªä½“içš„æ”¯é…ä¸ªä½“é˜Ÿåˆ—
+					np[j]++;  // æ”¯é…ä¸ªä½“jçš„ä¸ªä½“æ•°+1
 				}
-				if (flag == 2) { // ºóÕßÖ§ÅäÇ°Õß
+				if (flag == 2) { // åè€…æ”¯é…å‰è€…
 					spList.get(j).add(i);
 					np[i]++;
 				}
 			}
 		}
-		// ¶¨ÒåÒ»¸ö¼¯ºÏ£¬ÓÃÀ´´æ´¢Ç°ÃæÒÑ¾­ÅÅºÃµÈ¼¶µÄ¸öÌåÔÚÖÖÈºµÄĞòÁĞºÅ
+		// å®šä¹‰ä¸€ä¸ªé›†åˆï¼Œç”¨æ¥å­˜å‚¨å‰é¢å·²ç»æ’å¥½ç­‰çº§çš„ä¸ªä½“åœ¨ç§ç¾¤çš„åºåˆ—å·
 		int num = 0;
 		int Rank =0;
 		while (num < populationSize) {
-			List<Integer> FRank = new ArrayList<Integer>(); // FRankÊÇÖÖÈºÖĞ£¬·ÇÖ§ÅäµÄ²»Í¬µÈ¼¶,ÈçF1£¬F2...
-			List<Integer> FRank2 = new ArrayList<Integer>();  //°´Óµ¼·¶ÈÅÅĞòºóµÄ¸öÌåË÷Òı¼¯
+			List<Integer> FRank = new ArrayList<Integer>(); // FRankæ˜¯ç§ç¾¤ä¸­ï¼Œéæ”¯é…çš„ä¸åŒç­‰çº§,å¦‚F1ï¼ŒF2...
+			List<Integer> FRank2 = new ArrayList<Integer>();  //æŒ‰æ‹¥æŒ¤åº¦æ’åºåçš„ä¸ªä½“ç´¢å¼•é›†
 			for (int i = 0; i < populationSize; i++) {
 				if (np[i] == 0) {
-					FRank.add(i); //½«ËùÓĞÃ»ÓĞ±»ÈÎºÎÆäËû¸öÌåÖ§ÅäµÄ¸öÌå¼ÓÈëµ½²ã¼¶
+					FRank.add(i); //å°†æ‰€æœ‰æ²¡æœ‰è¢«ä»»ä½•å…¶ä»–ä¸ªä½“æ”¯é…çš„ä¸ªä½“åŠ å…¥åˆ°å±‚çº§
 					individuals[i].setNon_dominatedRank(Rank);
-					np[i] = -1; //±ê¼Ç¸öÌåÒÑ´¦Àí
-					num ++;  //ÒÑ´¦ÀíµÄ¸öÌåÊıÁ¿¼ÆÊı£¬µ±ÒÑ´¦Àí¸öÌå¸öÊı´ïµ½ÖÖÈºÈËÊıÉÏÏß¼´¿ÉÖÕÖ¹´¦Àí
+					np[i] = -1; //æ ‡è®°ä¸ªä½“å·²å¤„ç†
+					num ++;  //å·²å¤„ç†çš„ä¸ªä½“æ•°é‡è®¡æ•°ï¼Œå½“å·²å¤„ç†ä¸ªä½“ä¸ªæ•°è¾¾åˆ°ç§ç¾¤äººæ•°ä¸Šçº¿å³å¯ç»ˆæ­¢å¤„ç†
 				}
 			}
-			//±»·Ö²ãµÄ¸öÌåËùÖ§ÅäµÄ¸öÌåµÄ±»Ö§Åä¸öÌåÊıÁ¿¼õ1
+			//è¢«åˆ†å±‚çš„ä¸ªä½“æ‰€æ”¯é…çš„ä¸ªä½“çš„è¢«æ”¯é…ä¸ªä½“æ•°é‡å‡1
 			Population FP = new Population(FRank.size(),project);
 			for (int i = 0; i < FRank.size(); i++) {
-				//±»·Ö²ãµÄ¸öÌåËùÖ§ÅäµÄ¸öÌåµÄ±»Ö§Åä¸öÌåÊıÁ¿¼õ1
+				//è¢«åˆ†å±‚çš„ä¸ªä½“æ‰€æ”¯é…çš„ä¸ªä½“çš„è¢«æ”¯é…ä¸ªä½“æ•°é‡å‡1
 				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
 					np[spList.get(FRank.get(i)).get(j)]--;
 				}
-				//²úÉúµ±Ç°²ãµÄÖÖÈº
+				//äº§ç”Ÿå½“å‰å±‚çš„ç§ç¾¤
 				FP.setIndividual(i, individuals[FRank.get(i)]);
 			}
 			
-			setcorwd(FP,project);//Îªµ±Ç°ÖÖÈºÖĞµÄ¸öÌå¼ÆËã²¢ÉèÖÃÓµ¼·¶ÈÖµ¡£
+			setcorwd(FP,project);//ä¸ºå½“å‰ç§ç¾¤ä¸­çš„ä¸ªä½“è®¡ç®—å¹¶è®¾ç½®æ‹¥æŒ¤åº¦å€¼ã€‚
 			
 			List<Integer> ind = sortBycrowd(FP);
 			for (int i = 0; i <FP.size();i++){
 				FRank2.add(FRank.get(ind.get(i)));
 			}
-			//¶Ôµ±Ç°²ãµÄ¸öÌå°´Óµ¼·¶ÈÅÅĞò
+			//å¯¹å½“å‰å±‚çš„ä¸ªä½“æŒ‰æ‹¥æŒ¤åº¦æ’åº
 			indivIndexRank.add(FRank2);
 			Rank ++;
 			
@@ -90,7 +90,7 @@ public class Tools {
 
 	
 	public static void setcorwd(Population fp,Case project){
-		//¸ÃÖ§Åä²ã¸öÌåµÄÄ¿±êº¯Êı¼¯ºÏ
+		//è¯¥æ”¯é…å±‚ä¸ªä½“çš„ç›®æ ‡å‡½æ•°é›†åˆ
 		//List<double[]> objList=fp.populationObjCompute(fp.getPopulation(),project);
 		Map<Integer,double[]> indexAndObj=new HashMap<>();
 		for(int k=0;k<fp.size();k++){
@@ -107,21 +107,21 @@ public class Tools {
 	
 
 	/**
-	 * ¶ÔÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò£¬½«½â·Ö³É²»Í¬µÄ·ÇÖ§Åä¼¶ ´Ë´¦ÎªÁË±ãÓÚ´¦Àí£¬ÓÃ¸öÌåÔÚÖÖÈºÖĞµÄĞòÁĞºÅ½øĞĞÒ»ÏµÁĞ¼ÆËã
+	 * å¯¹ç§ç¾¤è¿›è¡Œéæ”¯é…æ’åºï¼Œå°†è§£åˆ†æˆä¸åŒçš„éæ”¯é…çº§ æ­¤å¤„ä¸ºäº†ä¾¿äºå¤„ç†ï¼Œç”¨ä¸ªä½“åœ¨ç§ç¾¤ä¸­çš„åºåˆ—å·è¿›è¡Œä¸€ç³»åˆ—è®¡ç®—
 	 * 
 	 * @param population
-	 *            ÖÖÈº
-	 *        level  ¼ÆËã·ÇÖ§ÅäÅÅĞòµÄ×î´ó²ã¼¶£¬0£¬¼ÆËãËùÓĞ²ã£¬1£¬¼ÆËãµÚ1²ã¡£
-	 * @return ·µ»ØÖÖÈº·Ö³É²»Í¬·ÇÖ§ÅäµÈ¼¶ºó£¬Ã¿¸ö¸öÌåÔÚ¶ÔÓ¦ÖÖÈºÖĞĞòÁĞºÅ¼¯ºÏ
+	 *            ç§ç¾¤
+	 *        level  è®¡ç®—éæ”¯é…æ’åºçš„æœ€å¤§å±‚çº§ï¼Œ0ï¼Œè®¡ç®—æ‰€æœ‰å±‚ï¼Œ1ï¼Œè®¡ç®—ç¬¬1å±‚ã€‚
+	 * @return è¿”å›ç§ç¾¤åˆ†æˆä¸åŒéæ”¯é…ç­‰çº§åï¼Œæ¯ä¸ªä¸ªä½“åœ¨å¯¹åº”ç§ç¾¤ä¸­åºåˆ—å·é›†åˆ
 	 */
 	
 		public static List<List<Integer>> non_Dominated_Sort(Population population,int level,Case project) {
 		int populationSize = population.size();
 		Individual[] individuals = population.getPopulation();
 
-		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // °´·ÇÖ§ÅäµÈ¼¶ÅÅĞòºó£¬¸÷¸öÌåÔÚÖÖÈºÖĞ¶ÔÓ¦µÄĞòÁĞºÅµÄ¼¯ºÏ
-		// Ã¿¸ö½â¶¼¿ÉÒÔ·Ö³ÉÁ½¸öÊµÌå²¿·Ö:1¡¢Ö§Åä¸Ã½âµÄÆäËû½âµÄÊıÁ¿np;2¡¢±»¸Ã½âÖ§ÅäµÄ½â¼¯ºÏSp
-		List<List<Integer>> spList = new ArrayList<List<Integer>>();// ´æ´¢µÄÊÇ¸öÌåÔÚÖÖÈºÖĞµÄĞòÁĞºÅ
+		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // æŒ‰éæ”¯é…ç­‰çº§æ’åºåï¼Œå„ä¸ªä½“åœ¨ç§ç¾¤ä¸­å¯¹åº”çš„åºåˆ—å·çš„é›†åˆ
+		// æ¯ä¸ªè§£éƒ½å¯ä»¥åˆ†æˆä¸¤ä¸ªå®ä½“éƒ¨åˆ†:1ã€æ”¯é…è¯¥è§£çš„å…¶ä»–è§£çš„æ•°é‡np;2ã€è¢«è¯¥è§£æ”¯é…çš„è§£é›†åˆSp
+		List<List<Integer>> spList = new ArrayList<List<Integer>>();// å­˜å‚¨çš„æ˜¯ä¸ªä½“åœ¨ç§ç¾¤ä¸­çš„åºåˆ—å·
 		for (int i = 0; i < populationSize; i++) {
 			spList.add(new ArrayList<Integer>());
 		}
@@ -130,30 +130,30 @@ public class Tools {
 			for (int j = i+1; j < populationSize; j++) {
 
 				int flag=Dominated(individuals[i], individuals[j],project);
-				if (flag == 1) { // Ç°ÕßÖ§ÅäºóÕß
-					spList.get(i).add(j); // ½«¸öÌåj¼ÓÈë¸öÌåiµÄÖ§Åä¸öÌå¶ÓÁĞ
-					np[j]++;  // Ö§Åä¸öÌåjµÄ¸öÌåÊı+1
+				if (flag == 1) { // å‰è€…æ”¯é…åè€…
+					spList.get(i).add(j); // å°†ä¸ªä½“jåŠ å…¥ä¸ªä½“içš„æ”¯é…ä¸ªä½“é˜Ÿåˆ—
+					np[j]++;  // æ”¯é…ä¸ªä½“jçš„ä¸ªä½“æ•°+1
 				}
-				if (flag == 2) { // ºóÕßÖ§ÅäÇ°Õß
+				if (flag == 2) { // åè€…æ”¯é…å‰è€…
 					spList.get(j).add(i);
 					np[i]++;
 				}
 			}
 		}
-		// ¶¨ÒåÒ»¸ö¼¯ºÏ£¬ÓÃÀ´´æ´¢Ç°ÃæÒÑ¾­ÅÅºÃµÈ¼¶µÄ¸öÌåÔÚÖÖÈºµÄĞòÁĞºÅ
+		// å®šä¹‰ä¸€ä¸ªé›†åˆï¼Œç”¨æ¥å­˜å‚¨å‰é¢å·²ç»æ’å¥½ç­‰çº§çš„ä¸ªä½“åœ¨ç§ç¾¤çš„åºåˆ—å·
 		int num = 0;
 		int Rank =0;
 		while (num < populationSize) {
-			List<Integer> FRank = new ArrayList<Integer>(); // FRankÊÇÖÖÈºÖĞ£¬·ÇÖ§ÅäµÄ²»Í¬µÈ¼¶,ÈçF1£¬F2...
+			List<Integer> FRank = new ArrayList<Integer>(); // FRankæ˜¯ç§ç¾¤ä¸­ï¼Œéæ”¯é…çš„ä¸åŒç­‰çº§,å¦‚F1ï¼ŒF2...
 			for (int i = 0; i < populationSize; i++) {
 				if (np[i] == 0) {
-					FRank.add(i); //½«ËùÓĞÃ»ÓĞ±»ÈÎºÎÆäËû¸öÌåÖ§ÅäµÄ¸öÌå¼ÓÈëµ½²ã¼¶
+					FRank.add(i); //å°†æ‰€æœ‰æ²¡æœ‰è¢«ä»»ä½•å…¶ä»–ä¸ªä½“æ”¯é…çš„ä¸ªä½“åŠ å…¥åˆ°å±‚çº§
 					individuals[i].setNon_dominatedRank(Rank);
-					np[i] = -1; //±ê¼Ç¸öÌåÒÑ´¦Àí
-					num ++;  //ÒÑ´¦ÀíµÄ¸öÌåÊıÁ¿¼ÆÊı£¬µ±ÒÑ´¦Àí¸öÌå¸öÊı´ïµ½ÖÖÈºÈËÊıÉÏÏß¼´¿ÉÖÕÖ¹´¦Àí
+					np[i] = -1; //æ ‡è®°ä¸ªä½“å·²å¤„ç†
+					num ++;  //å·²å¤„ç†çš„ä¸ªä½“æ•°é‡è®¡æ•°ï¼Œå½“å·²å¤„ç†ä¸ªä½“ä¸ªæ•°è¾¾åˆ°ç§ç¾¤äººæ•°ä¸Šçº¿å³å¯ç»ˆæ­¢å¤„ç†
 				}
 			}
-			//±»·Ö²ãµÄ¸öÌåËùÖ§ÅäµÄ¸öÌåµÄ±»Ö§Åä¸öÌåÊıÁ¿¼õ1
+			//è¢«åˆ†å±‚çš„ä¸ªä½“æ‰€æ”¯é…çš„ä¸ªä½“çš„è¢«æ”¯é…ä¸ªä½“æ•°é‡å‡1
 			for (int i = 0; i < FRank.size(); i++) {
 				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
 					np[spList.get(FRank.get(i)).get(j)]--;
@@ -174,8 +174,8 @@ public class Tools {
 
 	
 	/**
-	 * Á½¸ö¸öÌåÖ®¼äÊÇ·ñ´æÔÚÖ§Åä¹ØÏµ
-	 * flag=1´ú±íindividual1Ö§Åäindividual2£»flag=2±íÊ¾individual2Ö§Åäindividual1£»flag=0±íÊ¾Á½ÕßÖ®¼äÃ»ÓĞÖ§Åä¹ØÏµ
+	 * ä¸¤ä¸ªä¸ªä½“ä¹‹é—´æ˜¯å¦å­˜åœ¨æ”¯é…å…³ç³»
+	 * flag=1ä»£è¡¨individual1æ”¯é…individual2ï¼›flag=2è¡¨ç¤ºindividual2æ”¯é…individual1ï¼›flag=0è¡¨ç¤ºä¸¤è€…ä¹‹é—´æ²¡æœ‰æ”¯é…å…³ç³»
 	 * 
 	 * @param individual1
 	 * @param individual2
@@ -185,7 +185,7 @@ public class Tools {
 		int flag, n, k;
 		flag =  n = k = 0;
 
-		//¸öÌåÄ¿±êº¯ÊıÖµ
+		//ä¸ªä½“ç›®æ ‡å‡½æ•°å€¼
 		double[] obj1=individual1.getObj();
 		double[] obj2=individual2.getObj();
 		
@@ -209,23 +209,23 @@ public class Tools {
 	
 	
 	/**
-	 * ¼ÆËãparetoÇ°ÑØÖĞÃ¿¸ö½âµÄÓµ¼·¶È£¬Ã¿¸öparetoÇ°ÑØµÄµÚÒ»¸öºÍ×îºóÒ»¸ö½âµÄÓµ¼·¶È¶¼ÎªÎŞÇî´ó£¬±ãÓÚ¼ÆËã£¬ÓÃ1000±íÊ¾
+	 * è®¡ç®—paretoå‰æ²¿ä¸­æ¯ä¸ªè§£çš„æ‹¥æŒ¤åº¦ï¼Œæ¯ä¸ªparetoå‰æ²¿çš„ç¬¬ä¸€ä¸ªå’Œæœ€åä¸€ä¸ªè§£çš„æ‹¥æŒ¤åº¦éƒ½ä¸ºæ— ç©·å¤§ï¼Œä¾¿äºè®¡ç®—ï¼Œç”¨1000è¡¨ç¤º
 	 * 
 	 * @param indexAndObj
-	 *            paretoÇ°ÑØµÄ¸öÌåÔÚÖÖÈºµÄË÷ÒıÖµÓëÄ¿±êº¯ÊıµÄMap¼¯ºÏ
-	 * @return pareto Ç°ÑØµÄ¸öÌåÔÚÖÖÈºµÄË÷ÒıÖµºÍ¸öÌåÓµ¼·¶ÈÊı×éµÄMap¼¯ºÏ
+	 *            paretoå‰æ²¿çš„ä¸ªä½“åœ¨ç§ç¾¤çš„ç´¢å¼•å€¼ä¸ç›®æ ‡å‡½æ•°çš„Mapé›†åˆ
+	 * @return pareto å‰æ²¿çš„ä¸ªä½“åœ¨ç§ç¾¤çš„ç´¢å¼•å€¼å’Œä¸ªä½“æ‹¥æŒ¤åº¦æ•°ç»„çš„Mapé›†åˆ
 	 */
 	public static Map<Integer, Double> crowdingCompute(Map<Integer, double[]> indexAndObj) {
 		Map<Integer, Double> crowMap = new HashMap<>();
 
-		double[] crowding = new double[indexAndObj.size()]; // Óµ¼·¶È¾àÀëÊı×é
+		double[] crowding = new double[indexAndObj.size()]; // æ‹¥æŒ¤åº¦è·ç¦»æ•°ç»„
 		List<Map.Entry<Integer, double[]>> index_objList = new ArrayList<>(indexAndObj.entrySet());
 
 		int L = index_objList.size();
-		sortByObj(index_objList, 0);//°´¹¤ÆÚÉıĞòÅÅÁĞ
+		sortByObj(index_objList, 0);//æŒ‰å·¥æœŸå‡åºæ’åˆ—
 		crowding[0] = 1000;
 		crowding[L - 1] = 1000;
-		for (int i = 0; i < index_objList.get(0).getValue().length; i++) { // i±íÊ¾µÚ¼¸¸öÄ¿±êº¯Êı
+		for (int i = 0; i < index_objList.get(0).getValue().length; i++) { // iè¡¨ç¤ºç¬¬å‡ ä¸ªç›®æ ‡å‡½æ•°
 			for (int j = 1; j < L - 1; j++) {
 				crowding[j] = crowding[j]
 						+ (index_objList.get(j + 1).getValue()[i] - index_objList.get(j - 1).getValue()[i])
@@ -243,16 +243,16 @@ public class Tools {
 
 	
 	/**
-	 * ¸ù¾İÖ¸¶¨µÄÄ¿±êº¯ÊıÖµ´óĞ¡£¬°´ÉıĞòÅÅÁĞ¸÷½â
+	 * æ ¹æ®æŒ‡å®šçš„ç›®æ ‡å‡½æ•°å€¼å¤§å°ï¼ŒæŒ‰å‡åºæ’åˆ—å„è§£
 	 * 
 	 * @param crowMap
-	 *            ¸öÌå¼¯ºÏ
-	 * @return    ÅÅºÃĞòµÄ¸öÌå¼¯ºÏ
+	 *            ä¸ªä½“é›†åˆ
+	 * @return    æ’å¥½åºçš„ä¸ªä½“é›†åˆ
 	 */
 	public static List<Map.Entry<Integer, Double>>  sortBycrowd(Map<Integer, Double> crowMap) {
 		
 	List<Map.Entry<Integer, Double>> crowSort = new ArrayList<>(crowMap.entrySet());
-	//¸ù¾İÓµ¼·¶È½øĞĞÅÅĞò
+	//æ ¹æ®æ‹¥æŒ¤åº¦è¿›è¡Œæ’åº
 		Collections.sort(crowSort, new Comparator<Map.Entry<Integer, Double>>() {
 
 			@Override
@@ -273,12 +273,12 @@ public class Tools {
 	}
 
 	/**
-	 * ¸ù¾İÖ¸¶¨µÄÄ¿±êº¯ÊıÖµ´óĞ¡£¬°´ÉıĞòÅÅÁĞ¸÷½â
+	 * æ ¹æ®æŒ‡å®šçš„ç›®æ ‡å‡½æ•°å€¼å¤§å°ï¼ŒæŒ‰å‡åºæ’åˆ—å„è§£
 	 * 
 	 * @param index_objList
-	 *            ¸öÌåÔÚÈ«¾ÖÖÖÈºÖĞµÄË÷ÒıÖµ¼¯ºÏ
+	 *            ä¸ªä½“åœ¨å…¨å±€ç§ç¾¤ä¸­çš„ç´¢å¼•å€¼é›†åˆ
 	 * @param FP
-	 *            ¸öÌå×é³ÉµÄ¾Ö²¿ÖÖÈº¼¯ºÏ
+	 *            ä¸ªä½“ç»„æˆçš„å±€éƒ¨ç§ç¾¤é›†åˆ
 	 * @return
 	 */
 	public static List<Integer>  sortBycrowd(Population FP) {
@@ -288,7 +288,7 @@ public class Tools {
 			crowMap.put(i, FP.getPopulation()[i].getCrowDistance());
 		}
 		List<Map.Entry<Integer, Double>> crowSort = new ArrayList<>(crowMap.entrySet());
-	//¸ù¾İÓµ¼·¶È½øĞĞÅÅĞò
+	//æ ¹æ®æ‹¥æŒ¤åº¦è¿›è¡Œæ’åº
 		Collections.sort(crowSort, new Comparator<Map.Entry<Integer, Double>>() {
 
 			@Override
@@ -304,7 +304,7 @@ public class Tools {
 			}
 
 		});
-		//½«ÅÅºÃĞòµÄ¸öÌåË÷ÒıºÅ¼ÓÈëµ½Ë÷ÒıÁĞ±íÖĞ£¬´ËË÷ÒıºÅÊÇ¾Ö²¿ÖÖÈºÖĞµÄË÷ÒıºÅ
+		//å°†æ’å¥½åºçš„ä¸ªä½“ç´¢å¼•å·åŠ å…¥åˆ°ç´¢å¼•åˆ—è¡¨ä¸­ï¼Œæ­¤ç´¢å¼•å·æ˜¯å±€éƒ¨ç§ç¾¤ä¸­çš„ç´¢å¼•å·
 		for (int i = 0; i <crowSort.size();i++){
 			indexlist.add(crowSort.get(i).getKey());
 			}
@@ -313,18 +313,18 @@ public class Tools {
 	
 	
 	/**
-	 * ¸ù¾İÖ¸¶¨µÄÄ¿±êº¯ÊıÖµ´óĞ¡£¬°´ÉıĞòÅÅÁĞ¸÷½â
+	 * æ ¹æ®æŒ‡å®šçš„ç›®æ ‡å‡½æ•°å€¼å¤§å°ï¼ŒæŒ‰å‡åºæ’åˆ—å„è§£
 	 * 
 	 * @param index_objList
-	 *            ¸öÌåÔÚÖÖÈºÖĞµÄË÷ÒıÖµºÍ¸öÌåÄ¿±êº¯ÊıÊı×éµÄList¼¯ºÏ
+	 *            ä¸ªä½“åœ¨ç§ç¾¤ä¸­çš„ç´¢å¼•å€¼å’Œä¸ªä½“ç›®æ ‡å‡½æ•°æ•°ç»„çš„Listé›†åˆ
 	 * @param m
-	 *            Ö¸¶¨±È½Ï¸öÌåÄ¿±êº¯ÊıÊı×éµÄµÚ¼¸¸öº¯Êı
+	 *            æŒ‡å®šæ¯”è¾ƒä¸ªä½“ç›®æ ‡å‡½æ•°æ•°ç»„çš„ç¬¬å‡ ä¸ªå‡½æ•°
 	 * @return
 	 */
 	public static List<Map.Entry<Integer, double[]>> sortByObj(List<Map.Entry<Integer, double[]>> index_objList,
 			int m) {
 		// List<Map.Entry<Integer, double[]>> index_objList = new ArrayList<>();
-		// ÅÅĞò
+		// æ’åº
 		Collections.sort(index_objList, new Comparator<Map.Entry<Integer, double[]>>() {
 
 			@Override
@@ -375,7 +375,7 @@ public class Tools {
 		
 	
 	/**
-	 * Ñ¡ÔñÖÖÈºÖĞ¸öÌåÖ¸¶¨Ä¿±êº¯ÊıµÄ×î´óÖµ
+	 * é€‰æ‹©ç§ç¾¤ä¸­ä¸ªä½“æŒ‡å®šç›®æ ‡å‡½æ•°çš„æœ€å¤§å€¼
 	 * 
 	 * @param index_objList
 	 * @param m
@@ -388,7 +388,7 @@ public class Tools {
 	}
 
 	/**
-	 * Ñ¡ÔñÖÖÈºÖĞ¸öÌåÖ¸¶¨Ä¿±êº¯ÊıµÄ×î´óÖµ
+	 * é€‰æ‹©ç§ç¾¤ä¸­ä¸ªä½“æŒ‡å®šç›®æ ‡å‡½æ•°çš„æœ€å¤§å€¼
 	 * 
 	 * @param index_objList
 	 * @param m
@@ -401,7 +401,7 @@ public class Tools {
 	}
 
 	/**
-	 * Ñ¡ÔñÖÖÈºÖĞ¸öÌåÖ¸¶¨Ä¿±êº¯ÊıµÄ×î´óÖµ
+	 * é€‰æ‹©ç§ç¾¤ä¸­ä¸ªä½“æŒ‡å®šç›®æ ‡å‡½æ•°çš„æœ€å¤§å€¼
 	 * 
 	 * @param index_objList
 	 * @param m
@@ -409,10 +409,10 @@ public class Tools {
 	 */
 	public static Population getbestsolution(Population p,Case project) {
 		Population solutions;
-		// PÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò
+		// Pç§ç¾¤è¿›è¡Œéæ”¯é…æ’åº
 		List<List<Integer>> indivIndexRank = non_Dominated_Sort(p,1, project);
 		if (indivIndexRank.get(0).size() != 0) {
-			// Ëã·¨ÇóµÃµÄ×îÓÅ½â¼¯
+			// ç®—æ³•æ±‚å¾—çš„æœ€ä¼˜è§£é›†
 			solutions = new Population(indivIndexRank.get(0).size(),project);
 			for (int i = 0; i < indivIndexRank.get(0).size(); i++) {
 				solutions.setIndividual(i, p.getPopulation()[indivIndexRank.get(0).get(i)]);
@@ -428,7 +428,7 @@ public class Tools {
 	
 	
 	/**
-	 * Ñ¡ÔñÖÖÈºÖĞ¸öÌåÖ¸¶¨Ä¿±êº¯ÊıµÄ×î´óÖµ
+	 * é€‰æ‹©ç§ç¾¤ä¸­ä¸ªä½“æŒ‡å®šç›®æ ‡å‡½æ•°çš„æœ€å¤§å€¼
 	 * 
 	 * @param index_objList
 	 * @param m
@@ -439,26 +439,26 @@ public class Tools {
 			   
 			Individual[] bestIndividuals = solutions.getPopulation();
 
-			// ´æ´¢¸öÌåµÄÄ¿±êº¯Êı
+			// å­˜å‚¨ä¸ªä½“çš„ç›®æ ‡å‡½æ•°
 			List<double[]> betterObjs = new ArrayList<>();
 
-			// ±éÀúÊä³öÃ¿¸ö¸öÌå,²¢¸ñÊ½»¯Êä³öÈ¾É«Ìå½á¹¹ÒÔ¼°Ä¿±êº¯Êı
+			// éå†è¾“å‡ºæ¯ä¸ªä¸ªä½“,å¹¶æ ¼å¼åŒ–è¾“å‡ºæŸ“è‰²ä½“ç»“æ„ä»¥åŠç›®æ ‡å‡½æ•°
 			for (int i = 0; i < bestIndividuals.length; i++) {
-				//System.out.print("È¾É«Ìå½á¹¹Îª:\n" + bestIndividuals[i].getChromosome().get(0).toString());
+				//System.out.print("æŸ“è‰²ä½“ç»“æ„ä¸º:\n" + bestIndividuals[i].getChromosome().get(0).toString());
 
 
 				double[] obj = bestIndividuals[i].getObj();
 
 				betterObjs.add(obj);
-				System.out.println("ÏîÄ¿¹¤ÆÚÎª£º" + obj[0] + "£»ÏîÄ¿³É±¾Îª£º" + obj[1]);
+				System.out.println("é¡¹ç›®å·¥æœŸä¸ºï¼š" + obj[0] + "ï¼›é¡¹ç›®æˆæœ¬ä¸ºï¼š" + obj[1]);
 			}
 
-			// ĞÔÄÜÆÀ¼Û±ê×¼£ºMID¡¢SM¡¢DM¡¢SNS
-			// ¶ÔÓÚ100_10_65_15¶øÑÔ
+			// æ€§èƒ½è¯„ä»·æ ‡å‡†ï¼šMIDã€SMã€DMã€SNS
+			// å¯¹äº100_10_65_15è€Œè¨€
 			double best_f1 = 0;
 	     	double best_f2 = 0;
 
-			// ¶ÔÓÚ200_20_145_15¶øÑÔ
+			// å¯¹äº200_20_145_15è€Œè¨€
 			 //double best_f1=198;
 			 //double best_f2=143497;
 
@@ -466,7 +466,7 @@ public class Tools {
 			double DM = calDiversification(betterObjs);
 			//double SNS = calSNS(betterObjs, MID, best_f1, best_f2);
 			//double SM = calSpace_Metric(betterObjs);
-			// // Êä³ö±äÁ¿
+			// // è¾“å‡ºå˜é‡
 			//System.out.println("MID=" + MID);
 			//System.out.println("DM=" + DM);
 			//System.out.println("SNS=" + SNS);
@@ -474,27 +474,27 @@ public class Tools {
 			
 			
 
-			// Êä³ö±äÁ¿
+			// è¾“å‡ºå˜é‡
 
 			double MOCV = MID / DM;
-			System.out.println("Ö¸±êMOCV:"+MOCV);
-			/*System.out.println("Ö¸±êMID:"+MID);
-			System.out.println("Ö¸±êDM:"+DM);*/
+			System.out.println("æŒ‡æ ‡MOCV:"+MOCV);
+			/*System.out.println("æŒ‡æ ‡MID:"+MID);
+			System.out.println("æŒ‡æ ‡DM:"+DM);*/
 			//System.out.println(betterObjs.size());
 			
 		}
-		// Èç¹ûÃ»ÓĞ·ÇÖ§Åä½â
+		// å¦‚æœæ²¡æœ‰éæ”¯é…è§£
 		else {
-			System.out.println("¸ÃËã·¨ÎŞ·¨ÇóµÃ×îÓÅ½â");
+			System.out.println("è¯¥ç®—æ³•æ— æ³•æ±‚å¾—æœ€ä¼˜è§£");
 		}
 		long endTime = System.currentTimeMillis();
-		System.out.println("¹²¼ÆÓÃÊ±£º" + (endTime - startTime) / 1000 + "Ãë");
+		System.out.println("å…±è®¡ç”¨æ—¶ï¼š" + (endTime - startTime) / 1000 + "ç§’");
 
 	
 	}
 	
 	/**
-	 * ¼ÆËãMean Ideal Distance
+	 * è®¡ç®—Mean Ideal Distance
 	 * 
 	 * @param betterObjs
 	 * @return
@@ -523,7 +523,7 @@ public class Tools {
 	}
 
 	/**
-	 * ¼ÆËã Spread of non-dominated solutions ºâÁ¿Ëã·¨»ñµÃ½âµÄ¶àÑùĞÔ
+	 * è®¡ç®— Spread of non-dominated solutions è¡¡é‡ç®—æ³•è·å¾—è§£çš„å¤šæ ·æ€§
 	 * 
 	 * @param betterObjs
 	 * @param best_f1
@@ -551,14 +551,14 @@ public class Tools {
 	}
 
 	/**
-	 * ¼ÆËã Spacing Metric ºâÁ¿¾ùÔÈ·Ö²¼ÌØĞÔ
+	 * è®¡ç®— Spacing Metric è¡¡é‡å‡åŒ€åˆ†å¸ƒç‰¹æ€§
 	 * 
 	 * @param betterObjs
 	 * @return
 	 */
 	public static double calSpace_Metric(List<double[]> betterObjs) {
 		double SM = 0.0;
-		// ½«Ä¿±êÖµ°´ÕÕf1ÉıĞòÅÅĞò
+		// å°†ç›®æ ‡å€¼æŒ‰ç…§f1å‡åºæ’åº
 		sort(betterObjs, 0);
 		double sum = 0;
 		for (int i = 0; i < betterObjs.size() - 1; i++) {
@@ -577,7 +577,7 @@ public class Tools {
 	}
 
 	/**
-	 * ¼ÆËã Diversification Metric pareto½â¼¯µÄÀ©Õ¹ĞÔ
+	 * è®¡ç®— Diversification Metric paretoè§£é›†çš„æ‰©å±•æ€§
 	 * 
 	 * @param betterObjs
 	 * @return
@@ -588,6 +588,7 @@ public class Tools {
 		sort(betterObjs, 0);
 		double max_f1 = betterObjs.get(betterObjs.size() - 1)[0];
 		double min_f1 = betterObjs.get(0)[0];
+		//
 		double max_f2 = betterObjs.get(0)[1];
 		double min_f2 = betterObjs.get(betterObjs.size() - 1)[1];
 
@@ -599,7 +600,7 @@ public class Tools {
 	}
 
 	/**
-	 * ¸ù¾İÄ¿±êº¯Êı´óĞ¡½øĞĞÅÅĞò
+	 * æ ¹æ®ç›®æ ‡å‡½æ•°å¤§å°è¿›è¡Œæ’åº
 	 * 
 	 * @param objs
 	 * @param m
@@ -622,7 +623,7 @@ public class Tools {
 	}
 
 	/**
-	 * Ñ¡Ôñ×î´óÖµ
+	 * é€‰æ‹©æœ€å¤§å€¼
 	 * 
 	 * @param objs
 	 * @param m

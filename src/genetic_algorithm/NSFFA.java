@@ -3,13 +3,13 @@ package genetic_algorithm;
 
 
 public class NSFFA {
-	// ÖÖÈºÊıÁ¿£¬¼´¹ûÓ¬ÈºÌåÊıÁ¿
+	// ç§ç¾¤æ•°é‡ï¼Œå³æœè‡ç¾¤ä½“æ•°é‡
 	public static int NS = 300 ;
-	// Ã¿¸ö¸öÌåÉú³É×Ó´úÖÖÈºµÄ´óĞ¡
+	// æ¯ä¸ªä¸ªä½“ç”Ÿæˆå­ä»£ç§ç¾¤çš„å¤§å°
 	public static int S = 1;
-	// ÖªÊ¶¿â¸üĞÂµÄ¸ÅÂÊ
+	// çŸ¥è¯†åº“æ›´æ–°çš„æ¦‚ç‡
 	public static double alpha = 0.15;
-	// Ìá¹©¾­ÑéµÄ¹ûÓ¬ÊıÁ¿
+	// æä¾›ç»éªŒçš„æœè‡æ•°é‡
 	public static int NE = 7;
 	
 	public static int maxGenerations =250;

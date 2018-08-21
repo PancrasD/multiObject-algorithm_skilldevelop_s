@@ -1,20 +1,18 @@
 package genetic_algorithm;
-
-
 /**
- * ����һ����Դ�࣬�������ԣ�
- * ��ԴID��ÿСʱ��нˮ�����յļ���
- * @author �ܿ�
+ * 定义一个资源类，包含属性：
+ * 资源ID，每小时的薪水，掌握的技能
+ * @author 熊凯
  *
  */
 public class Resource {
-	//��ԴID
+	//资源ID
 	private int resourceID;
-	//Ա��ÿСʱ��нˮ
+	//员工每小时的薪水
 	private double salary;
-	//Ա�����յļ���
+	//员工掌握的技能
 	private String skils;
-	//��Դѧϰ����
+	//资源学习能力
 	private double learnbility;
 		
 	@SuppressWarnings("null")

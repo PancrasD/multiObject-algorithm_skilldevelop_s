@@ -13,7 +13,7 @@ public class ITask {
 	private String skillType;
 	private int skillLevel;
 	private List<Integer> predecessorIDs = new  ArrayList<>();
-	//ÈÎÎñ¿ÉÓÃµÄ×ÊÔ´
+	//ä»»åŠ¡å¯ç”¨çš„èµ„æº
 	private List<Integer> resourceIDs = new ArrayList<>();
 	
 	public ITask(Task task){

@@ -7,31 +7,31 @@ import java.util.List;
 
 
 public class Individual {
-	// ¸öÌåÈ¾É«ÌåµÄÎ¬Êı
+	// ä¸ªä½“æŸ“è‰²ä½“çš„ç»´æ•°
 	static final int chromosomeLayer = 2;
-	// Ã¿¸ö¸öÌåµÄÄ¿±êº¯Êı¸öÊı
+	// æ¯ä¸ªä¸ªä½“çš„ç›®æ ‡å‡½æ•°ä¸ªæ•°
 	static final int objNum = 2;
-	// ¸öÌåÖĞÈÎÎñ
+	// ä¸ªä½“ä¸­ä»»åŠ¡
 	private List<ITask> taskslist = new ArrayList<ITask>(); 
-	//¸öÌåÖĞ×ÊÔ´
+	//ä¸ªä½“ä¸­èµ„æº
 	private List<IResource> resourceslist = new ArrayList<IResource>();
-	// È¾É«Ìå
+	// æŸ“è‰²ä½“
 	private List<List<Integer>> chromosome = new ArrayList<List<Integer>>();
 	
-	// È¾É«ÌåËæ»úÊı
+	// æŸ“è‰²ä½“éšæœºæ•°
 	private List<List<Double>> chromosomeDNA = new ArrayList<List<Double>>();	
-	// Ä¿±êº¯Êı
+	// ç›®æ ‡å‡½æ•°
 	private double[] obj = new double[objNum];
 	private int maxtime = 0;
 	private double cost = 0.0;
-	/*//¼ÇÂ¼¼¼ÄÜÔ¾Ç¨´ÎÊı
+	/*//è®°å½•æŠ€èƒ½è·ƒè¿æ¬¡æ•°
 	private int jumpTimes = 0;
-	//¼ÇÂ¼ÊÜÓ°ÏìÈÎÎñÊıÁ¿
+	//è®°å½•å—å½±å“ä»»åŠ¡æ•°é‡
 	private int influenceTasks = 0;*/
 
-	// ¸öÌåÔÚÖÖÈºÖĞµÄ·ÇÖ§ÅäµÈ¼¶
+	// ä¸ªä½“åœ¨ç§ç¾¤ä¸­çš„éæ”¯é…ç­‰çº§
 	private int non_dominatedRank;
-	// ¸öÌåµÄÔÚ·ÇÖ§Åä²ãÖĞµÄÓµ¼·¶È
+	// ä¸ªä½“çš„åœ¨éæ”¯é…å±‚ä¸­çš„æ‹¥æŒ¤åº¦
 	private double crowDistance;
 	
 	private Case project;
@@ -40,26 +40,26 @@ public class Individual {
 
 		
 	public Individual(List<List<Integer>> _chromosome,List<List<Double>> _chromosomemDNA,Case project) {
-		// ´´½¨¸öÌåµÄÈ¾É«Ìå
+		// åˆ›å»ºä¸ªä½“çš„æŸ“è‰²ä½“
 		this.project = project;
 		settaskslist(project);
 		setResourcesList(project);
 		this.chromosome = _chromosome;
 		this.chromosomeDNA = _chromosomemDNA;
 
-		//¼ÆËã¸öÌåµÄÄ¿±êº¯ÊıÖµ£¬Êä³ö¼ÆËãÁËÆğÍ£Ê±¼äµÄÈÎÎñ¶ÔÏólist
+		//è®¡ç®—ä¸ªä½“çš„ç›®æ ‡å‡½æ•°å€¼ï¼Œè¾“å‡ºè®¡ç®—äº†èµ·åœæ—¶é—´çš„ä»»åŠ¡å¯¹è±¡list
 		learnObjCompute();		
 	}
 	
 	public Individual(List<List<Integer>> _chromosome,Case project) {
-		// ´´½¨¸öÌåµÄÈ¾É«Ìå
+		// åˆ›å»ºä¸ªä½“çš„æŸ“è‰²ä½“
 		this.project = project;
 		settaskslist(project);	
 		setResourcesList(project);
 		this.chromosome = _chromosome;
 		//this.chromosomeDNA = _chromosomemDNA;
 
-		//¼ÆËã¸öÌåµÄÄ¿±êº¯ÊıÖµ£¬Êä³ö¼ÆËãÁËÆğÍ£Ê±¼äµÄÈÎÎñ¶ÔÏólist
+		//è®¡ç®—ä¸ªä½“çš„ç›®æ ‡å‡½æ•°å€¼ï¼Œè¾“å‡ºè®¡ç®—äº†èµ·åœæ—¶é—´çš„ä»»åŠ¡å¯¹è±¡list
 		learnObjCompute();		
 	}
 		
@@ -68,12 +68,12 @@ public class Individual {
 		this.project = project;
 		settaskslist(project);
 		setResourcesList(project);
-		//Ëæ»ú²úÉúDNA¼°ÈÎÎñĞòÁĞ
+		//éšæœºäº§ç”ŸDNAåŠä»»åŠ¡åºåˆ—
 		deciphering( project);
-		//Ëæ»ú²úÉú×ÊÔ´ĞòÁĞ£¬¼ÆËãÄ¿±êº¯ÊıÖµ
+		//éšæœºäº§ç”Ÿèµ„æºåºåˆ—ï¼Œè®¡ç®—ç›®æ ‡å‡½æ•°å€¼
 		learnObjCompute();
 		
-		//¼ÆËã¸öÌåµÄÄ¿±êº¯ÊıÖµ£¬Êä³ö¼ÆËãÁËÆğÍ£Ê±¼äµÄÈÎÎñ¶ÔÏólist
+		//è®¡ç®—ä¸ªä½“çš„ç›®æ ‡å‡½æ•°å€¼ï¼Œè¾“å‡ºè®¡ç®—äº†èµ·åœæ—¶é—´çš„ä»»åŠ¡å¯¹è±¡list
 		/*objCompute(project);*/
 
 	}
@@ -92,7 +92,7 @@ public class Individual {
 		}
 	}
 	
-	//´ÓindivÖĞÌáÈ¡nums¸öĞòÁĞ
+	//ä»indivä¸­æå–numsä¸ªåºåˆ—
 	public void insert(List<Integer> _tasks, List<Double> _taskdna, int nums, Individual indiv){
 		int m = 0;
 		for(int n = 0; n < nums; n++){
@@ -110,7 +110,7 @@ public class Individual {
 		}
 	}
 	
-	//tlbo½»²æ
+	//tlboäº¤å‰
 	public Individual mating_tlbo(Individual husband) {
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
 		List<List<Double>> son_chromosomeDNA = new ArrayList<List<Double>>();
@@ -133,7 +133,7 @@ public class Individual {
 		return son;
 	}
 	
-	//½»ÅäÉú×Ó
+	//äº¤é…ç”Ÿå­
 	public Individual Mating(Individual husband, int crosspoint) {
 
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
@@ -172,7 +172,7 @@ public class Individual {
 		return son;
 	}
 	
-	//¸öÌå±äÒì
+	//ä¸ªä½“å˜å¼‚
 	public Individual mutationPopulation(double tMutationRate,double rMutationRate) {
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
 
@@ -202,8 +202,8 @@ public class Individual {
 				
 				Task t1 = project.getTasks().get(taskGene1 - 1);
 				Task t2 = project.getTasks().get(taskGene2 - 1);
-				if (!project.isPredecessor(t1, t2)) {//t1²»ÊÇt2µÄ½ôÇ°ÈÎÎñ
-					// ½»»»Á½¸öÎ»ÖÃÉÏµÄÈÎÎñ±àºÅÒÔ¼°×ÊÔ´±àºÅ
+				if (!project.isPredecessor(t1, t2)) {//t1ä¸æ˜¯t2çš„ç´§å‰ä»»åŠ¡
+					// äº¤æ¢ä¸¤ä¸ªä½ç½®ä¸Šçš„ä»»åŠ¡ç¼–å·ä»¥åŠèµ„æºç¼–å·
 					_tasks.set(geneIndex, taskGene2);
 					_tasks.set(geneIndex+1, taskGene1);
 					/*_resources.set(geneIndex, resourceGene2);
@@ -216,11 +216,11 @@ public class Individual {
 			}
 			
 			/*if (rMutationRate > Math.random()) {
-				// Ã¿¸öÈÎÎñ¿É¹©Ñ¡ÔñµÄ×ÊÔ´¼¯ºÏ
-				// ÈÎÎñID
+				// æ¯ä¸ªä»»åŠ¡å¯ä¾›é€‰æ‹©çš„èµ„æºé›†åˆ
+				// ä»»åŠ¡ID
 				int gene=_tasks.get(geneIndex);
 				List<Integer> capapleResource = project.getTasks().get(gene - 1).getresourceIDs();
-				// ÔÚ¿ÉĞĞ×ÊÔ´ÖĞ£¬Ëæ»úÑ¡ÔñÒ»ÖÖ
+				// åœ¨å¯è¡Œèµ„æºä¸­ï¼Œéšæœºé€‰æ‹©ä¸€ç§
 				double  randnum = Math.random();
 				_resourcesdna.set(geneIndex, randnum);
 				int r = (int) (randnum * capapleResource.size());
@@ -230,13 +230,13 @@ public class Individual {
 		son_chromosome.add(_tasks);
 		/*son_chromosome.add(_resources);*/
 		son_chromosomeDNA.add(_taskdna);
-		/*son_chromosomeDNA.add(_resourcesdna);*///£¡£¡£¡ÓĞÎóson_chromosomeDNA.add(_resourcesdna)
+		/*son_chromosomeDNA.add(_resourcesdna);*///ï¼ï¼ï¼æœ‰è¯¯son_chromosomeDNA.add(_resourcesdna)
 		Individual son = new Individual(son_chromosome,son_chromosomeDNA,project);	
 
 		return son;
 	}
 
-	// »ñÈ¡¸Ã¸öÌåµÄÈ¾É«Ìå½á¹¹(taskid)
+	// è·å–è¯¥ä¸ªä½“çš„æŸ“è‰²ä½“ç»“æ„(taskid)
 	public List<List<Integer>> getChromosome() {
 		return this.chromosome;
 	}
@@ -256,27 +256,27 @@ public class Individual {
 	}
 
 	
-	// ÉèÖÃÈ¾É«ÌåÈÎÎñĞòÁĞÖ¸¶¨Î»ÖÃµÄÈÎÎñ±àºÅ
+	// è®¾ç½®æŸ“è‰²ä½“ä»»åŠ¡åºåˆ—æŒ‡å®šä½ç½®çš„ä»»åŠ¡ç¼–å·
 	public void setTaskGene(int offset, int gene) {
 		this.chromosome.get(0).set(offset, gene);
 	}
 
-	// »ñÈ¡È¾É«ÌåÈÎÎñĞòÁĞÖ¸¶¨Î»ÖÃµÄÈÎÎñ±àºÅ
+	// è·å–æŸ“è‰²ä½“ä»»åŠ¡åºåˆ—æŒ‡å®šä½ç½®çš„ä»»åŠ¡ç¼–å·
 	public int getTaskGene(int offset) {
 		return this.chromosome.get(0).get(offset);
 	}
 
-	// ÉèÖÃÈ¾É«Ìå×ÊÔ´·ÖÅäĞòÁĞÖ¸¶¨Î»ÖÃµÄ×ÊÔ´±àºÅ
+	// è®¾ç½®æŸ“è‰²ä½“èµ„æºåˆ†é…åºåˆ—æŒ‡å®šä½ç½®çš„èµ„æºç¼–å·
 	public void setResourceGene(int offset, int gene) {
 		this.chromosome.get(1).set(offset, gene);
 	}
 
-	// »ñÈ¡È¾É«Ìå×ÊÔ´·ÖÅäĞòÁĞÖ¸¶¨Î»ÖÃµÄ×ÊÔ´±àºÅ
+	// è·å–æŸ“è‰²ä½“èµ„æºåˆ†é…åºåˆ—æŒ‡å®šä½ç½®çš„èµ„æºç¼–å·
 	public int getResourceGene(int offset) {
 		return this.chromosome.get(1).get(offset);
 	}
 
-	// »ñÈ¡¸Ã¸öÌåµÄÄ¿±êº¯ÊıÖµ
+	// è·å–è¯¥ä¸ªä½“çš„ç›®æ ‡å‡½æ•°å€¼
 	public double[] getObj() {
 		return this.obj;
 	}
@@ -284,22 +284,22 @@ public class Individual {
 	public void setObj(double[] obj) {
 		this.obj = obj;
 	}
-	// non_dominatedRankµÄgetter·½·¨
+	// non_dominatedRankçš„getteræ–¹æ³•
 	public int getNon_dominatedRank() {
 		return non_dominatedRank;
 	}
 
-	// non_dominatedRankµÄsetter·½·¨
+	// non_dominatedRankçš„setteræ–¹æ³•
 	public void setNon_dominatedRank(int non_dominatedRank) {
 		this.non_dominatedRank = non_dominatedRank;
 	}
 
-	// crowDistanceµÄgetter·½·¨
+	// crowDistanceçš„getteræ–¹æ³•
 	public double getCrowDistance() {
 		return crowDistance;
 	}
 
-	// crowDistanceµÄsetter·½·¨
+	// crowDistanceçš„setteræ–¹æ³•
 	public void setCrowDistance(double crowDistance) {
 		this.crowDistance = crowDistance;
 	}
@@ -313,7 +313,7 @@ public class Individual {
 	}
 
 	/**
-	 * ¸öÌåµÄtoString·½·¨
+	 * ä¸ªä½“çš„toStringæ–¹æ³•
 	 */
 	/*
 	public String toString() {
@@ -330,11 +330,11 @@ public class Individual {
 	*/
 
 	/**
-	 * Ã¿¸öchromosome½âÃÜÖ®ºó¶ÔÓ¦µÄÄ¿±êº¯ÊıÖµ£¬ÓÃÒ»¸öÒ»Î¬Êı×é±íÊ¾£¬Êı×é³¤¶ÈµÈÓÚÄ¿±êº¯ÊıµÄ¸öÊı
+	 * æ¯ä¸ªchromosomeè§£å¯†ä¹‹åå¯¹åº”çš„ç›®æ ‡å‡½æ•°å€¼ï¼Œç”¨ä¸€ä¸ªä¸€ç»´æ•°ç»„è¡¨ç¤ºï¼Œæ•°ç»„é•¿åº¦ç­‰äºç›®æ ‡å‡½æ•°çš„ä¸ªæ•°
 	 * 
 	 * @param chromosome
-	 *            ½âÃÜºóµÄ½â
-	 * @return ¼ÆËãºÃÆğÍ£Ê±¼äµÄÈÎÎñ¶ÓÁĞ
+	 *            è§£å¯†åçš„è§£
+	 * @return è®¡ç®—å¥½èµ·åœæ—¶é—´çš„ä»»åŠ¡é˜Ÿåˆ—
 	 */
 	public void objCompute(Case project) {
 		List<Task> tasks = project.getTasks();
@@ -345,34 +345,34 @@ public class Individual {
 		
 		int[] endtime_res = new int[project.getM()];
 		for (int i = 0; i < endtime_res.length ; i++) {
-			//ÓÃÓÚ¼ÇÂ¼Ã¿¸ö×ÊÔ´ÊÍ·ÅÊ±¼ä
+			//ç”¨äºè®°å½•æ¯ä¸ªèµ„æºé‡Šæ”¾æ—¶é—´
 			endtime_res[i] = 0;
 		}
 		
 		for (int i = 0; i < project.getN(); i++){
 			int endtime = 0;
 			Task curtask = tasks.get(chromosome.get(0).get(i)-1);
-			//µÃµ½ËùÓĞÇ°ÖÃÈÎÎñ,Ñ­»·Ã¿Ò»Ç°ÖÃÈÎÎñ£¬È¡×îÍí½áÊøÊ±¼ä
+			//å¾—åˆ°æ‰€æœ‰å‰ç½®ä»»åŠ¡,å¾ªç¯æ¯ä¸€å‰ç½®ä»»åŠ¡ï¼Œå–æœ€æ™šç»“æŸæ—¶é—´
 			pretaskids = curtask.getPredecessorIDs();
 			for (int j = 0; j < pretaskids.size();j++){
 				if (endtime < tasks.get(pretaskids.get(j)-1).getFinishTime()){
 					endtime = tasks.get(pretaskids.get(j)-1).getFinishTime();
 				}
 			}
-			//µ±Ç°ÈÎÎñËù¶ÔÓ¦µÄ×ÊÔ´×îÍíÊ±¼ä
+			//å½“å‰ä»»åŠ¡æ‰€å¯¹åº”çš„èµ„æºæœ€æ™šæ—¶é—´
 			if (endtime < endtime_res[chromosome.get(1).get(i)-1]){
 				endtime = endtime_res[chromosome.get(1).get(i)-1];
 			}
-			//ÉèÖÃµ±Ç°ÈÎÎñµÄ¿ªÊ¼Ê±¼ä¼°Íê³ÉÊ±¼ä
+			//è®¾ç½®å½“å‰ä»»åŠ¡çš„å¼€å§‹æ—¶é—´åŠå®Œæˆæ—¶é—´
 			taskslist.get(chromosome.get(0).get(i)-1).setstarttime(endtime +1,1);
-			//¸üĞÂµ±Ç°ÈÎÎñ×ÊÔ´µÄ×îºóÍê¹¤Ê±¼ä
+			//æ›´æ–°å½“å‰ä»»åŠ¡èµ„æºçš„æœ€åå®Œå·¥æ—¶é—´
 			endtime_res[chromosome.get(1).get(i)-1] = taskslist.get(chromosome.get(0).get(i)-1).finishTime;
-            //µ±Ç°¸öÌå×îºóµÄÍê³ÉÊ±¼ä
+            //å½“å‰ä¸ªä½“æœ€åçš„å®Œæˆæ—¶é—´
 			if (maxtime < endtime_res[chromosome.get(1).get(i)-1]){
             	maxtime = endtime_res[chromosome.get(1).get(i)-1];
             }
 	     
-			// ¼ÆËã³É±¾			
+			// è®¡ç®—æˆæœ¬			
 			int duration = tasks.get(chromosome.get(0).get(i) - 1).getDuaration();
 			double salary = resourses.get(chromosome.get(1).get(i) - 1).getSalary();
 			cost += duration * salary;			
@@ -384,17 +384,17 @@ public class Individual {
 
 
 	/**
-	 * ½«Ëæ»ú³õÊ¼»¯½â£¬½âÃÜ³ÉÕûÊıÏòÁ¿±íÊ¾ÈÎÎñĞòÁĞ¡¢×ÊÔ´ĞòÁĞµÄÈ¾É«Ìå½á¹¹
+	 * å°†éšæœºåˆå§‹åŒ–è§£ï¼Œè§£å¯†æˆæ•´æ•°å‘é‡è¡¨ç¤ºä»»åŠ¡åºåˆ—ã€èµ„æºåºåˆ—çš„æŸ“è‰²ä½“ç»“æ„
 	 * 
 	 * @param _chromosome
-	 *            Ëæ»úÊı×é³ÉµÄ¶şÎ¬Êı×é
-	 * @return ·µ»ØÓÉÈÎÎñÖ´ĞĞĞòÁĞºÍ×ÊÔ´·ÖÅäĞòÁĞ×é³ÉµÄ¼¯ºÏ
+	 *            éšæœºæ•°ç»„æˆçš„äºŒç»´æ•°ç»„
+	 * @return è¿”å›ç”±ä»»åŠ¡æ‰§è¡Œåºåˆ—å’Œèµ„æºåˆ†é…åºåˆ—ç»„æˆçš„é›†åˆ
 	 */
 	public void deciphering(Case project) {
 		
 		List<Integer> taskList = new ArrayList<Integer>();
 		/*List<Integer> resourceList = new ArrayList<Integer>();*/
-		// ¿ÉÖ´ĞĞÈÎÎñ¼¯ºÏ
+		// å¯æ‰§è¡Œä»»åŠ¡é›†åˆ
 		List<Integer> executableTaskIDS = new ArrayList<Integer>();	
 		List<Task> tasks = project.getTasks();
 
@@ -403,11 +403,11 @@ public class Individual {
 		
 		/*int[] endtime_res = new int[project.getM()];
 		for (int j = 0; j < endtime_res.length ; j++) {
-			//ÓÃÓÚ¼ÇÂ¼Ã¿¸ö×ÊÔ´ÊÍ·ÅÊ±¼ä
+			//ç”¨äºè®°å½•æ¯ä¸ªèµ„æºé‡Šæ”¾æ—¶é—´
 			endtime_res[j] = 0;
 		}*/
 
-		// ÇótaskListÈÎÎñÖ´ĞĞĞòÁĞºÍresourceList×ÊÔ´·ÖÅäĞòÁĞ
+		// æ±‚taskListä»»åŠ¡æ‰§è¡Œåºåˆ—å’ŒresourceListèµ„æºåˆ†é…åºåˆ—
 		for (int i = 0; i < project.getN(); i++) {  
 			
 			executableTaskIDS.clear();
@@ -415,7 +415,7 @@ public class Individual {
 			_list1.add(rand1);
 			
 			for (int k = 0; k < tasks.size(); k++) {
-				if (taskslist.get(k).pretasknum == 0){//ÕÒµ½Ã»ÓĞ½ôÇ°ÈÎÎñµÄÈÎÎñ¼¯ºÏ×÷ÎªÓÅÏÈÖ´ĞĞÈÎÎñ¼¯ºÏ
+				if (taskslist.get(k).pretasknum == 0){//æ‰¾åˆ°æ²¡æœ‰ç´§å‰ä»»åŠ¡çš„ä»»åŠ¡é›†åˆä½œä¸ºä¼˜å…ˆæ‰§è¡Œä»»åŠ¡é›†åˆ
 					executableTaskIDS.add(tasks.get(k).getTaskID());
 				}
 			}
@@ -423,28 +423,28 @@ public class Individual {
 				break;
 			}
 			int A = (int) ( rand1 * executableTaskIDS.size());
-			int currentTaskID = executableTaskIDS.get(A);//ÓÅÏÈÈÎÎñ¼¯ºÏÖĞËæ»úÑ¡ÔñÒ»¸ö×÷Îªµ±Ç°Ö´ĞĞÈÎÎñ
+			int currentTaskID = executableTaskIDS.get(A);//ä¼˜å…ˆä»»åŠ¡é›†åˆä¸­éšæœºé€‰æ‹©ä¸€ä¸ªä½œä¸ºå½“å‰æ‰§è¡Œä»»åŠ¡
 			taskList.add(currentTaskID);
-			taskslist.get(currentTaskID -1).pretasknum = -1;   //µ±Ç°ÈÎÎñÒÑ¾­±»Ê¹ÓÃ£¬×öÉÏ±ê¼ÇÒÔ·ÀÖ¹ÏÂ´Î±»Ñ¡ÓÃ
+			taskslist.get(currentTaskID -1).pretasknum = -1;   //å½“å‰ä»»åŠ¡å·²ç»è¢«ä½¿ç”¨ï¼Œåšä¸Šæ ‡è®°ä»¥é˜²æ­¢ä¸‹æ¬¡è¢«é€‰ç”¨
 			
-			//´¦ÀíºóĞøÈÎÎñ
+			//å¤„ç†åç»­ä»»åŠ¡
 			for (int k = 0; k < tasks.size(); k++) {
-				//°ÑËùÓĞÒÔÈÎÎñjÎªÇ°ÖÃÈÎÎñµÄÇ°ÖÃÈÎÎñÊı¼õ1£»
+				//æŠŠæ‰€æœ‰ä»¥ä»»åŠ¡jä¸ºå‰ç½®ä»»åŠ¡çš„å‰ç½®ä»»åŠ¡æ•°å‡1ï¼›
 				if (tasks.get(k).getPredecessorIDs().contains(currentTaskID)){
 					taskslist.get(k).pretasknum--;	
-					//£¿£¿£¿Ó¦¸Ã½«¸ÃÈÎÎñ´ÓÇ°ĞòÈÎÎñ¼¯ÖĞÉ¾³ı
+					//ï¼Ÿï¼Ÿï¼Ÿåº”è¯¥å°†è¯¥ä»»åŠ¡ä»å‰åºä»»åŠ¡é›†ä¸­åˆ é™¤
 				}
 			}
 			
-			// Çó¶ÔÓ¦µÄ×ÊÔ´·ÖÅäĞòÁĞresourceList
-			// ¿ÉÖ´ĞĞ¸ÃÈÎÎñµÄ×ÊÔ´¼¯ºÏ
+			// æ±‚å¯¹åº”çš„èµ„æºåˆ†é…åºåˆ—resourceList
+			// å¯æ‰§è¡Œè¯¥ä»»åŠ¡çš„èµ„æºé›†åˆ
 			/*ITask curTask = taskslist.get(currentTaskID -1);
 			List<Integer> list = curTask.getresourceIDs();
 			int B = (int) (rand2 * list.size());
 			int resourceid = list.get(B);
 			resourceList.add( resourceid );*/
 			
-			//µ¥²½¼ÆËãÄ¿±êÖµ
+			//å•æ­¥è®¡ç®—ç›®æ ‡å€¼
 			/*singleCompute(resourceid,currentTaskID,endtime_res);*/
 		}
 		this.chromosomeDNA.add(_list1);
@@ -460,7 +460,7 @@ public class Individual {
 		List<Double> _list2 = new ArrayList<>();
 		int[] endtime_res = new int[project.getM()];
 		for (int j = 0; j < endtime_res.length ; j++) {
-			//ÓÃÓÚ¼ÇÂ¼Ã¿¸ö×ÊÔ´ÊÍ·ÅÊ±¼ä
+			//ç”¨äºè®°å½•æ¯ä¸ªèµ„æºé‡Šæ”¾æ—¶é—´
 			endtime_res[j] = 0;
 		}
 		
@@ -473,7 +473,7 @@ public class Individual {
 			int resourceid = list.get(B);
 			resourceList.add( resourceid );
 			
-			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res);//¶¯Ì¬¼ÆËã
+			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res);//åŠ¨æ€è®¡ç®—
 		}
 		this.chromosomeDNA.add(_list2);
 		this.chromosome.add(resourceList);
@@ -482,15 +482,15 @@ public class Individual {
 	public void singleCompute(int rid, int tid, int[] endtime_res){
 		ITask task = taskslist.get(tid-1);
 		IResource resource = resourceslist.get(rid-1);
-		if(!canInsert(resource, task)){//²»´æÔÚ½ôÇ°µ÷¶È
-			//½×¶ÎĞÔ¼ÆËã£º¸üĞÂ×ÊÔ´¿ÉÓÃÊ±¼ä£¬¸üĞÂÈÎÎñ¿ªÊ¼½áÊøÊ±¼ä
+		if(!canInsert(resource, task)){//ä¸å­˜åœ¨ç´§å‰è°ƒåº¦
+			//é˜¶æ®µæ€§è®¡ç®—ï¼šæ›´æ–°èµ„æºå¯ç”¨æ—¶é—´ï¼Œæ›´æ–°ä»»åŠ¡å¼€å§‹ç»“æŸæ—¶é—´
 			phaseCompute(rid, tid, endtime_res);
-			//¸üĞÂ¼¼ÄÜË®Æ½£ºµ±Ç°¼¼ÄÜ±í£¬¼¼ÄÜÖ´ĞĞÊ±¼ä±í	
+			//æ›´æ–°æŠ€èƒ½æ°´å¹³ï¼šå½“å‰æŠ€èƒ½è¡¨ï¼ŒæŠ€èƒ½æ‰§è¡Œæ—¶é—´è¡¨	
 			updateSkill(resource, task);
-			//¼ÆËãÄ¿±êÖµ£º ¹¤ÆÚ ³É±¾ 
+			//è®¡ç®—ç›®æ ‡å€¼ï¼š å·¥æœŸ æˆæœ¬ 
 			this.obj = aimCompute(task, resource);
 		}else{
-			//½ö¸üĞÂÄ¿±êÖµºÍÈÎÎñ¿ªÊ¼½áÊøÊ±¼ä£¬²»¸üĞÂ¼¼ÄÜ
+			//ä»…æ›´æ–°ç›®æ ‡å€¼å’Œä»»åŠ¡å¼€å§‹ç»“æŸæ—¶é—´ï¼Œä¸æ›´æ–°æŠ€èƒ½
 			this.obj = aimCompute(task, resource);
 		}
 	}
@@ -513,21 +513,21 @@ public class Individual {
 		IResource resource = resourceslist.get(rid-1);
 		double qinit = resource.getSkillsInfo().get(qtype); 
 		
-		//µÃµ½ËùÓĞÇ°ÖÃÈÎÎñ,Ñ­»·Ã¿Ò»Ç°ÖÃÈÎÎñ£¬È¡×îÍí½áÊøÊ±¼ä
+		//å¾—åˆ°æ‰€æœ‰å‰ç½®ä»»åŠ¡,å¾ªç¯æ¯ä¸€å‰ç½®ä»»åŠ¡ï¼Œå–æœ€æ™šç»“æŸæ—¶é—´
 		List<Integer> pretaskids = curtask.getPredecessorIDs();
 		for (int j = 0; j < pretaskids.size();j++){
 			if (endtime < taskslist.get(pretaskids.get(j)-1).getFinishTime()){
 				endtime = taskslist.get(pretaskids.get(j)-1).getFinishTime();
 			}
 		}
-		//µ±Ç°ÈÎÎñËù¶ÔÓ¦µÄ×ÊÔ´×îÍíÊ±¼ä
+		//å½“å‰ä»»åŠ¡æ‰€å¯¹åº”çš„èµ„æºæœ€æ™šæ—¶é—´
 		if (endtime < endtime_res[rid-1]){
 			endtime = endtime_res[rid-1];
 		}
 		
-		//ÉèÖÃµ±Ç°ÈÎÎñµÄ¿ªÊ¼Ê±¼ä¼°Íê³ÉÊ±¼ä
-		taskslist.get(tid-1).setstarttime(endtime,qinit);//¼ä¸ô1¿ÉÒÔÈ¡Ïû
-		//¸üĞÂµ±Ç°ÈÎÎñ×ÊÔ´µÄ×îºóÍê¹¤Ê±¼ä
+		//è®¾ç½®å½“å‰ä»»åŠ¡çš„å¼€å§‹æ—¶é—´åŠå®Œæˆæ—¶é—´
+		taskslist.get(tid-1).setstarttime(endtime,qinit);//é—´éš”1å¯ä»¥å–æ¶ˆ
+		//æ›´æ–°å½“å‰ä»»åŠ¡èµ„æºçš„æœ€åå®Œå·¥æ—¶é—´
 		endtime_res[rid-1] = taskslist.get(tid-1).finishTime;
 	}
 	
@@ -543,15 +543,15 @@ public class Individual {
 		double tmp = Math.pow((sstart+sdura), m);
 		double qfinal = tmp/(M*tmp+1-M);
 		
-		//¸üĞÂµ±Ç°¼¼ÄÜË®Æ½±í
+		//æ›´æ–°å½“å‰æŠ€èƒ½æ°´å¹³è¡¨
 		resource.putSkillsInfo(qtype, qfinal);
-		//¸üĞÂ¼¼ÄÜÖ´ĞĞÊ±¼ä±í
+		//æ›´æ–°æŠ€èƒ½æ‰§è¡Œæ—¶é—´è¡¨
 		resource.putSkillTimetable(qtype, new int[]{task.getStartTime(),task.getFinishTime()}, qfinal);		
 		
-		if(Math.floor(qfinal)-Math.floor(qinit)>=1){//¼¼ÄÜÔ¾Ç¨£¬ÖØĞÂ·ÖÅäÈÎÎñ¿ÉÓÃ×ÊÔ´
+		if(Math.floor(qfinal)-Math.floor(qinit)>=1){//æŠ€èƒ½è·ƒè¿ï¼Œé‡æ–°åˆ†é…ä»»åŠ¡å¯ç”¨èµ„æº
 			/*System.out.println(resource.getSkillTimetable().get(qtype));*/
 			Iterator<int[]> timeline = resource.getSkillTimetable().get(qtype).keySet().iterator();
-			//±éÀúÊ±¼ä±í
+			//éå†æ—¶é—´è¡¨
 			/*while(timeline.hasNext()){
 				int[] now = timeline.next();
 				System.out.println((Object)now);
@@ -571,27 +571,27 @@ public class Individual {
 		return false;
 	}
 	
-	//½ôÇ°µ÷¶È  ÊÇ·ñ¿ÉÒÔ×óÒÆµ÷¶È £¿ µ«ÊÇÎ´½«Ê±¼ä±íÅÅĞòÅĞ¶Ï
+	//ç´§å‰è°ƒåº¦  æ˜¯å¦å¯ä»¥å·¦ç§»è°ƒåº¦ ï¼Ÿ ä½†æ˜¯æœªå°†æ—¶é—´è¡¨æ’åºåˆ¤æ–­
 	public boolean canInsert(IResource resource, ITask task){
 		@SuppressWarnings("rawtypes")
 		String skillType = task.getSkill().split(":")[0].trim();
 		int stanDuration = task.getStandardDuration();
 		HashMap<String,HashMap<int[],Double>> timetable = resource.getSkillTimetable();
 		double skillLevel = Double.valueOf(task.getSkill().split(":")[1]);
-		//µÃµ½×ÊÔ´Ö´ĞĞÊ±¼ä±í
-		HashMap<int[],Double> skilltime = timetable.get(skillType);//int[] ÎªÊ²Ã´µü´úÃ»ÎÊÌâ
+		//å¾—åˆ°èµ„æºæ‰§è¡Œæ—¶é—´è¡¨
+		HashMap<int[],Double> skilltime = timetable.get(skillType);//int[] ä¸ºä»€ä¹ˆè¿­ä»£æ²¡é—®é¢˜
 		@SuppressWarnings("rawtypes")
 		Iterator timeline = skilltime.keySet().iterator();
 		int[] lasttime = (int[])timeline.next();
         
-		//±éÀúÊ±¼ä±í  +ĞèÒªÅÅĞò
+		//éå†æ—¶é—´è¡¨  +éœ€è¦æ’åº
 		while(timeline.hasNext()){
 			int[] time = (int[])timeline.next();
 			double rightskill = skilltime.get(lasttime);
-			//ÊÇ·ñÂú×ã¼¼ÄÜË®Æ½ºÍÊ±³¤Ìõ¼ş
+			//æ˜¯å¦æ»¡è¶³æŠ€èƒ½æ°´å¹³å’Œæ—¶é•¿æ¡ä»¶
 			if(rightskill >= skillLevel && stanDuration/rightskill <= time[0]-lasttime[1]){
 				List<Integer> preids = task.getPredecessorIDs();
-				//ÊÇ·ñÂú×ã½ôÇ°¹ØÏµ
+				//æ˜¯å¦æ»¡è¶³ç´§å‰å…³ç³»
 				for(int i = 0; i < preids.size();i++){
 					if(taskslist.get(preids.get(i)-1).getFinishTime() >= lasttime[1]){
 						return false;
@@ -616,13 +616,13 @@ public class Individual {
 
 
 	/**
-	 * ¶şÔª½õ±êÈüÑ¡Ôñ·½·¨£¬²ÎÊıÎªÁ½¸ö¸öÌå¶ÔÏó
+	 * äºŒå…ƒé”¦æ ‡èµ›é€‰æ‹©æ–¹æ³•ï¼Œå‚æ•°ä¸ºä¸¤ä¸ªä¸ªä½“å¯¹è±¡
 	 * 
 	 * @param indiv1
-	 *            ¸öÌå¶ÔÏó
+	 *            ä¸ªä½“å¯¹è±¡
 	 * @param indiv2
-	 *            ÁíÒ»¸ö¸öÌå¶ÔÏó
-	 * @return ·µ»Ø½ÏºÃµÄ¸öÌå
+	 *            å¦ä¸€ä¸ªä¸ªä½“å¯¹è±¡
+	 * @return è¿”å›è¾ƒå¥½çš„ä¸ªä½“
 	 */
 	public Individual binaryTournament(Individual indiv1, Individual indiv2) {
 		Individual individual = indiv1;

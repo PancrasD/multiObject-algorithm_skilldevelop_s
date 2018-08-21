@@ -3,13 +3,13 @@ package genetic_algorithm;
 import java.util.HashMap;
 
 public class IResource {
-		//×ÊÔ´ID
+		//èµ„æºID
 		private int resourceID;
-		//Ô±¹¤Ã¿Ğ¡Ê±µÄĞ½Ë®
+		//å‘˜å·¥æ¯å°æ—¶çš„è–ªæ°´
 		private double salary;
-		//Ô±¹¤ÕÆÎÕµÄ¼¼ÄÜ
+		//å‘˜å·¥æŒæ¡çš„æŠ€èƒ½
 		private String skils;
-		//×ÊÔ´Ñ§Ï°ÄÜÁ¦
+		//èµ„æºå­¦ä¹ èƒ½åŠ›
 		private double learnbility;
 		
 		private HashMap<String,Double> skillsInfo = new HashMap<String,Double>();
