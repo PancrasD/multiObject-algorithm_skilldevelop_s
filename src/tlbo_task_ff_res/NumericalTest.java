@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class NumericalTest {
 	public static void main(String[] args) {
@@ -65,8 +67,9 @@ public class NumericalTest {
     		}
     		if (args[0].trim().toLowerCase().equals("tf")){
     			for(int j = 0; j < 10; j++){
-    				long time=System.currentTimeMillis();
-    				 String dic = "data/TLBO_F"+time+"/tlbo_f"+j;
+    				 long time=System.currentTimeMillis();
+    				 String head=buildFileName();
+    				 String dic = "data/TLBO_F"+head+"/tlbo_f"+j;
     				 File f=new File(dic);
                 	 if(f.exists()) {
                 		 f.delete();
@@ -74,7 +77,7 @@ public class NumericalTest {
                 	 f.mkdirs();
 	                for(int i = 0; i<fl.length; i++){
 	                	 String _fn =  "case_def/" + fl[i];
-	                	 String _fo = "data/TLBO_F"+time+"/tlbo_f"+j+"/TLBO_F_"+fl[i]+".txt";
+	                	 String _fo = "data/TLBO_F"+head+"/tlbo_f"+j+"/TLBO_F_"+fl[i]+".txt";
 	                	 TLBO_F_algorithm(_fn,_fo);
 	                }
 	    			}
@@ -309,4 +312,15 @@ public class NumericalTest {
 		        if(ps != null) 	ps.close();
 		     }
 	}
+
+	 public static String buildFileName()
+	 {
+		 //new一个时间对象date
+		 Date date = new Date();
+	 
+	     //格式化
+		 SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+	     //格式化时间，并且作为文件名
+		 return sdf.format(date);
+	 }
 }

@@ -450,7 +450,7 @@ public class Tools {
 				double[] obj = bestIndividuals[i].getObj();
 
 				betterObjs.add(obj);
-				System.out.println("项目工期为：" + obj[0] + "；项目成本为：" + obj[1]);
+				System.out.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
 			}
 
 			// 性能评价标准：MID、SM、DM、SNS

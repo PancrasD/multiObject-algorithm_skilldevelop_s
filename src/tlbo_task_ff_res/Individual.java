@@ -271,26 +271,26 @@ public class Individual {
 						break;
 					} 
 				}
-				son_chromosome.add(_tasks);
-				/*son_chromosome.add(_resources);*/
-				son_chromosomeDNA.add(_taskdna);
 			}
-		}else if(rand<0) {
+			son_chromosome.add(_tasks);
+			/*son_chromosome.add(_resources);*/
+			son_chromosomeDNA.add(_taskdna);
+		}/*else if(rand<0) {
 			//随机交换
 			while(true) {
-			int index_1 = (int) (Math.random() * chromosomeLength);
-			int index_2 = (int) (Math.random() * chromosomeLength);
-			int taskID1 = _tasks.get(index_1);
-			int taskID2 = _tasks.get(index_2);
-			Task task1 = project.getTasks().get(taskID1 - 1);
-			Task task2 = project.getTasks().get(taskID2 - 1);
-			//验证错误 
-			if (!project.isPredecessor(task1, task2)) {
-				//
-				_tasks.set(index_1,taskID2);
-				_tasks.set(index_2, taskID1);
-				break;
-			}
+				int index_1 = (int) (Math.random() * chromosomeLength);
+				int index_2 = (int) (Math.random() * chromosomeLength);
+				int taskID1 = _tasks.get(index_1);
+				int taskID2 = _tasks.get(index_2);
+				Task task1 = project.getTasks().get(taskID1 - 1);
+				Task task2 = project.getTasks().get(taskID2 - 1);
+				//验证错误 
+				if (!project.isPredecessor(task1, task2)) {
+					//
+					_tasks.set(index_1,taskID2);
+					_tasks.set(index_2, taskID1);
+					break;
+				}
 			}
 		}else {
 			//随机插入
@@ -307,7 +307,7 @@ public class Individual {
 				//前插
 			}
 			
-		}
+		}*/
 		
 		Individual son = new Individual(son_chromosome,son_chromosomeDNA,project);	
 
@@ -502,11 +502,11 @@ public class Individual {
 			}
 			//1随机  2最大紧后集   34先选择资源然后选择任务3最大执行时间 4 最大紧后集执行时间和
 			double rand3=Math.random();
-			if(rand3<0.3) {
+			if(rand3<0.7) {
 			   scheduleTaskByRandomRule(executableTaskIDS,taskList);
-			}else if(rand3<0.5) {
+			}else if(rand3<0.8) {
 				scheduleTaskByMaxSuccessorsRule(executableTaskIDS,taskList);
-			}else if(rand3>0.7) {
+			}else if(rand3>0.9) {
 				scheduleTaskByMaxProcessTimeRule(executableTaskIDS,taskList);
 			}else {
 				scheduleTaskByMaxSumSuccessorsProcessTimeRule(executableTaskIDS,taskList);
