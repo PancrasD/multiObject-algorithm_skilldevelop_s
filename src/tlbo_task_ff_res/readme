@@ -5,3 +5,4 @@ Individual 目标计算过程中资源序列的生成 采用生成多个果蝇的方法  然后选择最佳的返
 因为改变了目标的计算规则  所以之前的教学与遗传算法随之改变   计算算法使用包genetic_algorithm下的算法
 伪代码实现：参考A knowledge-based fruit fly optimization algorithm for multi-skill
 resource-constrained project scheduling problem
+获取前两层的精英个体的操作序列 进行资源搜索 种群扩充 以增加最优种群的多样性

@@ -2,19 +2,19 @@ package tlbo_task_ff_res;
 
 
 /**
- * ¶¨ÒåÒ»¸ö×ÊÔ´Àà£¬°üº¬ÊôĞÔ£º
- * ×ÊÔ´ID£¬Ã¿Ğ¡Ê±µÄĞ½Ë®£¬ÕÆÎÕµÄ¼¼ÄÜ
- * @author ĞÜ¿­
+ * å®šä¹‰ä¸€ä¸ªèµ„æºç±»ï¼ŒåŒ…å«å±æ€§ï¼š
+ * èµ„æºIDï¼Œæ¯å°æ—¶çš„è–ªæ°´ï¼ŒæŒæ¡çš„æŠ€èƒ½
+ * @author ç†Šå‡¯
  *
  */
 public class Resource {
-	//×ÊÔ´ID
+	//èµ„æºID
 	private int resourceID;
-	//Ô±¹¤Ã¿Ğ¡Ê±µÄĞ½Ë®
+	//å‘˜å·¥æ¯å°æ—¶çš„è–ªæ°´
 	private double salary;
-	//Ô±¹¤ÕÆÎÕµÄ¼¼ÄÜ
+	//å‘˜å·¥æŒæ¡çš„æŠ€èƒ½
 	private String skils;
-	//×ÊÔ´Ñ§Ï°ÄÜÁ¦
+	//èµ„æºå­¦ä¹ èƒ½åŠ›
 	private double learnbility;
 		
 	@SuppressWarnings("null")

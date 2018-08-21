@@ -6,37 +6,37 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ¶¨ÒåÒ»¸öÈÎÎñÀà£¬ÊôĞÔ°üº¬£º
- * ÈÎÎñID£¬ÈÎÎñ¹¤ÆÚ£¬Ö´ĞĞÈÎÎñËùĞè¼¼ÄÜ£¬½ôÇ°ÈÎÎñIDs
- * @author ĞÜ¿­
+ * å®šä¹‰ä¸€ä¸ªä»»åŠ¡ç±»ï¼Œå±æ€§åŒ…å«ï¼š
+ * ä»»åŠ¡IDï¼Œä»»åŠ¡å·¥æœŸï¼Œæ‰§è¡Œä»»åŠ¡æ‰€éœ€æŠ€èƒ½ï¼Œç´§å‰ä»»åŠ¡IDs
+ * @author ç†Šå‡¯
  *
  */
 public class Task implements Cloneable {
-	//ÈÎÎñID
+	//ä»»åŠ¡ID
 	private int taskID;
-	//ÈÎÎñ¹¤ÆÚ
+	//ä»»åŠ¡å·¥æœŸ
 	private int duaration;
-	//Ö´ĞĞÈÎÎñËùĞè¼¼ÄÜ
+	//æ‰§è¡Œä»»åŠ¡æ‰€éœ€æŠ€èƒ½
 	private String skill;
-	//½ôÇ°ÈÎÎñIDs
+	//ç´§å‰ä»»åŠ¡IDs
 	private List<Integer> predecessorIDs = new  ArrayList<>();
-	//½ôÇ°ÈÎÎñÊı
+	//ç´§å‰ä»»åŠ¡æ•°
 	private int pretasknum;
-	//±ê×¼¹¤ÆÚ
+	//æ ‡å‡†å·¥æœŸ
 	private int standardDuration;
-	//½ôºóÈÎÎñIDS
+	//ç´§åä»»åŠ¡IDS
 	private List<Integer> successorTaskIDS = new  ArrayList<>();
-	//ÈÎÎñ¿ÉÓÃµÄ×ÊÔ´
+	//ä»»åŠ¡å¯ç”¨çš„èµ„æº
 	private List<Integer> resourceIDs = new ArrayList<>();
 	
-	//Ã¿¸ö×ÊÔ´Ê¹ÓÃµÄ¿ÉÄÜĞÔ
+	//æ¯ä¸ªèµ„æºä½¿ç”¨çš„å¯èƒ½æ€§
 	private Map<Integer,Double> capaleResource = new HashMap<Integer,Double>();
 	
-	//ÈÎÎñµÄ¿ªÊ¼Ê±¼ä
+	//ä»»åŠ¡çš„å¼€å§‹æ—¶é—´
 	private int startTime;
-	//ÈÎÎñµÄ½áÊøÊ±¼ä
+	//ä»»åŠ¡çš„ç»“æŸæ—¶é—´
 	private int finishTime;
-	//¼¼ÄÜË®Æ½
+	//æŠ€èƒ½æ°´å¹³
 	private int skillLevel;
 	
 	
@@ -132,8 +132,8 @@ public class Task implements Cloneable {
 	}
 
     public Task clone()throws CloneNotSupportedException {
-		//Ö»¸´ÖÆÁËÈÎÎñÖĞµÄÖµÀàĞÍ±äÁ¿£¬Èçpretasknum¡¢startTime¡¢finishTime
-    	//¶øÈÎÎñµÄÇ°¼ÌÈÎÎñÊı×é¡¢ºó¼ÌÈÎÎñÊı×é¡¢¿ÉÓÃ×ÊÔ´Êı×é»¹ÊÇÒıÓÃ£¬ÔÚÊ¹ÓÃÊ±ĞèÒª×¢Òâ¡£
+		//åªå¤åˆ¶äº†ä»»åŠ¡ä¸­çš„å€¼ç±»å‹å˜é‡ï¼Œå¦‚pretasknumã€startTimeã€finishTime
+    	//è€Œä»»åŠ¡çš„å‰ç»§ä»»åŠ¡æ•°ç»„ã€åç»§ä»»åŠ¡æ•°ç»„ã€å¯ç”¨èµ„æºæ•°ç»„è¿˜æ˜¯å¼•ç”¨ï¼Œåœ¨ä½¿ç”¨æ—¶éœ€è¦æ³¨æ„ã€‚
     	Task clone = (Task)super.clone();
    		return clone;     
     }

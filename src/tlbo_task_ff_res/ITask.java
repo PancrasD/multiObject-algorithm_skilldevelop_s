@@ -13,7 +13,7 @@ public class ITask {
 	private String skillType;
 	private int skillLevel;
 	private List<Integer> predecessorIDs = new  ArrayList<>();
-	//任务可用的资源
+	
 	private List<Integer> resourceIDs = new ArrayList<>();
 	
 	public ITask(Task task){

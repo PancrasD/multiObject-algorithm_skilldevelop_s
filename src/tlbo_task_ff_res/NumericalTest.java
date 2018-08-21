@@ -11,7 +11,7 @@ public class NumericalTest {
         File ff = new File("case_def");
         String[] fl = ff.list(); 
         if (fl==null){
-        	System.out.print("Ã»ÓĞÔÚcase_defÄ¿Â¼ÏÂÕÒµ½ËãÀıÎÄ¼ş");
+        	System.out.print("æ²¡æœ‰åœ¨case_defç›®å½•ä¸‹æ‰¾åˆ°ç®—ä¾‹æ–‡ä»¶");
         	return;           	
         }
         for(int i = 0; i<fl.length; i++){
@@ -19,16 +19,16 @@ public class NumericalTest {
        	 String _fo = "data/NSFFA_"+fl[i]+".txt";
        	 NSFFA_algorithm(_fn,_fo);
        }
-       System.out.println(fl.length +"¸ö°¸Àı¹ûÓ¬Ëã·¨¼ÆËãÍê³É"); 
+       System.out.println(fl.length +"ä¸ªæ¡ˆä¾‹æœè‡ç®—æ³•è®¡ç®—å®Œæˆ"); 
        return;
 		*/
 		
         if (args.length==1){
             File ff = new File("case_def");
-            //»ñÈ¡°¸Àı¿âcase_defÎÄ¼şÄ¿Â¼
+            //è·å–æ¡ˆä¾‹åº“case_defæ–‡ä»¶ç›®å½•
             String[] fl = ff.list(); 
             if (fl==null){
-            	System.out.print("Ã»ÓĞÔÚcase_defÄ¿Â¼ÏÂÕÒµ½ËãÀıÎÄ¼ş");
+            	System.out.print("æ²¡æœ‰åœ¨case_defç›®å½•ä¸‹æ‰¾åˆ°ç®—ä¾‹æ–‡ä»¶");
             	return;           	
             }
     		if (args[0].trim().toLowerCase().equals("g")){
@@ -39,7 +39,7 @@ public class NumericalTest {
                    	 NSGA_algorithm(_fn,_fo);
                    }
     			}
-                System.out.println(fl.length +"¸ö°¸ÀıÒÅ´«Ëã·¨¼ÆËãÍê³É"); 
+                System.out.println(fl.length +"ä¸ªæ¡ˆä¾‹é—ä¼ ç®—æ³•è®¡ç®—å®Œæˆ"); 
                 return;
                 
     		}
@@ -49,7 +49,7 @@ public class NumericalTest {
                 	 String _fo = "data/NSFFA_"+fl[i]+".txt";
                 	 NSFFA_algorithm(_fn,_fo);
                 }
-                System.out.println(fl.length +"¸ö°¸Àı¹ûÓ¬Ëã·¨¼ÆËãÍê³É"); 
+                System.out.println(fl.length +"ä¸ªæ¡ˆä¾‹æœè‡ç®—æ³•è®¡ç®—å®Œæˆ"); 
                 return;
     		}
     		if (args[0].trim().toLowerCase().equals("t")){
@@ -60,7 +60,7 @@ public class NumericalTest {
                 	 TLBO_algorithm(_fn,_fo);
                 }
     			}
-                System.out.println(fl.length +"¸ö°¸Àı½ÌÑ§ÓÅ»¯Ëã·¨¼ÆËãÍê³É"); 
+                System.out.println(fl.length +"ä¸ªæ¡ˆä¾‹æ•™å­¦ä¼˜åŒ–ç®—æ³•è®¡ç®—å®Œæˆ"); 
                 return;
     		}
     		if (args[0].trim().toLowerCase().equals("tf")){
@@ -74,39 +74,100 @@ public class NumericalTest {
                 	 f.mkdirs();
 	                for(int i = 0; i<fl.length; i++){
 	                	 String _fn =  "case_def/" + fl[i];
-	                	 String _fo = "data/TLBO_F"+time+"/tlbo_f"+j+"/TLBO_F"+fl[i]+".txt";
+	                	 String _fo = "data/TLBO_F"+time+"/tlbo_f"+j+"/TLBO_F_"+fl[i]+".txt";
 	                	 TLBO_F_algorithm(_fn,_fo);
 	                }
 	    			}
-	                System.out.println(fl.length +"¸ö°¸Àı½ÌÑ§ÓÅ»¯¹ûÓ¬Ëã·¨¼ÆËãÍê³É"); 
+	                System.out.println(fl.length +"ä¸ªæ¡ˆä¾‹æ•™å­¦ä¼˜åŒ–æœè‡ç®—æ³•è®¡ç®—å®Œæˆ"); 
+	                return;
+    		}
+    		if (args[0].trim().toLowerCase().equals("tg")){
+    			for(int j = 0; j < 10; j++){
+    				long time=System.currentTimeMillis();
+    				 String dic = "data/both"+time+"/both_"+j;
+    				 File f=new File(dic);
+                	 if(f.exists()) {
+                		 f.delete();
+                	 }
+                	 f.mkdirs();
+	                for(int i = 0; i<fl.length; i++){
+	                	 String _fn =  "case_def/" + fl[i];
+	                	 String _fo = "data/both"+time+"/both_"+j+"/both_"+fl[i]+".txt";
+	                	 both_algorithm(_fn,_fo);
+	                }
+	    			}
+	                System.out.println(fl.length +"ä¸ªé—ä¼ æ•™å­¦è®¡ç®—å®Œæˆ"); 
 	                return;
     		}
 
         }else{
-        	System.out.print("ÇëÊäÈë²ÎÊı£º'g'¡¢ÒÅ´«Ëã·¨£¬'f'¡¢¹ûÓ¬Ëã·¨£¬'C'¡¢²¼¹ÈÄñËã·¨");
+        	System.out.print("è¯·è¾“å…¥å‚æ•°ï¼š'g'ã€é—ä¼ ç®—æ³•ï¼Œ'f'ã€æœè‡ç®—æ³•ï¼Œ'C'ã€å¸ƒè°·é¸Ÿç®—æ³•");
         	return;
         }
 
 	}
 	
-	public static void TLBO_algorithm(String casefile, String datafile) {
-		 //¼ÇÂ¼¿ªÊ¼¼ÆËãµÄÊ±¼ä£¬ÓÃÓÚÍ³¼Æ±¾Ëã·¨µÄ×ÜÊ±¼ä
+	private static void both_algorithm(String casefile, String datafile) {
+		 //è®°å½•å¼€å§‹è®¡ç®—çš„æ—¶é—´ï¼Œç”¨äºç»Ÿè®¡æœ¬ç®—æ³•çš„æ€»æ—¶é—´
 		long startTime = System.currentTimeMillis();
-		// ´´½¨°¸ÀıÀà¶ÔÏó
+		// åˆ›å»ºæ¡ˆä¾‹ç±»å¯¹è±¡
 		Case project = new Case(casefile);
 
-		// ³õÊ¼»¯ÖÖÈº
+		// åˆå§‹åŒ–ç§ç¾¤
+		Population P = new Population(TLBOF.populationSize,project,true);
+		
+		int generationCount = 0;
+		//List<Integer> best=P.getPopulation().
+       //å¾ªç¯è¿­ä»£ ç®—æ³•æŒ‡å®šçš„æ¬¡æ•°
+		while (generationCount < TLBOF.maxGenerations ) {
+
+			Population p1 = P.getOffSpring_TLBO_F();
+			Population p2=P.getOffSpring_NSGA();
+			P=Tools.selectPopulation(p1,p2);
+			generationCount++;
+		}
+		//è·å–å‰ä¸¤å±‚çš„ç²¾è‹±ä¸ªä½“çš„æ“ä½œåºåˆ— è¿›è¡Œèµ„æºæœç´¢ ç§ç¾¤æ‰©å…… ä»¥å¢åŠ æœ€ä¼˜ç§ç¾¤çš„å¤šæ ·æ€§
+		//Population elite = Tools.getbestsolution(P,2,project);	
+		Population expandPop=P.serchMoreSpaceByRes(TLBOF.s1);
+		//ä»æœ€åå¾—åˆ°ç§ç¾¤ä¸­è·å–æœ€ä¼˜è§£é›†
+		Population solutions = Tools.getbestsolution(expandPop,1, project);		
+		
+		 File f = new File(datafile);
+		 PrintStream ps = null;
+		 try {
+		   if (f.exists()) f.delete();
+		   f.createNewFile();
+		   FileOutputStream fos = new FileOutputStream(f);
+		   ps = new PrintStream(fos);
+		   System.setOut(ps);
+		   //è¾“å‡ºæœ€ä¼˜è§£é›†
+		   Tools.printsolutions(solutions,startTime);			   
+		 } catch (IOException e) {
+			e.printStackTrace();
+		 }  finally {
+	        if(ps != null) 	ps.close();
+	     }
+		
+	}
+
+	public static void TLBO_algorithm(String casefile, String datafile) {
+		 //è®°å½•å¼€å§‹è®¡ç®—çš„æ—¶é—´ï¼Œç”¨äºç»Ÿè®¡æœ¬ç®—æ³•çš„æ€»æ—¶é—´
+		long startTime = System.currentTimeMillis();
+		// åˆ›å»ºæ¡ˆä¾‹ç±»å¯¹è±¡
+		Case project = new Case(casefile);
+
+		// åˆå§‹åŒ–ç§ç¾¤
 		Population P = new Population(TLBO.populationSize,project,true);
 		
 		int generationCount = 0;
-        //Ñ­»·µü´ú Ëã·¨Ö¸¶¨µÄ´ÎÊı
+        //å¾ªç¯è¿­ä»£ ç®—æ³•æŒ‡å®šçš„æ¬¡æ•°
 		while (generationCount < TLBO.maxGenerations ) {
 
 			P = P.getOffSpring_TLBO();
 
 			generationCount++;
 		}
-		//´Ó×îºóµÃµ½ÖÖÈºÖĞ»ñÈ¡×îÓÅ½â¼¯
+		//ä»æœ€åå¾—åˆ°ç§ç¾¤ä¸­è·å–æœ€ä¼˜è§£é›†
 		Population solutions = Tools.getbestsolution(P,1, project);		
 		
 		 File f = new File(datafile);
@@ -117,7 +178,7 @@ public class NumericalTest {
 		   FileOutputStream fos = new FileOutputStream(f);
 		   ps = new PrintStream(fos);
 		   System.setOut(ps);
-		   //Êä³ö×îÓÅ½â¼¯
+		   //è¾“å‡ºæœ€ä¼˜è§£é›†
 		   Tools.printsolutions(solutions,startTime);			   
 		 } catch (IOException e) {
 			e.printStackTrace();
@@ -126,29 +187,29 @@ public class NumericalTest {
 	     }
 	}
 	
-	/*@param caseFile:°¸Àı¶ÁÈ¡Ä¿Â¼
-	 * @param dataFile:°¸Àı¼ÆËã½á¹ûĞ´ÈëÄ¿Â¼*/
+	/*@param caseFile:æ¡ˆä¾‹è¯»å–ç›®å½•
+	 * @param dataFile:æ¡ˆä¾‹è®¡ç®—ç»“æœå†™å…¥ç›®å½•*/
 	public static void NSGA_algorithm(String casefile,String datafile){
-	       //¼ÇÂ¼¿ªÊ¼¼ÆËãµÄÊ±¼ä£¬ÓÃÓÚÍ³¼Æ±¾Ëã·¨µÄ×ÜÊ±¼ä
+	       //è®°å½•å¼€å§‹è®¡ç®—çš„æ—¶é—´ï¼Œç”¨äºç»Ÿè®¡æœ¬ç®—æ³•çš„æ€»æ—¶é—´
 			long startTime = System.currentTimeMillis();
-			// ´´½¨°¸ÀıÀà¶ÔÏó
+			// åˆ›å»ºæ¡ˆä¾‹ç±»å¯¹è±¡
 			Case project = new Case(casefile);
 
-			// ³õÊ¼»¯ÖÖÈº
+			// åˆå§‹åŒ–ç§ç¾¤
 			Population P = new Population(NSGA_II.populationSize,project,true);
 			
 			int generationCount = 0;
-	        //Ñ­»·µü´ú Ëã·¨Ö¸¶¨µÄ´ÎÊı
+	        //å¾ªç¯è¿­ä»£ ç®—æ³•æŒ‡å®šçš„æ¬¡æ•°
 			while (generationCount < NSGA_II.maxGenerations ) {
 
 				P = P.getOffSpring_NSGA();
 
 				generationCount++;
 			}
-			//´Ó×îºóµÃµ½ÖÖÈºÖĞ»ñÈ¡×îÓÅ½â¼¯
+			//ä»æœ€åå¾—åˆ°ç§ç¾¤ä¸­è·å–æœ€ä¼˜è§£é›†
 			Population solutions = Tools.getbestsolution(P,1, project);
 			
-		    //Êä³ö×îÓÅ½â¼¯
+		    //è¾“å‡ºæœ€ä¼˜è§£é›†
 			//Tools.printsolutions(solutions,startTime,datafile);		
 			
 			
@@ -160,7 +221,7 @@ public class NumericalTest {
 			   FileOutputStream fos = new FileOutputStream(f);
 			   ps = new PrintStream(fos);
 			   System.setOut(ps);
-			   //Êä³ö×îÓÅ½â¼¯
+			   //è¾“å‡ºæœ€ä¼˜è§£é›†
 			   Tools.printsolutions(solutions,startTime);			   
 			 } catch (IOException e) {
 				e.printStackTrace();
@@ -170,29 +231,29 @@ public class NumericalTest {
 		    
 		          	
 	}
-	//½ÌÑ§Ëã·¨ÓÃÓÚ²Ù×÷ĞòÁĞËÑË÷  Ê¹ÓÃ¹ûÓ¬Ëã·¨ÓÃÓÚ×ÊÔ´ĞòÁĞËÑË÷
+	//æ•™å­¦ç®—æ³•ç”¨äºæ“ä½œåºåˆ—æœç´¢  ä½¿ç”¨æœè‡ç®—æ³•ç”¨äºèµ„æºåºåˆ—æœç´¢
 	public static void TLBO_F_algorithm(String casefile, String datafile) {
-		 //¼ÇÂ¼¿ªÊ¼¼ÆËãµÄÊ±¼ä£¬ÓÃÓÚÍ³¼Æ±¾Ëã·¨µÄ×ÜÊ±¼ä
+		 //è®°å½•å¼€å§‹è®¡ç®—çš„æ—¶é—´ï¼Œç”¨äºç»Ÿè®¡æœ¬ç®—æ³•çš„æ€»æ—¶é—´
 		long startTime = System.currentTimeMillis();
-		// ´´½¨°¸ÀıÀà¶ÔÏó
+		// åˆ›å»ºæ¡ˆä¾‹ç±»å¯¹è±¡
 		Case project = new Case(casefile);
 
-		// ³õÊ¼»¯ÖÖÈº
+		// åˆå§‹åŒ–ç§ç¾¤
 		Population P = new Population(TLBOF.populationSize,project,true);
 		
 		int generationCount = 0;
 		//List<Integer> best=P.getPopulation().
-       //Ñ­»·µü´ú Ëã·¨Ö¸¶¨µÄ´ÎÊı
+       //å¾ªç¯è¿­ä»£ ç®—æ³•æŒ‡å®šçš„æ¬¡æ•°
 		while (generationCount < TLBOF.maxGenerations ) {
 
 			P = P.getOffSpring_TLBO_F();
 
 			generationCount++;
 		}
-		//»ñÈ¡Ç°Á½²ãµÄ¾«Ó¢¸öÌåµÄ²Ù×÷ĞòÁĞ ½øĞĞ×ÊÔ´ËÑË÷ ÖÖÈºÀ©³ä ÒÔÔö¼Ó×îÓÅÖÖÈºµÄ¶àÑùĞÔ
+		//è·å–å‰ä¸¤å±‚çš„ç²¾è‹±ä¸ªä½“çš„æ“ä½œåºåˆ— è¿›è¡Œèµ„æºæœç´¢ ç§ç¾¤æ‰©å…… ä»¥å¢åŠ æœ€ä¼˜ç§ç¾¤çš„å¤šæ ·æ€§
 		//Population elite = Tools.getbestsolution(P,2,project);	
 		Population expandPop=P.serchMoreSpaceByRes(TLBOF.s1);
-		//´Ó×îºóµÃµ½ÖÖÈºÖĞ»ñÈ¡×îÓÅ½â¼¯
+		//ä»æœ€åå¾—åˆ°ç§ç¾¤ä¸­è·å–æœ€ä¼˜è§£é›†
 		Population solutions = Tools.getbestsolution(expandPop,1, project);		
 		
 		 File f = new File(datafile);
@@ -203,7 +264,7 @@ public class NumericalTest {
 		   FileOutputStream fos = new FileOutputStream(f);
 		   ps = new PrintStream(fos);
 		   System.setOut(ps);
-		   //Êä³ö×îÓÅ½â¼¯
+		   //è¾“å‡ºæœ€ä¼˜è§£é›†
 		   Tools.printsolutions(solutions,startTime);			   
 		 } catch (IOException e) {
 			e.printStackTrace();
@@ -212,23 +273,23 @@ public class NumericalTest {
 	     }
 	}
 	public static void NSFFA_algorithm(String casefile,String datafile){
-	       //¼ÇÂ¼¿ªÊ¼¼ÆËãµÄÊ±¼ä£¬ÓÃÓÚÍ³¼Æ±¾Ëã·¨µÄ×ÜÊ±¼ä
+	       //è®°å½•å¼€å§‹è®¡ç®—çš„æ—¶é—´ï¼Œç”¨äºç»Ÿè®¡æœ¬ç®—æ³•çš„æ€»æ—¶é—´
 			long startTime = System.currentTimeMillis();
-			// ´´½¨°¸ÀıÀà¶ÔÏó
+			// åˆ›å»ºæ¡ˆä¾‹ç±»å¯¹è±¡
 			Case project = new Case(casefile);
 
-			// ³õÊ¼»¯ÖÖÈº
+			// åˆå§‹åŒ–ç§ç¾¤
 			Population P = new Population(NSFFA.NS,project,true);
 			
 			int generationCount = 0;
-	        //Ñ­»·µü´ú Ëã·¨Ö¸¶¨µÄ´ÎÊı
+	        //å¾ªç¯è¿­ä»£ ç®—æ³•æŒ‡å®šçš„æ¬¡æ•°
 			while (generationCount < NSFFA.maxGenerations ) {
 
 				P = P.getOffSpring_NSFFA();
 
 				generationCount++;
 			}
-			//´Ó×îºóµÃµ½ÖÖÈºÖĞ»ñÈ¡×îÓÅ½â¼¯
+			//ä»æœ€åå¾—åˆ°ç§ç¾¤ä¸­è·å–æœ€ä¼˜è§£é›†
 			Population solutions = Tools.getbestsolution(P,1, project);
 			
 	
@@ -240,7 +301,7 @@ public class NumericalTest {
 			   FileOutputStream fos = new FileOutputStream(f);
 			   ps = new PrintStream(fos);
 			   System.setOut(ps);
-			   //Êä³ö×îÓÅ½â¼¯
+			   //è¾“å‡ºæœ€ä¼˜è§£é›†
 			   Tools.printsolutions(solutions,startTime);			   
 			 } catch (IOException e) {
 				e.printStackTrace();

@@ -39,11 +39,11 @@ public class Population {
 	}
 
 	/**
-	 * ¼ÆËã¸ø¶¨ÖÖÈºµÄ¸öÌåÄ¿±êº¯Êı
-	 * µÃµ½¸öÌåÄ¿±êº¯ÊıµÄ¼¯ºÏ
+	 * è®¡ç®—ç»™å®šç§ç¾¤çš„ä¸ªä½“ç›®æ ‡å‡½æ•°
+	 * å¾—åˆ°ä¸ªä½“ç›®æ ‡å‡½æ•°çš„é›†åˆ
 	 * @param population
-	 *            ÖÖÈº
-	 * @return populationObj ÖÖÈºÖĞ¸öÌåÄ¿±êº¯Êı¼¯ºÏ
+	 *            ç§ç¾¤
+	 * @return populationObj ç§ç¾¤ä¸­ä¸ªä½“ç›®æ ‡å‡½æ•°é›†åˆ
 	 */
 	public List<double[]> populationObjCompute(Individual[] population) {
 		List<double[]> populationObj = new ArrayList<>();
@@ -56,26 +56,26 @@ public class Population {
 	
 	
 	
-	// »ñÈ¡ÖÖÈºµÄ¸öÌå³ÉÔ±
-	public Individual[] getPopulation() {
-		return this.population;
-	}
+	// è·å–ç§ç¾¤çš„ä¸ªä½“æˆå‘˜
+		public Individual[] getPopulation() {
+			return this.population;
+		}
 
-	// »ñÈ¡ÖÖÈºµÄÄ¿±êº¯Êı¼¯ºÏ
-	public List<double[]> getPopulationObj() {
-		return this.populationObj;
-	}
+		// è·å–ç§ç¾¤çš„ç›®æ ‡å‡½æ•°é›†åˆ
+		public List<double[]> getPopulationObj() {
+			return this.populationObj;
+		}
 
-	// »ñÈ¡ÖÖÈº´óĞ¡
-	public int size() {
-		return this.populationsize;
-	}
+		// è·å–ç§ç¾¤å¤§å°
+		public int size() {
+			return this.populationsize;
+		}
 
-	// ÉèÖÃÖÖÈºÖĞµÄ¸öÌå
-	public Individual setIndividual(int offset, Individual individual) {
-		return population[offset] = individual;
-	}
-	
+		// è®¾ç½®ç§ç¾¤ä¸­çš„ä¸ªä½“
+		public Individual setIndividual(int offset, Individual individual) {
+			return population[offset] = individual;
+		}
+		
 	
 	public int getPopulationsize() {
 		return populationsize;
@@ -104,281 +104,285 @@ public class Population {
 		return mergedPopulation;
 	}
 
-	// Ñ¡Ôñ
-	// ´Ó»ìºÏÖÖÈºÖĞ£¬Ñ¡ÔñÇ°N¸ö¸öÌå
-	public Population slectPopulation(int num) {
-		// ´´½¨ĞÂµÄÖÖÈº
-		Population newPopulation = new Population(num,project);
+	// é€‰æ‹©
+		// ä»æ··åˆç§ç¾¤ä¸­ï¼Œé€‰æ‹©å‰Nä¸ªä¸ªä½“
+		public Population slectPopulation(int num) {
+			// åˆ›å»ºæ–°çš„ç§ç¾¤
+			Population newPopulation = new Population(num,project);
 
-		// »ìºÏÖÖÈº½øĞĞ¿ìËÙ·ÇÖ§ÅäÅÅĞò
-		// µÃµ½²»Í¬·ÇÖ§Åä²ã£¬Ã¿¸ö·ÇÖ§Åä²ãÓÉ¶à¸öÕûÊı×é³É£¬¸ÃÕûÊıÎª¸öÌåÔÚ»ìºÏÖÖÈºµÄË÷Òı
-		List<List<Integer>> indivIndexRank = Tools.non_Dominated_Sort(this,0, project);
-		// ¸öÌåÊıÁ¿
-		int indivSum = 0;
-		int total = 0;
-		for (int j = 0; j < indivIndexRank.size(); j++) {
-			if (indivSum + indivIndexRank.get(j).size() <= num){
-				for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
-					int indivIndex = indivIndexRank.get(j).get(k);
-					Individual individual = this.getPopulation()[indivIndex];
+			// æ··åˆç§ç¾¤è¿›è¡Œå¿«é€Ÿéæ”¯é…æ’åº
+			// å¾—åˆ°ä¸åŒéæ”¯é…å±‚ï¼Œæ¯ä¸ªéæ”¯é…å±‚ç”±å¤šä¸ªæ•´æ•°ç»„æˆï¼Œè¯¥æ•´æ•°ä¸ºä¸ªä½“åœ¨æ··åˆç§ç¾¤çš„ç´¢å¼•
+			List<List<Integer>> indivIndexRank = Tools.non_Dominated_Sort(this,0, project);
+			// ä¸ªä½“æ•°é‡
+			int indivSum = 0;
+			int total = 0;
+			for (int j = 0; j < indivIndexRank.size(); j++) {
+				if (indivSum + indivIndexRank.get(j).size() <= num){
+					for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
+						int indivIndex = indivIndexRank.get(j).get(k);
+						Individual individual = this.getPopulation()[indivIndex];
 
-					newPopulation.setIndividual(total, individual);
-					total++;
+						newPopulation.setIndividual(total, individual);
+						total++;
+					}
+				}else{
+					Map<Integer, double[]> indexAndObj = new HashMap<>();
+					for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
+						int indivIndex = indivIndexRank.get(j).get(k);
+						Individual individual = this.getPopulation()[indivIndex];
+						indexAndObj.put(indivIndex, individual.getObj());
+					}
+					//å¾—åˆ°æŒ‰æ‹¥æŒ¤åº¦æ’å¥½åºçš„ä¸ªä½“é›†åˆ
+					Map<Integer, Double> crowMap = Tools.crowdingCompute(indexAndObj);
+					List<Map.Entry<Integer, Double>> crowmaplist = Tools.sortBycrowd(crowMap);
+					// é€‰æ‹©jæ”¯é…å±‚ä¸­çš„å‰[indexList.size()-(indivSum-populationSize)]ä¸ªä¸ªä½“æ·»åŠ åˆ°æ–°ä¸€ä»£çˆ¶ä»£ç§ç¾¤ä¸­
+					for (int i = 0; i < (num - indivSum); i++) {
+						// ä¸ªä½“åœ¨æ”¯é…å±‚ç§ç¾¤ä¸­çš„ç´¢å¼•
+						int index = crowmaplist.get(i).getKey();
+						// æŒ‰æ‹¥æŒ¤åº¦æ’åºåï¼Œæ”¯é…å±‚ä¸­å‰[indexList.size()-(indivSum-populationSize)]ä¸ªä¸ªä½“
+						Individual individual = this.getPopulation()[index];
+						newPopulation.setIndividual(total, individual);
+						total++;	
+					}
 				}
-			}else{
-				Map<Integer, double[]> indexAndObj = new HashMap<>();
-				for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
-					int indivIndex = indivIndexRank.get(j).get(k);
-					Individual individual = this.getPopulation()[indivIndex];
-					indexAndObj.put(indivIndex, individual.getObj());
-				}
-				//µÃµ½°´Óµ¼·¶ÈÅÅºÃĞòµÄ¸öÌå¼¯ºÏ
-				Map<Integer, Double> crowMap = Tools.crowdingCompute(indexAndObj);
-				List<Map.Entry<Integer, Double>> crowmaplist = Tools.sortBycrowd(crowMap);
-				// Ñ¡ÔñjÖ§Åä²ãÖĞµÄÇ°[indexList.size()-(indivSum-populationSize)]¸ö¸öÌåÌí¼Óµ½ĞÂÒ»´ú¸¸´úÖÖÈºÖĞ
-				for (int i = 0; i < (num - indivSum); i++) {
-					// ¸öÌåÔÚÖ§Åä²ãÖÖÈºÖĞµÄË÷Òı
-					int index = crowmaplist.get(i).getKey();
-					// °´Óµ¼·¶ÈÅÅĞòºó£¬Ö§Åä²ãÖĞÇ°[indexList.size()-(indivSum-populationSize)]¸ö¸öÌå
-					Individual individual = this.getPopulation()[index];
-					newPopulation.setIndividual(total, individual);
-					total++;	
-				}
+				indivSum += indivIndexRank.get(j).size();
+				if (indivSum >= num) break;
 			}
-			indivSum += indivIndexRank.get(j).size();
-			if (indivSum >= num) break;
-		}
 
-		return newPopulation;
-	}
-	
-	public Population getOffSpring_TLBO() {
-		Population OffSpring = new Population(TLBO.populationSize,project,false);
-		// ÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò,ÉèÖÃÖÖÈºÖĞÃ¿¸ö¸öÌåµÄ·ÇÖ§ÅäµÈ¼¶ºÍÓµ¼·¶ÈÖµ
-		Population teachers = selectTeachers();
-		//teacherÊ±ÆÚ
-		Population teacherPhase = crossTeachers(teachers);
-		//studentÊ±ÆÚ
-		Population studentPhase = teacherPhase.crossStudents();
-		//reinforcementÊ±ÆÚ
-		OffSpring = studentPhase.reinforcement();
-
-		return OffSpring;
-	}
-	
-	//ÀÏÊ¦¸öÌå±äÒì²Ù×÷
-	public Population reinforcement() {
-		Population rein = new Population(TLBO.populationSize, project);
-		for(int i=0; i<TLBO.populationSize; i++){
-			Individual result = this.getPopulation()[i];
-			if(result.getTeacher()){
-				//ÒıÈëÇ¿»¯´ÎÊı
-				result.mutationPopulation(TLBOF.probp, 0);
-				result = result.binaryTournament(this.getPopulation()[i], result);
-			}
-			rein.setIndividual(i, result);
-		}
-		return rein;
-	}
-	
-	//Ñ§Éú¸öÌåÖ®¼ä½»²æ
-	public Population crossStudents() {
-		Individual[] individuals = this.getPopulation();
-		Population offSpring = new Population(TLBO.populationSize, project);
-		int range = individuals.length;
-		for(int i=0; i<range; i++){
-			Individual result = individuals[i];
-			int r = (int)(Math.random()*range);
-			if(r!=i
-				&&!individuals[i].getTeacher()
-				&&!individuals[r].getTeacher()){
-				Individual newIndiv = individuals[i].mating_tlbo(individuals[r]);
-				result = newIndiv.binaryTournament(newIndiv, individuals[i]);
-			}
-			offSpring.setIndividual(i, result);
-		}
-		return offSpring;
-	}
-	
-	//ÀÏÊ¦ºÍÑ§Éú¸öÌå½»²æ
-	public Population crossTeachers(Population teachers){
-		Individual[] individuals = this.getPopulation();
-		Population students = new Population(TLBO.populationSize, project);
-		for(int i = 0; i<individuals.length; i++){
-			Individual resultIndividual = individuals[i];
-			if(!resultIndividual.getTeacher()){
-				int r = (int) (Math.random() * teachers.size());
-				Individual newIndividual = individuals[i].mating_tlbo(teachers.getPopulation()[r]);
-				resultIndividual = newIndividual.binaryTournament(newIndividual, individuals[i]);
-			}
-			students.setIndividual(i, resultIndividual);
-		}
-		//ÈÚºÏÉ¸Ñ¡
-		return students;
-	}
-	
-	
-	
-	//Ñ¡ÔñÀÏÊ¦ÖÖÈº
-	public Population selectTeachers(){
-		List<List<Integer>> indexs = Tools.setRankAndCrowD(this, project);
-		int tSize = indexs.get(0).size();
-		Population teachers = new Population(tSize,project);
-		for(int i = 0; i<tSize; i++){
-			Individual teacher = this.getPopulation()[indexs.get(0).get(i)];
-			teacher.setTeacher(true);
-			teachers.setIndividual(i, teacher);
+			return newPopulation;
 		}
 		
-		return teachers;
-	}
+		public Population getOffSpring_TLBO() {
+			Population OffSpring = new Population(TLBO.populationSize,project,false);
+			// ç§ç¾¤è¿›è¡Œéæ”¯é…æ’åº,è®¾ç½®ç§ç¾¤ä¸­æ¯ä¸ªä¸ªä½“çš„éæ”¯é…ç­‰çº§å’Œæ‹¥æŒ¤åº¦å€¼
+			Population teachers = selectTeachers();
+			//teacheræ—¶æœŸ
+			Population teacherPhase = crossTeachers(teachers);
+			//studentæ—¶æœŸ
+			Population studentPhase = teacherPhase.crossStudents();
+			//reinforcementæ—¶æœŸ
+			OffSpring = studentPhase.reinforcement();
 
-	////ÒÅ´«Ëã·¨/////////////////////////////////////////////////////////////////
-	/**
-	 * Ê¹ÓÃÒÅ´«Ëã·¨»ñµÃÏÂÒ»´úÖÖÈº
-	 * 
-	 * @param project
-	 *            °¸Àı¼¯
-	 * @return ÏÂÒ»´úÖÖÈº
-	 */
-	public Population getOffSpring_NSGA() {
-	
-		Population OffSpring = new Population(NSGA_II.populationSize,project,false);
-		// ÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò,ÉèÖÃÖÖÈºÖĞÃ¿¸ö¸öÌåµÄ·ÇÖ§ÅäµÈ¼¶ºÍÓµ¼·¶ÈÖµ
-		Tools.setRankAndCrowD(this, project);
-		// 
-
-		// Ñ¡Ôñ³ö½»Åä³Ø
-		Population matePool = getMatePool();
-
-		// ½«½»Åä³ØÖĞµÄ¸öÌå°´Ö¸¶¨µÄ¸ÅÂÊ½øĞĞ½»Åä
-		Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
-
-		// ½«²úÉúµÄ×Ó´úÖÖÈº½øĞĞ±äÒì£¨tMutationRate£ºÈÎÎñĞòÁĞ±äÒì¸ÅÂÊ£¬rMutationRate ×ÊÔ´ĞòÁĞ±àÒë¸ÅÂÊ£©
-		Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
-
-		// ½«Á½¸öÖÖÈººÏ²¢
-		Population mergedPopulation = merged(this,p2);
-
-		// ´Ó»ìºÏÖÖÈºÖĞÑ¡ÔñÇ°populationSize¸ö¸öÌå×÷ÎªĞÂÒ»´ú¸¸´úÖÖÈº
-		OffSpring = mergedPopulation.slectPopulation(NSGA_II.populationSize);
-
-		return OffSpring;
-	}
-	
-	
-	
-	
-	/**
-	 * »ñÈ¡ÓÃÓÚ½»²æµÄ½»Åä³Ø£¬ÆäÖĞ¸öÌåÊıÁ¿µÈÓÚÊäÈëÖÖÈºµÄ¸öÌåÊıÁ¿
-	 * 
-	 * @param population
-	 *            ¸¸´úÖÖÈº
-	 * @return ÓÃÓÚ½»²æµÄ½»Åä³Ø
-	 */
-	public Population getMatePool() {
-		Population matePool = new Population(populationsize,project);
-		for (int i = 0; i < matePool.size(); i++) {
-			int m, n;
-			while (true) {
-				m = (int) (Math.random() * populationsize);
-				n = (int) (Math.random() * populationsize);
-				if (m == n)
-					continue; 
-				else
-					break;
+			return OffSpring;
+		}
+		//è€å¸ˆä¸ªä½“å˜å¼‚æ“ä½œ
+		public Population reinforcement() {
+			Population rein = new Population(TLBO.populationSize, project);
+			for(int i=0; i<TLBO.populationSize; i++){
+				Individual result = this.getPopulation()[i];
+				if(result.getTeacher()){
+					//å¼•å…¥å¼ºåŒ–æ¬¡æ•°
+					result.mutationPopulation(TLBOF.probp, 0);
+					result = result.binaryTournament(this.getPopulation()[i], result);
+				}
+				rein.setIndividual(i, result);
 			}
-			matePool.setIndividual(i, population[m].binaryTournament(population[m], population[n]));
+			return rein;
 		}
-		return matePool;
-	}
-	
-	
-	
-	/**
-	 * µ¥µã½»²æ·½·¨ ÈÎÎñÖ´ĞĞÁ´±íºÍ×ÊÔ´·ÖÅäÁ´±íÊ¹ÓÃÍ¬Ò»¸ö½»²æµã£¬½»²æºó£¬×Ó´ú¸öÌåµÄÈÎÎñÁ´±íÈÔÈ»ÊÇ½ôÇ°¹ØÏµ¿ÉĞĞÁ´±í
-	 * 
-	 * @param matePool
-	 *            ½»Åä³ØÖÖÈº
-	 * @return ·µ»ØĞÂÒ»´úÖÖÈº
-	 */
-	public Population crossoverPopulaiton(double crossoverRate) {
-		Population newPopulation = new Population(populationsize,project);
-		for (int i = 0; i < populationsize - 1; i += 2) {
-			Individual parent1 = population[i];
-			Individual parent2 = population[i + 1];
-			if (crossoverRate > Math.random()) {
-				
-				// »ñÈ¡ÈÎÎñÁ´±íµÄ½»²æµã[1,chromosomeLength]
-				int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
-				Individual son1 = parent1.Mating(parent2, swapPoint);
-				Individual son2 = parent2.Mating(parent1, swapPoint);
-				newPopulation.setIndividual(i, son1);
-				newPopulation.setIndividual(i + 1, son2);
-				
-			}else{
-				newPopulation.setIndividual(i, parent1);
-				newPopulation.setIndividual(i + 1, parent2);				
-			}
-		}
-		return newPopulation;
-	}
-	
-	/**
-	 * ±äÒì
-	 * 
-	 * @param population
-	 *            ÖÖÈº
-	 * @return ·µ»ØĞÂÒ»´úÖÖÈº
-	 */
-	public Population mutationPopulation(double tMutationRate,double rMutationRate) {
-		// ´´½¨ĞÂµÄÖÖÈº
-		Population newPopulation = new Population(populationsize,project);
-		for (int i = 0; i < populationsize; i++) {
-			Individual parent = population[i];
-			Individual son = parent.mutationPopulation(tMutationRate,rMutationRate);
-			newPopulation.setIndividual(i, son);
-		}
-		return newPopulation;
-	}
-
-
-	/////NSFFA/////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Ê¹ÓÃÒÅ´«Ëã·¨»ñµÃÏÂÒ»´úÖÖÈº
-	 * 
-	 * @param project
-	 *            °¸Àı¼¯
-	 * @return ÏÂÒ»´úÖÖÈº
-	 */
-	public Population getOffSpring_NSFFA() {
-	
-		Population OffSpring = new Population(NSFFA.NS,project);
-		// ÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò,ÉèÖÃÖÖÈºÖĞÃ¿¸ö¸öÌåµÄ·ÇÖ§ÅäµÈ¼¶ºÍÓµ¼·¶ÈÖµ
-		Tools.setRankAndCrowD(this, project);
-		// 
-		// »ùÓÚÆøÎ¶ËÑË÷£¬Ã¿¸ö¸öÌåÉú³ÉS¸ö¸öÌå£¬ÖÖÈº´óĞ¡ÎªNS*S
-		Population p1 = this.smell_BasedSearch();
-		// ½«Á½¸öÖÖÈººÏ²¢
-		Population mp1 = merged(this,p1);
-		// ´Ó»ìºÏÖÖÈºÖĞÑ¡ÔñÇ°populationSize¸ö¸öÌå×÷ÎªĞÂÒ»´ú¸¸´úÖÖÈº
-		Population p2 = mp1.slectPopulation(NSFFA.NS);
 		
-		 // »ùÓÚÖªÊ¶µÄËÑË÷
-		Population Q = p2.knowledge_BasedSearch();
-		// ½«Á½¸öÖÖÈººÏ²¢
-		Population mp2 = merged(p2,Q);
-		// ´Ó»ìºÏÖÖÈºÖĞÑ¡ÔñÇ°populationSize¸ö¸öÌå×÷ÎªĞÂÒ»´ú¸¸´úÖÖÈº
-		OffSpring = mp2.slectPopulation(NSFFA.NS);
+	
+		//å­¦ç”Ÿä¸ªä½“ä¹‹é—´äº¤å‰
+		public Population crossStudents() {
+			Individual[] individuals = this.getPopulation();
+			Population offSpring = new Population(TLBO.populationSize, project);
+			int range = individuals.length;
+			for(int i=0; i<range; i++){
+				Individual result = individuals[i];
+				int r = (int)(Math.random()*range);
+				if(r!=i
+					&&!individuals[i].getTeacher()
+					&&!individuals[r].getTeacher()){
+					Individual newIndiv = individuals[i].mating_tlbo(individuals[r]);
+					result = newIndiv.binaryTournament(newIndiv, individuals[i]);
+				}
+				offSpring.setIndividual(i, result);
+			}
+			return offSpring;
+		}
+		
+	
+		//è€å¸ˆå’Œå­¦ç”Ÿä¸ªä½“äº¤å‰
+		public Population crossTeachers(Population teachers){
+			Individual[] individuals = this.getPopulation();
+			Population students = new Population(TLBO.populationSize, project);
+			for(int i = 0; i<individuals.length; i++){
+				Individual resultIndividual = individuals[i];
+				if(!resultIndividual.getTeacher()){
+					int r = (int) (Math.random() * teachers.size());
+					Individual newIndividual = individuals[i].mating_tlbo(teachers.getPopulation()[r]);
+					resultIndividual = newIndividual.binaryTournament(newIndividual, individuals[i]);
+				}
+				students.setIndividual(i, resultIndividual);
+			}
+			//èåˆç­›é€‰
+			return students;
+		}
+		
+	
+		//é€‰æ‹©è€å¸ˆç§ç¾¤
+		public Population selectTeachers(){
+			List<List<Integer>> indexs = Tools.setRankAndCrowD(this, project);
+			int tSize = indexs.get(0).size();
+			Population teachers = new Population(tSize,project);
+			for(int i = 0; i<tSize; i++){
+				Individual teacher = this.getPopulation()[indexs.get(0).get(i)];
+				teacher.setTeacher(true);
+				teachers.setIndividual(i, teacher);
+			}
+			
+			return teachers;
+		}
 
-		return OffSpring;
-	}
+
+		////é—ä¼ ç®—æ³•/////////////////////////////////////////////////////////////////
+		/**
+		 * ä½¿ç”¨é—ä¼ ç®—æ³•è·å¾—ä¸‹ä¸€ä»£ç§ç¾¤
+		 * 
+		 * @param project
+		 *            æ¡ˆä¾‹é›†
+		 * @return ä¸‹ä¸€ä»£ç§ç¾¤
+		 */
+		public Population getOffSpring_NSGA() {
+		
+			Population OffSpring = new Population(NSGA_II.populationSize,project,false);
+			// ç§ç¾¤è¿›è¡Œéæ”¯é…æ’åº,è®¾ç½®ç§ç¾¤ä¸­æ¯ä¸ªä¸ªä½“çš„éæ”¯é…ç­‰çº§å’Œæ‹¥æŒ¤åº¦å€¼
+			Tools.setRankAndCrowD(this, project);
+			// 
+
+			// é€‰æ‹©å‡ºäº¤é…æ± 
+			Population matePool = getMatePool();
+
+			// å°†äº¤é…æ± ä¸­çš„ä¸ªä½“æŒ‰æŒ‡å®šçš„æ¦‚ç‡è¿›è¡Œäº¤é…
+			Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
+
+			// å°†äº§ç”Ÿçš„å­ä»£ç§ç¾¤è¿›è¡Œå˜å¼‚ï¼ˆtMutationRateï¼šä»»åŠ¡åºåˆ—å˜å¼‚æ¦‚ç‡ï¼ŒrMutationRate èµ„æºåºåˆ—ç¼–è¯‘æ¦‚ç‡ï¼‰
+			Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
+
+			// å°†ä¸¤ä¸ªç§ç¾¤åˆå¹¶
+			Population mergedPopulation = merged(this,p2);
+
+			// ä»æ··åˆç§ç¾¤ä¸­é€‰æ‹©å‰populationSizeä¸ªä¸ªä½“ä½œä¸ºæ–°ä¸€ä»£çˆ¶ä»£ç§ç¾¤
+			OffSpring = mergedPopulation.slectPopulation(NSGA_II.populationSize);
+
+			return OffSpring;
+		}
+	
+	
+	
+
+		/**
+		 * è·å–ç”¨äºäº¤å‰çš„äº¤é…æ± ï¼Œå…¶ä¸­ä¸ªä½“æ•°é‡ç­‰äºè¾“å…¥ç§ç¾¤çš„ä¸ªä½“æ•°é‡
+		 * 
+		 * @param population
+		 *            çˆ¶ä»£ç§ç¾¤
+		 * @return ç”¨äºäº¤å‰çš„äº¤é…æ± 
+		 */
+		public Population getMatePool() {
+			Population matePool = new Population(populationsize,project);
+			for (int i = 0; i < matePool.size(); i++) {
+				int m, n;
+				while (true) {
+					m = (int) (Math.random() * populationsize);
+					n = (int) (Math.random() * populationsize);
+					if (m == n)
+						continue; 
+					else
+						break;
+				}
+				matePool.setIndividual(i, population[m].binaryTournament(population[m], population[n]));
+			}
+			return matePool;
+		}
+	
+
+		/**
+		 * å•ç‚¹äº¤å‰æ–¹æ³• ä»»åŠ¡æ‰§è¡Œé“¾è¡¨å’Œèµ„æºåˆ†é…é“¾è¡¨ä½¿ç”¨åŒä¸€ä¸ªäº¤å‰ç‚¹ï¼Œäº¤å‰åï¼Œå­ä»£ä¸ªä½“çš„ä»»åŠ¡é“¾è¡¨ä»ç„¶æ˜¯ç´§å‰å…³ç³»å¯è¡Œé“¾è¡¨
+		 * 
+		 * @param matePool
+		 *            äº¤é…æ± ç§ç¾¤
+		 * @return è¿”å›æ–°ä¸€ä»£ç§ç¾¤
+		 */
+		public Population crossoverPopulaiton(double crossoverRate) {
+			Population newPopulation = new Population(populationsize,project);
+			for (int i = 0; i < populationsize - 1; i += 2) {
+				Individual parent1 = population[i];
+				Individual parent2 = population[i + 1];
+				if (crossoverRate > Math.random()) {
+					
+					// è·å–ä»»åŠ¡é“¾è¡¨çš„äº¤å‰ç‚¹[1,chromosomeLength]
+					int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
+					Individual son1 = parent1.Mating(parent2, swapPoint);
+					Individual son2 = parent2.Mating(parent1, swapPoint);
+					newPopulation.setIndividual(i, son1);
+					newPopulation.setIndividual(i + 1, son2);
+					
+				}else{
+					newPopulation.setIndividual(i, parent1);
+					newPopulation.setIndividual(i + 1, parent2);				
+				}
+			}
+			return newPopulation;
+		}
+
+		/**
+		 * å˜å¼‚
+		 * 
+		 * @param population
+		 *            ç§ç¾¤
+		 * @return è¿”å›æ–°ä¸€ä»£ç§ç¾¤
+		 */
+		public Population mutationPopulation(double tMutationRate,double rMutationRate) {
+			// åˆ›å»ºæ–°çš„ç§ç¾¤
+			Population newPopulation = new Population(populationsize,project);
+			for (int i = 0; i < populationsize; i++) {
+				Individual parent = population[i];
+				Individual son = parent.mutationPopulation(tMutationRate,rMutationRate);
+				newPopulation.setIndividual(i, son);
+			}
+			return newPopulation;
+		}
+
+
+
+
+		/////NSFFA/////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * ä½¿ç”¨é—ä¼ ç®—æ³•è·å¾—ä¸‹ä¸€ä»£ç§ç¾¤
+		 * 
+		 * @param project
+		 *            æ¡ˆä¾‹é›†
+		 * @return ä¸‹ä¸€ä»£ç§ç¾¤
+		 */
+		public Population getOffSpring_NSFFA() {
+		
+			Population OffSpring = new Population(NSFFA.NS,project);
+			// ç§ç¾¤è¿›è¡Œéæ”¯é…æ’åº,è®¾ç½®ç§ç¾¤ä¸­æ¯ä¸ªä¸ªä½“çš„éæ”¯é…ç­‰çº§å’Œæ‹¥æŒ¤åº¦å€¼
+			Tools.setRankAndCrowD(this, project);
+			// 
+			// åŸºäºæ°”å‘³æœç´¢ï¼Œæ¯ä¸ªä¸ªä½“ç”ŸæˆSä¸ªä¸ªä½“ï¼Œç§ç¾¤å¤§å°ä¸ºNS*S
+			Population p1 = this.smell_BasedSearch();
+			// å°†ä¸¤ä¸ªç§ç¾¤åˆå¹¶
+			Population mp1 = merged(this,p1);
+			// ä»æ··åˆç§ç¾¤ä¸­é€‰æ‹©å‰populationSizeä¸ªä¸ªä½“ä½œä¸ºæ–°ä¸€ä»£çˆ¶ä»£ç§ç¾¤
+			Population p2 = mp1.slectPopulation(NSFFA.NS);
+			
+			 // åŸºäºçŸ¥è¯†çš„æœç´¢
+			Population Q = p2.knowledge_BasedSearch();
+			// å°†ä¸¤ä¸ªç§ç¾¤åˆå¹¶
+			Population mp2 = merged(p2,Q);
+			// ä»æ··åˆç§ç¾¤ä¸­é€‰æ‹©å‰populationSizeä¸ªä¸ªä½“ä½œä¸ºæ–°ä¸€ä»£çˆ¶ä»£ç§ç¾¤
+			OffSpring = mp2.slectPopulation(NSFFA.NS);
+
+			return OffSpring;
+		}
+		
+		
 	
 	
 	
 	/**
-	 * »ùÓÚÆøÎ¶ËÑË÷·½·¨ ±éÀúÊäÈëÖÖÈºÖĞµÄÃ¿¸ö¸öÌå£¬Ã¿¸ö¸öÌå¾­¹ı²Ù×÷£¬Éú³ÉS¸ö×Ó¸öÌå
+	 * åŸºäºæ°”å‘³æœç´¢æ–¹æ³• éå†è¾“å…¥ç§ç¾¤ä¸­çš„æ¯ä¸ªä¸ªä½“ï¼Œæ¯ä¸ªä¸ªä½“ç»è¿‡æ“ä½œï¼Œç”ŸæˆSä¸ªå­ä¸ªä½“
 	 * 
 	 * @param population
 	 * @return
@@ -386,7 +390,7 @@ public class Population {
 	public Population smell_BasedSearch() {
 		Population newPopulation = new Population(this.size() * NSFFA.S,project );
 		List<Individual> indivList = new ArrayList<>();
-		// ±éÀúÊäÈëÖÖÈºÖĞµÄÃ¿¸ö¸öÌå£¬Ã¿¸ö¸öÌå¾­¹ı²Ù×÷£¬Éú³ÉS¸ö×Ó¸öÌå
+		// éå†è¾“å…¥ç§ç¾¤ä¸­çš„æ¯ä¸ªä¸ªä½“ï¼Œæ¯ä¸ªä¸ªä½“ç»è¿‡æ“ä½œï¼Œç”ŸæˆSä¸ªå­ä¸ªä½“
 		Individual[] individuals = this.getPopulation();
 		for (int i = 0; i < this.size(); i++) {
 			Individual individual = individuals[i];
@@ -400,7 +404,7 @@ public class Population {
 					}
 					offspringChromosome.add(list);
 				}
-				// Ëæ»úÑ¡ÔñÈÎÎñĞòÁĞÖĞµÄÄ³¸öÎ»ÖÃ  ¶Ô1¸öÈÎÎñµÄ×ÊÔ´ÖØĞÂÑ¡Ôñ 
+				// éšæœºé€‰æ‹©ä»»åŠ¡åºåˆ—ä¸­çš„æŸä¸ªä½ç½®  å¯¹1ä¸ªä»»åŠ¡çš„èµ„æºé‡æ–°é€‰æ‹© 
 				int index_t_1 = (int) (Math.random() * offspringChromosome.get(0).size());
 				
 				int taskID = offspringChromosome.get(0).get(index_t_1);
@@ -413,7 +417,7 @@ public class Population {
 				int resourceid = capapleResource.get(index_capaple);
 				offspringChromosome.get(1).set(index_t_1, resourceid);
 				
-				// ÖØ¸´Ëæ»úÑ¡ÔñÈÎÎñĞòÁĞÖĞµÄÄ³¸öÎ»ÖÃ£¬Ö±µ½Á½¸öÏàÁÚÈÎÎñÃ»ÓĞ½ôÇ°ÈÎÎñ¹ØÏµ£¬ ×ö1´ÎÈÎÎñÎ»ÖÃ½»»»
+				// é‡å¤éšæœºé€‰æ‹©ä»»åŠ¡åºåˆ—ä¸­çš„æŸä¸ªä½ç½®ï¼Œç›´åˆ°ä¸¤ä¸ªç›¸é‚»ä»»åŠ¡æ²¡æœ‰ç´§å‰ä»»åŠ¡å…³ç³»ï¼Œ åš1æ¬¡ä»»åŠ¡ä½ç½®äº¤æ¢
 				while (true) {
 					int index_t_2 = (int) (Math.random() * offspringChromosome.get(0).size());
 					if (index_t_2 != (offspringChromosome.get(0).size() - 1)) {
@@ -427,7 +431,7 @@ public class Population {
 						Task task2 = project.getTasks().get(taskID2 - 1);
 
 						if (!project.isPredecessor(task1, task2)) {
-							// ½»»»Á½¸öÎ»ÖÃÉÏµÄÈÎÎñ±àºÅÒÔ¼°×ÊÔ´±àºÅ
+							// äº¤æ¢ä¸¤ä¸ªä½ç½®ä¸Šçš„ä»»åŠ¡ç¼–å·ä»¥åŠèµ„æºç¼–å·
 							offspringChromosome.get(0).set(index_t_2, taskID2);
 							offspringChromosome.get(1).set(index_t_2, resourceID2);
 							offspringChromosome.get(0).set(index_t_2 + 1, taskID1);
@@ -437,7 +441,7 @@ public class Population {
 						} 
 					}
 				}
-				// ´´½¨×Ó´ú¸öÌå¶ÔÏó
+				// åˆ›å»ºå­ä»£ä¸ªä½“å¯¹è±¡
 				Individual offspring = new Individual(offspringChromosome,project);
 				indivList.add(offspring);
 			}
@@ -448,15 +452,16 @@ public class Population {
 		return newPopulation;
 	}
 
+
 	/**
-	 * »ùÓÚÖªÊ¶¿âËÑË÷
+	 * åŸºäºçŸ¥è¯†åº“æœç´¢
 	 * 
 	 * @param population
 	 * @return
 	 */
 	public Population knowledge_BasedSearch() {
 		Population newPopulation = new Population(this.size(),project);
-		// Ñ¡ÔñNE¸ö¾«Ó¢¸öÌå
+		// é€‰æ‹©NEä¸ªç²¾è‹±ä¸ªä½“
 		Population EPop = this.slectPopulation(NSFFA.NE);
 
 		List<Task> tasks = project.getTasks();
@@ -479,12 +484,12 @@ public class Population {
 
 		}
 
-		// ±éÀúÖÖÈºµÄ¸öÌå£¬ÀûÓÃÂÖÅÌ¶Ä·¨ÎªÃ¿¸ö¸öÌåµÄÈ¾É«ÌåÈÎÎñĞòÁĞÖØĞÂ·ÖÅä×ÊÔ´,²¢½øĞĞ½»²æËã×Ó²Ù×÷
+		// éå†ç§ç¾¤çš„ä¸ªä½“ï¼Œåˆ©ç”¨è½®ç›˜èµŒæ³•ä¸ºæ¯ä¸ªä¸ªä½“çš„æŸ“è‰²ä½“ä»»åŠ¡åºåˆ—é‡æ–°åˆ†é…èµ„æº,å¹¶è¿›è¡Œäº¤å‰ç®—å­æ“ä½œ
 		for (int i = 0; i < this.size(); i++) {
 			Individual parent = this.getPopulation()[i];
-			// ¸öÌåiµÄÈ¾É«Ìå½á¹¹
+			// ä¸ªä½“içš„æŸ“è‰²ä½“ç»“æ„
 			List<List<Integer>> chromosome = parent.getChromosome();
-			// ´´½¨×Ó¸öÌåµÄÈ¾É«Ìå¶ÔÏó
+			// åˆ›å»ºå­ä¸ªä½“çš„æŸ“è‰²ä½“å¯¹è±¡
 			List<List<Integer>> newChromosome = new ArrayList<>();
 			for (int m = 0; m < chromosome.size(); m++) {
 				List<Integer> list = new ArrayList<>();
@@ -495,23 +500,23 @@ public class Population {
 			}
 
 			for (int j = 0; j < newChromosome.get(0).size(); j++) {
-				// ÈÎÎñID
+				// ä»»åŠ¡ID
 				int tID = newChromosome.get(0).get(j);
-				// ÈÎÎñ¶ÔÏó
+				// ä»»åŠ¡å¯¹è±¡
 				Task t = tasks.get(tID - 1);
-				// ÈÎÎñtµÄ¿ÉÖ´ĞĞ×ÊÔ´¼¯
+				// ä»»åŠ¡tçš„å¯æ‰§è¡Œèµ„æºé›†
 				Map<Integer,Double> capapleResource = t.getCapaleResource();
-				// ÀûÓÃÂÖÅÌ¶Ä·¨ÎªÈÎÎñtÖØĞÂ·ÖÅä×ÊÔ´
+				// åˆ©ç”¨è½®ç›˜èµŒæ³•ä¸ºä»»åŠ¡té‡æ–°åˆ†é…èµ„æº
 				int reassignResourceID = selectResource(capapleResource);
 				newChromosome.get(1).set(j, reassignResourceID);
 			}
 
-			// ´ÓNE¾«Ó¢¸öÌåÈºÖĞËæ»úÑ¡ÔñÒ»¸ö¸öÌå
+			// ä»NEç²¾è‹±ä¸ªä½“ç¾¤ä¸­éšæœºé€‰æ‹©ä¸€ä¸ªä¸ªä½“
 			int randIndex = (int) (Math.random() * EPop.size());
 			Individual parent_2 = EPop.getPopulation()[randIndex];
 			List<List<Integer>> chromosome_2 = parent_2.getChromosome();
 
-			// Ëæ»úÑ¡ÔñÁ½¸öÎ»ÖÃ£¬p,q,ĞèÒªÂú×ã1<=p<q<=J-1
+			// éšæœºé€‰æ‹©ä¸¤ä¸ªä½ç½®ï¼Œp,q,éœ€è¦æ»¡è¶³1<=p<q<=J-1
 			int p, q;
 			while (true) {
 				p = (int) (Math.random() * newChromosome.get(0).size());
@@ -520,7 +525,7 @@ public class Population {
 					break;
 				}
 			}
-			// ÓÃÀ´´æ´¢ÒÑÅÅºÃĞòµÄ×ÓÈÎÎñĞòÁĞ
+			// ç”¨æ¥å­˜å‚¨å·²æ’å¥½åºçš„å­ä»»åŠ¡åºåˆ—
 			List<Integer> tID_List = new ArrayList<>();
 			for (int j = 0; j < chromosome_2.get(0).size(); j++) {
 				if (j < p || j > q) {
@@ -540,23 +545,22 @@ public class Population {
 				}
 			}
 
-			// ´´½¨×Ó¸öÌå
+			// åˆ›å»ºå­ä¸ªä½“
 			Individual offspring = new Individual(newChromosome,project);
 			newPopulation.setIndividual(i, offspring);
 		}
 
 		return newPopulation;
 	}
-
 	/**
-	 * ÂÖÅÌ¶Ä·¨£¬ÎªÃ¿¸öÈÎÎñÖØĞÂ·ÖÅä×ÊÔ´
+	 * è½®ç›˜èµŒæ³•ï¼Œä¸ºæ¯ä¸ªä»»åŠ¡é‡æ–°åˆ†é…èµ„æº
 	 * 
 	 * @param capapleResource
 	 * @return
 	 */
 	public int selectResource(Map<Integer, Double> capapleResource) {
 		double rouletteWheelPosition = Math.random();
-		// Ñ¡Ôñ×ÊÔ´
+		// é€‰æ‹©èµ„æº
 		double spinWheel = 0;
 		int Resourceid = 0;
 		Iterator<Integer> rt = capapleResource.keySet().iterator();
@@ -571,7 +575,7 @@ public class Population {
 	}
 
 	/**
-	 * ¼ÆËãÔÚNE¸ö¾«Ó¢¸öÌåÖĞ£¬ÓĞ¶àÉÙ¸öÌåÂú×ãÖ¸¶¨ÈÎÎñ£¬±»Ö¸¶¨×ÊÔ´·ÖÅä
+	 * è®¡ç®—åœ¨NEä¸ªç²¾è‹±ä¸ªä½“ä¸­ï¼Œæœ‰å¤šå°‘ä¸ªä½“æ»¡è¶³æŒ‡å®šä»»åŠ¡ï¼Œè¢«æŒ‡å®šèµ„æºåˆ†é…
 	 * 
 	 * @param ePop
 	 * @param taskID
@@ -582,10 +586,10 @@ public class Population {
 		int sum = 0;
 		for (int i = 0; i < ePop.size(); i++) {
 			Individual indiv = ePop.getPopulation()[i];
-			// Ö¸¶¨ÈÎÎñÔÚ¸öÌåÈ¾É«ÌåÖĞµÄË÷Òı
+			// æŒ‡å®šä»»åŠ¡åœ¨ä¸ªä½“æŸ“è‰²ä½“ä¸­çš„ç´¢å¼•
 			int index_t = indiv.getChromosome().get(0).indexOf(taskID);
 			int rID = indiv.getChromosome().get(1).get(index_t);
-			// Èç¹ûÓëÖ¸¶¨×ÊÔ´IDÏàÍ¬£¬sum¼Ó1
+			// å¦‚æœä¸æŒ‡å®šèµ„æºIDç›¸åŒï¼ŒsumåŠ 1
 			if (rID == resourceID) {
 				sum++;
 			}
@@ -604,20 +608,20 @@ public class Population {
 	public Population getOffSpring_TLBO_F() {
 		// TODO Auto-generated method stub
 		Population OffSpring = new Population(TLBO.populationSize,project,false);
-		// ÖÖÈº½øĞĞ·ÇÖ§ÅäÅÅĞò,ÉèÖÃÖÖÈºÖĞÃ¿¸ö¸öÌåµÄ·ÇÖ§ÅäµÈ¼¶ºÍÓµ¼·¶ÈÖµ
+		// ç§ç¾¤è¿›è¡Œéæ”¯é…æ’åº,è®¾ç½®ç§ç¾¤ä¸­æ¯ä¸ªä¸ªä½“çš„éæ”¯é…ç­‰çº§å’Œæ‹¥æŒ¤åº¦å€¼
 		Population teachers = selectTeachers();
-		//teacherÊ±ÆÚ
-		Population teacherPhase = crossTeachers(teachers);//Ã²ËÆÓĞÎÊÌâ
-		//studentÊ±ÆÚ
+		//teacheræ—¶æœŸ
+		Population teacherPhase = crossTeachers(teachers);//è²Œä¼¼æœ‰é—®é¢˜
+		//studentæ—¶æœŸ
 		Population studentPhase = teacherPhase.crossStudents();
-		//reinforcementÊ±ÆÚ
+		//reinforcementæ—¶æœŸ
 		OffSpring = studentPhase.reinforcement();
 
 		return OffSpring;
 	}
 	/*
-	 * Í¨¹ıÒ»ÏµÁĞµü´ú¹ıºóÒÑ¾­»ñÈ¡µ½½ü×îÓÅµÄ²Ù×÷ĞòÁĞÈ¾É«Ìå²¿·Ö£¬µ«ÊÇÕë¶Ô¾«Ó¢È¾É«Ìå¶ÔÓ¦µÄ×ÊÔ´·ÖÅäĞòÁĞËÑË÷²»×ã£¬½öÆ¥ÅäÁËÒ»ÌõºÏÊÊµÄ×ÊÔ´ĞòÁĞÈ¾É«Ìå
-	 * ¶øÏŞÖÆÁË×îÖÕ½âµÄ¶àÑùĞÔ£¬Ò»Ìõ¾«Ó¢²Ù×÷ĞòÁĞÈ¾É«Ìå¿ÉÒÔÆ¥Åä¶àÖÖÇéĞÎµÄ×ÊÔ´ĞòÁĞ Òò´ËÔÚ×îÖÕÕë¶Ô´Ë¼ÓÇ¿×ÊÔ´ĞòÁĞµÄËÑË÷ÒÔ¼ÓÇ¿½âµÄ¶àÑùĞÔ
+	 * é€šè¿‡ä¸€ç³»åˆ—è¿­ä»£è¿‡åå·²ç»è·å–åˆ°è¿‘æœ€ä¼˜çš„æ“ä½œåºåˆ—æŸ“è‰²ä½“éƒ¨åˆ†ï¼Œä½†æ˜¯é’ˆå¯¹ç²¾è‹±æŸ“è‰²ä½“å¯¹åº”çš„èµ„æºåˆ†é…åºåˆ—æœç´¢ä¸è¶³ï¼Œä»…åŒ¹é…äº†ä¸€æ¡åˆé€‚çš„èµ„æºåºåˆ—æŸ“è‰²ä½“
+	 * è€Œé™åˆ¶äº†æœ€ç»ˆè§£çš„å¤šæ ·æ€§ï¼Œä¸€æ¡ç²¾è‹±æ“ä½œåºåˆ—æŸ“è‰²ä½“å¯ä»¥åŒ¹é…å¤šç§æƒ…å½¢çš„èµ„æºåºåˆ— å› æ­¤åœ¨æœ€ç»ˆé’ˆå¯¹æ­¤åŠ å¼ºèµ„æºåºåˆ—çš„æœç´¢ä»¥åŠ å¼ºè§£çš„å¤šæ ·æ€§
 	 */
 	public Population serchMoreSpaceByRes(int s1) {
 		Individual[] indivs=this.getPopulation();
@@ -634,6 +638,9 @@ public class Population {
 		}
 		Population pop=new Population(population,project);
 		return pop;
+	}
+	public void setPopulation(Individual[] population) {
+		this.population = population;
 	}
 	
 }

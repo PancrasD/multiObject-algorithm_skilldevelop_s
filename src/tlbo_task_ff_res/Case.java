@@ -11,14 +11,14 @@ import java.util.Map;
 
 public class Case {
 
-	private int N;// °¸Àı°üº¬µÄÈÎÎñÊıÁ¿
-	private int M;// °¸Àı°üº¬µÄ×ÊÔ´ÊıÁ¿
-	private int PR;// °¸Àı°üº¬µÄ½ôÇ°¹ØÏµÊıÁ¿
-	private int K;// °¸Àı°üº¬µÄ¼¼ÄÜÀàĞÍÊıÁ¿
+	private int N;// æ¡ˆä¾‹åŒ…å«çš„ä»»åŠ¡æ•°é‡
+	private int M;// æ¡ˆä¾‹åŒ…å«çš„èµ„æºæ•°é‡
+	private int PR;// æ¡ˆä¾‹åŒ…å«çš„ç´§å‰å…³ç³»æ•°é‡
+	private int K;// æ¡ˆä¾‹åŒ…å«çš„æŠ€èƒ½ç±»å‹æ•°é‡
    
-	private List<Task> tasks = new ArrayList<>();//ÈÎÎñÊı×é
-	private List<Resource> resources = new ArrayList<>();//×ÊÔ´Êı×é
-	private List<Integer> characteristics = new ArrayList<>();//ÌØÕ÷ĞÅÏ¢Êı×é[ÈÎÎñÊıÁ¿£¬×ÊÔ´ÊıÁ¿£¬½ôÇ°ÈÎÎñÊıÁ¿£¬¼¼ÄÜÖÖÀà]
+	private List<Task> tasks = new ArrayList<>();//ä»»åŠ¡æ•°ç»„
+	private List<Resource> resources = new ArrayList<>();//èµ„æºæ•°ç»„
+	private List<Integer> characteristics = new ArrayList<>();//ç‰¹å¾ä¿¡æ¯æ•°ç»„[ä»»åŠ¡æ•°é‡ï¼Œèµ„æºæ•°é‡ï¼Œç´§å‰ä»»åŠ¡æ•°é‡ï¼ŒæŠ€èƒ½ç§ç±»]
 
 	public Case() {
 		caseDefinition();
@@ -30,18 +30,18 @@ public class Case {
 		this.M = characteristics.get(1);
 		this.PR = characteristics.get(2);
 		this.K = characteristics.get(3);
-		//ÉèÖÃ×ÊÔ´Ñ§Ï°ÄÜÁ¦
+		//è®¾ç½®èµ„æºå­¦ä¹ èƒ½åŠ›
 		setResourceLearnbility();
-		//¸ù¾İ¼¼ÄÜË®Æ½µÃµ½Ã¿¸öÈÎÎñµÄ¿ÉÓÃ×ÊÔ´¼¯ºÏ
+		//æ ¹æ®æŠ€èƒ½æ°´å¹³å¾—åˆ°æ¯ä¸ªä»»åŠ¡çš„å¯ç”¨èµ„æºé›†åˆ
 		setCapapleResource();
-		//µÃµ½Ã¿¸öÈÎÎñµÄ½ôºóÈÎÎñ¼¯ºÏ
+		//å¾—åˆ°æ¯ä¸ªä»»åŠ¡çš„ç´§åä»»åŠ¡é›†åˆ
 		countsuccessor();
-		//µÃµ½Ã¿¸öÈÎÎñ¶ÔÓ¦¿ÉÓÃ×ÊÔ´µÄÊ¹ÓÃ¸ÅÂÊ
+		//å¾—åˆ°æ¯ä¸ªä»»åŠ¡å¯¹åº”å¯ç”¨èµ„æºçš„ä½¿ç”¨æ¦‚ç‡
 		setTaskCapapleResource();
 		
 	}
 	
-	//round-robinÔ­ÔòÉèÖÃÑ§Ï°ÄÜÁ¦
+	//round-robinåŸåˆ™è®¾ç½®å­¦ä¹ èƒ½åŠ›
 	public void setResourceLearnbility() {
 		double[] learnArr = new double[]{0.515, 0.321, 0.152};
 		for(int i=0; i<resources.size();i++){
@@ -49,8 +49,8 @@ public class Case {
 		}
 	}
 
-	// ¶¨ÒåÒ»¸ö¶ÁÈ¡°¸ÀıÎÄ¼şµÄ·½·¨£¬»ñÈ¡°¸ÀıµÄÏà¹ØĞÅÏ¢
-	//½«°¸ÀıĞÅÏ¢±£´æµ½±äÁ¿tasks,resources,characteristicsÖĞ
+	// å®šä¹‰ä¸€ä¸ªè¯»å–æ¡ˆä¾‹æ–‡ä»¶çš„æ–¹æ³•ï¼Œè·å–æ¡ˆä¾‹çš„ç›¸å…³ä¿¡æ¯
+	//å°†æ¡ˆä¾‹ä¿¡æ¯ä¿å­˜åˆ°å˜é‡tasks,resources,characteristicsä¸­
 	public void readCaseDef(String defFile) {
 		try (FileInputStream fis = new FileInputStream(defFile);
 				BufferedReader br = new BufferedReader(new InputStreamReader(fis))) {
@@ -60,14 +60,14 @@ public class Case {
 			int b = 0;
 			int n = 0;
 			int m = 0;
-			//°´ĞĞ¶ÁÈ¡ÎÄ¼ş
+			//æŒ‰è¡Œè¯»å–æ–‡ä»¶
 			while ((line = br.readLine()) != null) {
 				row++;
 
-				if (row < 3) {//Ç°Á½ĞĞ²»´¦Àí
+				if (row < 3) {//å‰ä¸¤è¡Œä¸å¤„ç†
 					continue;
 				}
-				if (3 <= row && row <= 6) {// ¶ÁÈ¡°¸ÀıµÄÒ»°ãÌØÕ÷ĞÅÏ¢£ºÈÎÎñÊıÁ¿£¬×ÊÔ´ÊıÁ¿£¬½ôÇ°ÈÎÎñÊıÁ¿£¬¼¼ÄÜÖÖÀà
+				if (3 <= row && row <= 6) {// è¯»å–æ¡ˆä¾‹çš„ä¸€èˆ¬ç‰¹å¾ä¿¡æ¯ï¼šä»»åŠ¡æ•°é‡ï¼Œèµ„æºæ•°é‡ï¼Œç´§å‰ä»»åŠ¡æ•°é‡ï¼ŒæŠ€èƒ½ç§ç±»
 					String[] strArr = line.split(":");
 					characteristics.add(Integer.valueOf(strArr[1]));
 					continue;
@@ -79,7 +79,7 @@ public class Case {
 				}
 
 				if (a < row && row <= (a + m)) {
-					String[] resource = line.trim().split("     ", 3);// 5¸ö¿Õ¸ñ·ûÎª·Ö¸ô·û,²¢ÏŞ¶¨Êı×é³¤¶ÈÎª3
+					String[] resource = line.trim().split("     ", 3);// 5ä¸ªç©ºæ ¼ç¬¦ä¸ºåˆ†éš”ç¬¦,å¹¶é™å®šæ•°ç»„é•¿åº¦ä¸º3
 					Resource r = new Resource(Integer.valueOf(resource[0]), Double.valueOf(resource[1]), resource[2]);
 					resources.add(r);
 					continue;
@@ -90,7 +90,7 @@ public class Case {
 					continue;
 				}
 				if (b < row && row <= (b + n)) {
-					String[] task = line.trim().split("     ", 4);// 5¸ö¿Õ¸ñ·ûÎª·Ö¸î·û£¬ÏŞ¶¨Êı×é³¤¶ÈÎª4,ÎŞ½ôÇ°ÈÎÎñµÄ£¬Êı×é³¤¶ÈÎª3
+					String[] task = line.trim().split("     ", 4);// 5ä¸ªç©ºæ ¼ç¬¦ä¸ºåˆ†å‰²ç¬¦ï¼Œé™å®šæ•°ç»„é•¿åº¦ä¸º4,æ— ç´§å‰ä»»åŠ¡çš„ï¼Œæ•°ç»„é•¿åº¦ä¸º3
 					if (task.length == 3) {
 						Task t = new Task(Integer.valueOf(task[0]), Integer.valueOf(task[1]), task[2]);
 						tasks.add(t);
@@ -115,7 +115,7 @@ public class Case {
 		this.PR = 4;
 		this.K = 3;
 
-		String[] resource1 = { "1", "56.0", "Q1:0 Q2:1" }; // ÕâÀïÔİÊ±Ä£·Â¶ÁÈ¡ÎÄ¼şÊ±£¬ĞÎ³ÉµÄ×Ö·û´®Êı×é
+		String[] resource1 = { "1", "56.0", "Q1:0 Q2:1" }; // è¿™é‡Œæš‚æ—¶æ¨¡ä»¿è¯»å–æ–‡ä»¶æ—¶ï¼Œå½¢æˆçš„å­—ç¬¦ä¸²æ•°ç»„
 		Resource r1 = new Resource(Integer.valueOf(resource1[0]), Double.valueOf(resource1[1]), resource1[2]);
 		String[] resource2 = { "2", "53.6", "Q2:2 Q0:1" };
 		Resource r2 = new Resource(Integer.valueOf(resource2[0]), Double.valueOf(resource2[1]), resource2[2]);
@@ -219,10 +219,10 @@ public class Case {
 
 
 	public void setCapapleResource() {
-		// Ã¿Ò»ÖÖ×ÊÔ´ÓµÓĞµÄ¼¼ÄÜ¼¯ºÏ
+		// æ¯ä¸€ç§èµ„æºæ‹¥æœ‰çš„æŠ€èƒ½é›†åˆ
 		List<Map<String, Integer>> staffSkillList = new ArrayList<>();
 		for (int i = 0; i < resources.size(); i++) {
-			// ×ÊÔ´iÓµÓĞµÄ¼¼ÄÜ-¼¼ÄÜË®Æ½
+			// èµ„æºiæ‹¥æœ‰çš„æŠ€èƒ½-æŠ€èƒ½æ°´å¹³
 			Map<String, Integer> resourceSkill = new HashMap<>();
 			String[] skills = resources.get(i).getSkils().trim().split(" ");
 			for (String skill : skills) {
@@ -233,12 +233,12 @@ public class Case {
 			staffSkillList.add(resourceSkill);
 		}
 
-		// ±éÀúÈÎÎñ¼¯
+		// éå†ä»»åŠ¡é›†
 		for (int i = 0; i < tasks.size(); i++) {
 			List<Integer> capapleResourceIDS = new ArrayList<Integer>();
-			// ÈÎÎñiµÄËùĞè¼¼ÄÜÀàĞÍºÍË®Æ½
+			// ä»»åŠ¡içš„æ‰€éœ€æŠ€èƒ½ç±»å‹å’Œæ°´å¹³
 			String[] skill_level = tasks.get(i).getSkill().trim().split(":");
-			// ±éÀúÃ¿Ò»ÖÖ×ÊÔ´ÓµÓĞµÄ¼¼ÄÜ¼¯ºÏ
+			// éå†æ¯ä¸€ç§èµ„æºæ‹¥æœ‰çš„æŠ€èƒ½é›†åˆ
 			for (int j = 0; j < staffSkillList.size(); j++) {
 				Map<String, Integer> map = staffSkillList.get(j);
 				if (map.keySet().contains(skill_level[0])
@@ -252,9 +252,9 @@ public class Case {
 		return;
 	}
 	
-	//£¿£¿£¿Î´ÕÒ³öÈ«²¿½ôºóÈÎÎñ
+	//ï¼Ÿï¼Ÿï¼Ÿæœªæ‰¾å‡ºå…¨éƒ¨ç´§åä»»åŠ¡
 	public void countsuccessor() {
-		//Ñ­»·Ã¿Ò»ÁĞ£¬
+		//å¾ªç¯æ¯ä¸€åˆ—ï¼Œ
 
 		for (int i = 0; i< tasks.size();i++){
 			List<Integer> successorIDS = new ArrayList<>();
@@ -275,19 +275,19 @@ public class Case {
 	}
 	
 	/**
-	 * ÅĞ¶ÏÈÎÎñÖ´ĞĞÁ´±íÖĞÏàÁÚÁ½¸öÈÎÎñÖ®¼äÊÇ·ñ´æÔÚ½ôÇ°¹ØÏµÔ¼Êø¡£ Èç¹ûtask1ÊÇtask2µÄ½ôÇ°ÈÎÎñ£¬Ôò·µ»Øtrue
-	 * ·ÖÁ½ÖÖÇé¿ö£º1.task2Ã»ÓĞ½ôÇ°ÈÎÎñ,·µ»Øfalse; 2.task2ÓĞ½ôÇ°ÈÎÎñ: ½ôÇ°ÈÎÎñ°üº¬task1; ½ôÇ°ÈÎÎñ²»°üº¬task1
+	 * åˆ¤æ–­ä»»åŠ¡æ‰§è¡Œé“¾è¡¨ä¸­ç›¸é‚»ä¸¤ä¸ªä»»åŠ¡ä¹‹é—´æ˜¯å¦å­˜åœ¨ç´§å‰å…³ç³»çº¦æŸã€‚ å¦‚æœtask1æ˜¯task2çš„ç´§å‰ä»»åŠ¡ï¼Œåˆ™è¿”å›true
+	 * åˆ†ä¸¤ç§æƒ…å†µï¼š1.task2æ²¡æœ‰ç´§å‰ä»»åŠ¡,è¿”å›false; 2.task2æœ‰ç´§å‰ä»»åŠ¡: ç´§å‰ä»»åŠ¡åŒ…å«task1; ç´§å‰ä»»åŠ¡ä¸åŒ…å«task1
 	 * 
 	 * @param task1
-	 *            ÈÎÎñ1
+	 *            ä»»åŠ¡1
 	 * @param task2
-	 *            ÈÎÎñ2
+	 *            ä»»åŠ¡2
 	 * @return
 	 */
 	public boolean isPredecessor(Task task1, Task task2) {
 		boolean flag = false;
 
-		// task1µÄID
+		// task1çš„ID
 		int task1_ID = task1.getTaskID();
 		if (task2.getPredecessorIDs().contains(task1_ID)) {
 			flag = true;
@@ -295,7 +295,7 @@ public class Case {
 		return flag;
 	}
 
-	//Ã¿¸ö¿ÉÓÃ×ÊÔ´Ê¹ÓÃµÄ¸ÅÂÊ£º1/¿ÉÓÃ×ÊÔ´×ÜÊı
+	//æ¯ä¸ªå¯ç”¨èµ„æºä½¿ç”¨çš„æ¦‚ç‡ï¼š1/å¯ç”¨èµ„æºæ€»æ•°
 	public void setTaskCapapleResource() {
 		for (int i = 0; i < tasks.size(); i++) {
 			Map<Integer, Double> r_possibility = new HashMap<>();

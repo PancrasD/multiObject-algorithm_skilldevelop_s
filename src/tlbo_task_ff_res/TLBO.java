@@ -1,15 +1,15 @@
 package tlbo_task_ff_res;
 
 public class TLBO {
-	    // 种群大小
+	    // 绉嶇兢澶у皬
 		public static final int populationSize = 200;
 
-		// 任务序列变异概率
-		public static final double probp = 0.15;//变异
+		// 浠诲姟搴忓垪鍙樺紓姒傜巼
+		public static final double probp = 0.15;//鍙樺紓
 		
-		// 老师个体强化次数
+		// 鑰佸笀涓綋寮哄寲娆℃暟
 		public static final double rein = 50;
 			
-		// 迭代次数
+		// 杩唬娆℃暟
 		public static final double maxGenerations = 1000;
 }
