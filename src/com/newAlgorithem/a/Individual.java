@@ -7,10 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
-import org.junit.jupiter.api.Test;
-
-
 public class Individual {
 	// 个体染色体的维数
 	static final int chromosomeLayer = 2;
@@ -661,7 +657,7 @@ public class Individual {
 		for(int i = 0; i <taskList.size(); i++){
 			ITask curTask = taskslist.get(taskList.get(i) -1);
 			//资源的选择 引入四种规则  随机  最便宜的资源 最早空闲资源   最小负载资源  最先可以升级的
-			int resourceid=selectResource(curTask,endtime_res,workload);
+			int resourceid=selectResourceC(curTask,endtime_res,workload);
 			
 			/*int B = (int) (rand2 * list.size());
 			_list2.add(rand2);
@@ -680,9 +676,68 @@ public class Individual {
 		List<Integer> list = curTask.getresourceIDs();
 		double rand=Math.random();
 		int resourceid=list.get(0);
-		
-		
-		return maxtime;
+		List<Integer> list1=new ArrayList<>(list);
+		if(rand<0.5&&list1.size()>1) {
+			//-------->成本最低
+			//升序排序
+			Collections.sort(list1, new Comparator<Integer>() {
+				@Override
+				public int compare(Integer arg0, Integer arg1) {
+					double cost1=ress.get(arg0-1).getSalary()*curTask.getStandardDuration()/ress.get(arg0-1).getSkillsInfo().get(curTask.getSkillType());
+					double cost2=ress.get(arg1-1).getSalary()*curTask.getStandardDuration()/ress.get(arg1-1).getSkillsInfo().get(curTask.getSkillType());
+					if(cost1>cost2) {
+						return 1;
+					}else if(cost1<cost2) {
+						return -1;
+					}else {
+					    return 0;
+					}
+				}
+			});
+		resourceid=list1.get(0);
+		}else if(rand<1&&list1.size()>1) {
+			//-------->最早完成
+			//升序排序
+			Collections.sort(list1, new Comparator<Integer>() {
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					double finish1=endtime_res[o1-1]+curTask.getStandardDuration()/ress.get(o1-1).getSkillsInfo().get(curTask.getSkillType());
+					double finish2=endtime_res[o2-1]+curTask.getStandardDuration()/ress.get(o2-1).getSkillsInfo().get(curTask.getSkillType());
+					if(finish1>finish2) {
+						return 1;
+					}else if(finish1<finish2) {
+						return -1;
+					}else {
+					    return 0;
+					}
+				}
+			});
+			resourceid = list1.get(0);
+		}else if(list1.size()>1){
+			//最早可以升级的
+			String qtype = curTask.getSkillType();
+			//升序排列
+			Collections.sort(list1, new Comparator<Integer>() {
+ 
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					IResource iRes1=ress.get(o1-1);
+					IResource iRes2=ress.get(o2-1);
+					double qinit1 = iRes1.getSkillsInfo().get(qtype);
+					double qinit2 = iRes2.getSkillsInfo().get(qtype);
+					if((Math.ceil(qinit1)-qinit1)>(Math.ceil(qinit2)-qinit2)) {
+						return 1;
+					}else if((Math.ceil(qinit1)-qinit1)<(Math.ceil(qinit2)-qinit2)) {
+						return -1;
+					}else {
+						return 0;
+					}
+				}
+				
+			});
+			resourceid=list1.get(0);
+		}
+		return resourceid;
 		
 	}
 	//选择资源
@@ -697,16 +752,17 @@ public class Individual {
 			int B = (int) (rand1 * list.size());
 			resourceid = list.get(B);
 		}else if(rand<0.5) {
-			//最便宜的资源
+			//-------->成本最低
 			List<Integer> list1=new ArrayList<>(list);
 			//升序排序
 			Collections.sort(list1, new Comparator<Integer>() {
-
 				@Override
 				public int compare(Integer arg0, Integer arg1) {
-					if(ress.get(arg0-1).getSalary()>ress.get(arg1-1).getSalary()) {
+					double cost1=ress.get(arg0-1).getSalary()*curTask.getStandardDuration()/ress.get(arg0-1).getSkillsInfo().get(curTask.getSkillType());
+					double cost2=ress.get(arg1-1).getSalary()*curTask.getStandardDuration()/ress.get(arg1-1).getSkillsInfo().get(curTask.getSkillType());
+					if(cost1>cost2) {
 						return 1;
-					}else if(ress.get(arg0-1).getSalary()<ress.get(arg1-1).getSalary()) {
+					}else if(cost1<cost2) {
 						return -1;
 					}else {
 					    return 0;
@@ -715,16 +771,17 @@ public class Individual {
 			});
 			resourceid=list1.get(0);
 		}else if(rand<0.7) {
-			//最早空闲资源
+			//最早空闲资源-------->最早完成
 			List<Integer> list1=new ArrayList<>(list);
 			//升序排序
 			Collections.sort(list1, new Comparator<Integer>() {
-
 				@Override
 				public int compare(Integer o1, Integer o2) {
-					if(endtime_res[o1-1]>endtime_res[o2-1]) {
+					double finish1=endtime_res[o1-1]+curTask.getStandardDuration()/ress.get(o1-1).getSkillsInfo().get(curTask.getSkillType());
+					double finish2=endtime_res[o2-1]+curTask.getStandardDuration()/ress.get(o2-1).getSkillsInfo().get(curTask.getSkillType());
+					if(finish1>finish2) {
 						return 1;
-					}else if(endtime_res[o1-1]<endtime_res[o2-1]) {
+					}else if(finish1<finish2) {
 						return -1;
 					}else {
 					    return 0;
@@ -732,12 +789,10 @@ public class Individual {
 				}
 			});
 			resourceid = list1.get(0);
-			
 		}else if(rand<0.9) {
 			//最小负载资源
 			List<Integer> list1=new ArrayList<>(list);
 			Collections.sort(list1, new Comparator<Integer>() {
-
 				@Override
 				public int compare(Integer o1, Integer o2) {
 					if(workload[o1-1]>workload[o2-1]) {
@@ -754,7 +809,7 @@ public class Individual {
 		}else {
 			//最早可以升级的
 			List<Integer> list1=new ArrayList<>(list);
-			String qtype = curTask.getSkill().split(":")[0].trim();
+			String qtype = curTask.getSkillType();
 			//升序排列
 			Collections.sort(list1, new Comparator<Integer>() {
  
@@ -944,10 +999,10 @@ public class Individual {
 			individual = indiv2;
 		}
 		if (rank1 == rank2) {
-			if (indiv1.getCrowDistance() < indiv2.getCrowDistance()) {
+			if (indiv1.getHyperVolume() < indiv2.getHyperVolume()) {
 				individual = indiv2;
 			}
-			if (indiv1.getCrowDistance() > indiv2.getCrowDistance()) {
+			if (indiv1.getHyperVolume()> indiv2.getHyperVolume()) {
 				individual = indiv1;
 			} else {
 				if (Math.random() >= 0.5) {
@@ -1075,6 +1130,189 @@ public class Individual {
 	public void setHyperVolume(double hyperVolume) {
 		this.hyperVolume = hyperVolume;
 	}
+    //个体变邻搜索
+	public Individual variableNeighborDecent() {
+		Individual compare=this;
+		int k=1;//第一个邻结构的序号
+		while(k<=5) {
+			Individual son=compare.variableNeighborWithFirst(k);
+			if(Tools.Dominated(son,compare,this.project)==1) {
+				compare=son;
+				break;
+			}else {
+				k++;
+			}
+		}
+		return compare;
+	}
+
+	private Individual variableNeighborWithFirst(int k) {
+		
+		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
+		List<Integer> _tasks = new ArrayList<>();
+		int taskLength = this.chromosome.get(0).size();
+		for (int i =0; i<taskLength; i++){
+			_tasks.add(this.chromosome.get(0).get(i));			
+		}
+		switch(k) {
+		   case 1:  variableNeighbor_NeighborOne(taskLength,_tasks); break;
+		   case 2:  variableNeighbor_NeighborProb(taskLength,_tasks); break;
+		   case 3:  variableNeighbor_ForwardInsert(taskLength,_tasks); break;
+		   case 4:  variableNeighbor_BackWordInsert(taskLength,_tasks); break;
+		   case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;
+		}
+		son_chromosome.add(_tasks);
+		Individual son = new Individual(son_chromosome,project);
+		return son;
+	}
+	//随机交换
+	private void variableNeighbor_SwapRandom(int taskLength, List<Integer> _tasks) {
+		
+		while(true) {
+			int geneIndex1=(int)(Math.random()*(taskLength-1));
+			int geneIndex2=(int)(Math.random()*(taskLength-1));
+			while(geneIndex1==geneIndex2) {
+				geneIndex2=(int)(Math.random()*(taskLength-1));
+			} 
+			if(geneIndex1>geneIndex2) {
+				int a=geneIndex1;
+				geneIndex1=geneIndex2;
+				geneIndex2=a;
+			}
+			int taskGene1=_tasks.get(geneIndex1);//	ID
+			Task t1 = project.getTasks().get(taskGene1 - 1);
+			List<Integer> sucsuc=t1.getSucSucIDS();
+			boolean can1=true;
+			for(int m=geneIndex1+1;m<=geneIndex2;m++) {
+				int taskId=_tasks.get(m);
+				if(sucsuc.contains(taskId)) {
+					can1=false;
+					break;
+				}
+			}
+			if(can1) {
+				boolean can2=true;
+				int taskGene2=_tasks.get(geneIndex2);
+				Task t2 = project.getTasks().get(taskGene2 - 1);
+				List<Integer> prepre=t2.getPrePreIDs();
+				for(int m=geneIndex1;m<geneIndex2;m++) {
+					int taskId=_tasks.get(m);
+					if(prepre.contains(taskId)) {
+						can2=false;
+						break;
+					}
+				}
+				if(can2) {
+					_tasks.set(geneIndex1, taskGene2);
+					_tasks.set(geneIndex2, taskGene1);
+					break;
+				}
+			}
+					
+		}
+		
+	}
+
+	//随机向后插入
+	private void variableNeighbor_BackWordInsert(int taskLength, List<Integer> _tasks) {
+		while(true) {
+			int geneIndex1=(int)(Math.random()*(taskLength-1));
+			int geneIndex2=(int)(Math.random()*(taskLength-1));
+			while(geneIndex1==geneIndex2) {
+				geneIndex2=(int)(Math.random()*(taskLength-1));
+			} 
+			if(geneIndex1>geneIndex2) {
+				int a=geneIndex1;
+				geneIndex1=geneIndex2;
+				geneIndex2=a;
+			}
+			int taskGene1=_tasks.get(geneIndex1);//	ID
+			Task t1 = project.getTasks().get(taskGene1 - 1);
+			List<Integer> sucsuc=t1.getSucSucIDS();
+			boolean can=true;
+			for(int m=geneIndex1+1;m<=geneIndex2;m++) {
+				int taskId=_tasks.get(m);
+				if(sucsuc.contains(taskId)) {
+					can=false;
+					break;
+				}
+			}
+			if(can) {
+				_tasks.add(geneIndex2, taskGene1);
+				_tasks.remove(geneIndex1);
+				break;
+			}
+    	}
+		
+	}
+
+	// 随机向前插入
+    private void variableNeighbor_ForwardInsert(int taskLength, List<Integer> _tasks) {
+    	while(true) {
+			int geneIndex1=(int)(Math.random()*(taskLength-1));
+			int geneIndex2=(int)(Math.random()*(taskLength-1));
+			while(geneIndex1==geneIndex2) {
+				geneIndex2=(int)(Math.random()*(taskLength-1));
+			} 
+			if(geneIndex1<geneIndex2) {
+				int a=geneIndex1;
+				geneIndex1=geneIndex2;
+				geneIndex2=a;
+			}
+			int taskGene1=_tasks.get(geneIndex1);//	ID
+			Task t1 = project.getTasks().get(taskGene1 - 1);
+			List<Integer> prepre=t1.getPrePreIDs();
+			boolean can=true;
+			for(int m=geneIndex2;m<geneIndex1;m++) {
+				int taskId=_tasks.get(m);
+				if(prepre.contains(taskId)) {
+					can=false;
+					break;
+				}
+			}
+			if(can) {
+				_tasks.remove(geneIndex1);
+				_tasks.add(geneIndex2, taskGene1);
+				break;
+			}
+    	}
+		
+	}
+
+	//相邻交换概率决定
+	private void variableNeighbor_NeighborProb(int taskLength, List<Integer> _tasks) {
+		for (int geneIndex = 0; geneIndex < taskLength - 1; geneIndex++) {
+			if (0.1 > Math.random()) {
+				int taskGene1=_tasks.get(geneIndex);
+				int taskGene2=_tasks.get(geneIndex+1);
+				Task t1 = project.getTasks().get(taskGene1 - 1);
+				Task t2 = project.getTasks().get(taskGene2 - 1);
+				if (!project.isPredecessor(t1, t2)) {//t1不是t2的紧前任务
+					// 交换两个位置上的任务编号以及资源编号
+					_tasks.set(geneIndex, taskGene2);
+					_tasks.set(geneIndex+1, taskGene1);
+				}
+			}
+		}
+	}
+    //相邻交换一次
+	private void variableNeighbor_NeighborOne(int taskLength, List<Integer> _tasks) {
+		while(true) {
+			int geneIndex=(int)(Math.random()*(taskLength-1));
+			int taskGene1=_tasks.get(geneIndex);
+			int taskGene2=_tasks.get(geneIndex+1);
+			Task t1 = project.getTasks().get(taskGene1 - 1);
+			Task t2 = project.getTasks().get(taskGene2 - 1);
+			if (!project.isPredecessor(t1, t2)) {//t1不是t2的紧前任务
+				// 交换两个位置上的任务编号以及资源编号
+				_tasks.set(geneIndex, taskGene2);
+				_tasks.set(geneIndex+1, taskGene1);
+				break;
+			}
+		}
+	}
+
+	
 
 
 

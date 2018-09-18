@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Case {
 
@@ -38,9 +40,11 @@ public class Case {
 		countsuccessor();
 		//得到每个任务对应可用资源的使用概率
 		setTaskCapapleResource();
-		
+		setPrePre();
+		setSucSuc();
 	}
-	
+
+
 	//round-robin原则设置学习能力
 	public void setResourceLearnbility() {
 		double[] learnArr = new double[]{0.515, 0.321, 0.152};
@@ -307,6 +311,33 @@ public class Case {
 		}
 
 	}
-
+	//统计设置任务所有的往前追寻紧前任务集
+	private void setPrePre() {
+		for(int i = 0; i < tasks.size(); i++) {
+			Set<Integer> prepre=new TreeSet<>();
+			List<Integer> pre=tasks.get(i).getPredecessorIDs();
+			prepre.addAll(new ArrayList<>(pre));
+			for(int j=0;pre!=null&&j<pre.size();j++) {
+				List<Integer> newpre=tasks.get(pre.get(j)-1).getPrePreIDs();
+				prepre.addAll(newpre);
+			}
+			tasks.get(i).setPrePreIDs(new ArrayList<>(prepre));
+		}
+		
+	}
+	//统计并设置任务所有的往后搜索紧后任务集
+	private void setSucSuc() {
+		for(int i = tasks.size()-1; i >=0; i--) {
+			Set<Integer> sucsuc=new TreeSet<>();
+			List<Integer> suc=tasks.get(i).getsuccessortaskIDS();
+			sucsuc.addAll(suc);
+			for(int j=0;suc!=null&&j<suc.size();j++) {
+				List<Integer> newsuc=tasks.get(suc.get(j)-1).getSucSucIDS();
+				sucsuc.addAll(newsuc);
+			}
+			tasks.get(i).setSucSucIDS(new ArrayList<>(sucsuc));
+		}
+		
+	}
 
 }

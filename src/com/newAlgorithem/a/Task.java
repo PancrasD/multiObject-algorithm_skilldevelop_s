@@ -20,12 +20,16 @@ public class Task implements Cloneable {
 	private String skill;
 	//紧前任务IDs
 	private List<Integer> predecessorIDs = new  ArrayList<>();
+	//紧前追溯所有任务IDs
+	private List<Integer> prePreIDs = new  ArrayList<>();
 	//紧前任务数
 	private int pretasknum;
 	//标准工期
 	private int standardDuration;
 	//紧后任务IDS
 	private List<Integer> successorTaskIDS = new  ArrayList<>();
+	//紧后追溯任务IDs
+	private List<Integer> sucSucIDS = new  ArrayList<>();
 	//任务可用的资源
 	private List<Integer> resourceIDs = new ArrayList<>();
 	
@@ -142,6 +146,18 @@ public class Task implements Cloneable {
 	}
 	public void setCapaleResource(Map<Integer,Double> capaleResource) {
 		this.capaleResource = capaleResource;
+	}
+	public List<Integer> getPrePreIDs() {
+		return prePreIDs;
+	}
+	public void setPrePreIDs(List<Integer> prePreIDs) {
+		this.prePreIDs = prePreIDs;
+	}
+	public List<Integer> getSucSucIDS() {
+		return sucSucIDS;
+	}
+	public void setSucSucIDS(List<Integer> sucSucIDS) {
+		this.sucSucIDS = sucSucIDS;
 	}
 
 	

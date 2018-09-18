@@ -329,10 +329,22 @@ public class Tools {
 		hpervolume[0] = Double.MAX_VALUE;
 		hpervolume[L - 1] = Double.MAX_VALUE;
 		for (int j = 1; j < L - 1; j++) {
-			hpervolume[j] = hpervolume[j]*(index_objList.get(L-1).getValue()[0] - index_objList.get(j).getValue()[0])/
+			double x0=index_objList.get(L-1).getValue()[0];
+			double y0=index_objList.get(0).getValue()[1];
+			double x1=index_objList.get(j-1).getValue()[0];
+			double y1=index_objList.get(j-1).getValue()[1];
+			double x=index_objList.get(j).getValue()[0];
+			double y=index_objList.get(j).getValue()[1];
+			double x2=index_objList.get(j+1).getValue()[0];
+			double y2=index_objList.get(j+1).getValue()[1];
+			
+			/*hpervolume[j] = hpervolume[j]*(index_objList.get(L-1).getValue()[0] - index_objList.get(j).getValue()[0])/
 					(index_objList.get(L-1).getValue()[0] - index_objList.get(0).getValue()[0])
 					*(index_objList.get(0).getValue()[1] - index_objList.get(j).getValue()[1])/
-					(index_objList.get(0).getValue()[1] - index_objList.get(L-1).getValue()[0]);
+					(index_objList.get(0).getValue()[1] - index_objList.get(L-1).getValue()[0]);*/
+			/*hpervolume[j] =0.5*(Math.abs(x*(y1-y0)+x1*(y0-y)+x0*(y-y1))+Math.abs(x*(y2-y0)+x2*(y0-y)+x0*(y-y2)));*/
+			hpervolume[j]=0.5*(Math.abs(y*(x1-x0)+y1*(x0-x)+y0*(x-x1))+Math.abs(y*(x2-x0)+y2*(x0-x)+y0*(x-x2)));
+			/*hpervolume[j] = hpervolume[j]*0.5*Math.abs(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))/(x0*y0);*/
 		}
 	/*	for (int i = 0; i < index_objList.get(0).getValue().length; i++) { // i表示第几个目标函数
 			for (int j = 1; j < L - 1; j++) {

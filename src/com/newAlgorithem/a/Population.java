@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-
 public class Population {
 
 	private int populationsize;
@@ -59,24 +57,24 @@ public class Population {
 	
 	
 	// 获取种群的个体成员
-		public Individual[] getPopulation() {
-			return this.population;
-		}
+	public Individual[] getPopulation() {
+		return this.population;
+	}
 
-		// 获取种群的目标函数集合
-		public List<double[]> getPopulationObj() {
-			return this.populationObj;
-		}
+	// 获取种群的目标函数集合
+	public List<double[]> getPopulationObj() {
+		return this.populationObj;
+	}
 
-		// 获取种群大小
-		public int size() {
-			return this.populationsize;
-		}
+	// 获取种群大小
+	public int size() {
+		return this.populationsize;
+	}
 
-		// 设置种群中的个体
-		public Individual setIndividual(int offset, Individual individual) {
-			return population[offset] = individual;
-		}
+	// 设置种群中的个体
+	public Individual setIndividual(int offset, Individual individual) {
+		return population[offset] = individual;
+	}
 		
 	
 	public int getPopulationsize() {
@@ -107,358 +105,364 @@ public class Population {
 	}
 
 	// 选择
-		// 从混合种群中，选择前N个个体
-		public Population slectPopulation(int num) {
-			// 创建新的种群
-			Population newPopulation = new Population(num,project);
+	// 从混合种群中，选择前N个个体
+	public Population slectPopulation(int num) {
+		// 创建新的种群
+		Population newPopulation = new Population(num,project);
 
-			// 混合种群进行快速非支配排序
-			// 得到不同非支配层，每个非支配层由多个整数组成，该整数为个体在混合种群的索引
-			List<List<Integer>> indivIndexRank = Tools.non_Dominated_Sort(this,0, project);
-			// 个体数量
-			int indivSum = 0;
-			int total = 0;
-			for (int j = 0; j < indivIndexRank.size(); j++) {
-				if (indivSum + indivIndexRank.get(j).size() <= num){
-					for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
-						int indivIndex = indivIndexRank.get(j).get(k);
-						Individual individual = this.getPopulation()[indivIndex];
-						newPopulation.setIndividual(total, individual);
-						total++;
-					}
-				}else{
-					Map<Integer, double[]> indexAndObj = new HashMap<>();
-					for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
-						int indivIndex = indivIndexRank.get(j).get(k);
-						Individual individual = this.getPopulation()[indivIndex];
-						indexAndObj.put(indivIndex, individual.getObj());
-					}
-					//得到按拥挤度排好序的个体集合
-					Map<Integer, Double> crowMap = Tools.crowdingCompute(indexAndObj);
-					List<Map.Entry<Integer, Double>> crowmaplist = Tools.sortBycrowd(crowMap);
-					// 选择j支配层中的前[indexList.size()-(indivSum-populationSize)]个个体添加到新一代父代种群中
-					for (int i = 0; i < (num - indivSum); i++) {
-						// 个体在支配层种群中的索引
-						int index = crowmaplist.get(i).getKey();
-						// 按拥挤度排序后，支配层中前[indexList.size()-(indivSum-populationSize)]个个体
-						Individual individual = this.getPopulation()[index];
-						newPopulation.setIndividual(total, individual);
-						total++;	
-					}
+		// 混合种群进行快速非支配排序
+		// 得到不同非支配层，每个非支配层由多个整数组成，该整数为个体在混合种群的索引
+		List<List<Integer>> indivIndexRank = Tools.non_Dominated_Sort(this,0, project);
+		// 个体数量
+		int indivSum = 0;
+		int total = 0;
+		for (int j = 0; j < indivIndexRank.size(); j++) {
+			if (indivSum + indivIndexRank.get(j).size() <= num){
+				for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
+					int indivIndex = indivIndexRank.get(j).get(k);
+					Individual individual = this.getPopulation()[indivIndex];
+					newPopulation.setIndividual(total, individual);
+					total++;
 				}
-				indivSum += indivIndexRank.get(j).size();
-				if (indivSum >= num) break;
+			}else{
+				Map<Integer, double[]> indexAndObj = new HashMap<>();
+				for (int k = 0; k < indivIndexRank.get(j).size(); k++) {
+					int indivIndex = indivIndexRank.get(j).get(k);
+					Individual individual = this.getPopulation()[indivIndex];
+					indexAndObj.put(indivIndex, individual.getObj());
+				}
+				//得到按拥挤度排好序的个体集合
+				Map<Integer, Double> crowMap = Tools.crowdingCompute(indexAndObj);
+				List<Map.Entry<Integer, Double>> crowmaplist = Tools.sortBycrowd(crowMap);
+				// 选择j支配层中的前[indexList.size()-(indivSum-populationSize)]个个体添加到新一代父代种群中
+				for (int i = 0; i < (num - indivSum); i++) {
+					// 个体在支配层种群中的索引
+					int index = crowmaplist.get(i).getKey();
+					// 按拥挤度排序后，支配层中前[indexList.size()-(indivSum-populationSize)]个个体
+					Individual individual = this.getPopulation()[index];
+					newPopulation.setIndividual(total, individual);
+					total++;	
+				}
 			}
-
-			return newPopulation;
+			indivSum += indivIndexRank.get(j).size();
+			if (indivSum >= num) break;
 		}
-		public Population slectPopulationC(int newnum) {
-			// 创建新的种群
-			Population newPopulation = new Population(newnum,project);
-			int populationSize = this.getPopulationsize();
-			Individual[] individuals =this.getPopulation();
 
-			List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // 按非支配等级排序后，各个体在种群中对应的序列号的集合
-			// 每个解都可以分成两个实体部分:1、支配该解的其他解的数量np;2、被该解支配的解集合Sp
-			List<List<Integer>> spList = new ArrayList<List<Integer>>();// 存储的是个体在种群中的序列号
-			for (int i = 0; i < populationSize; i++) {
-				spList.add(new ArrayList<Integer>());
-			}
-			int[] np = new int[populationSize];
-			for (int i = 0; i < populationSize; i++) {
-				for (int j = i+1; j < populationSize; j++) {
+		return newPopulation;
+	}
+	public Population slectPopulationC(int newnum) {
+		// 创建新的种群
+		Population newPopulation = new Population(newnum,project);
+		int populationSize = this.getPopulationsize();
+		Individual[] individuals =this.getPopulation();
 
-					int flag=Tools.Dominated(individuals[i], individuals[j],project);
-					if (flag == 1) { // 前者支配后者
-						spList.get(i).add(j); // 将个体j加入个体i的支配个体队列
-						np[j]++;  // 支配个体j的个体数+1
-					}
-					if (flag == 2) { // 后者支配前者
-						spList.get(j).add(i);
-						np[i]++;
-					}
+		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // 按非支配等级排序后，各个体在种群中对应的序列号的集合
+		// 每个解都可以分成两个实体部分:1、支配该解的其他解的数量np;2、被该解支配的解集合Sp
+		List<List<Integer>> spList = new ArrayList<List<Integer>>();// 存储的是个体在种群中的序列号
+		for (int i = 0; i < populationSize; i++) {
+			spList.add(new ArrayList<Integer>());
+		}
+		int[] np = new int[populationSize];
+		for (int i = 0; i < populationSize; i++) {
+			for (int j = i+1; j < populationSize; j++) {
+
+				int flag=Tools.Dominated(individuals[i], individuals[j],project);
+				if (flag == 1) { // 前者支配后者
+					spList.get(i).add(j); // 将个体j加入个体i的支配个体队列
+					np[j]++;  // 支配个体j的个体数+1
+				}
+				if (flag == 2) { // 后者支配前者
+					spList.get(j).add(i);
+					np[i]++;
 				}
 			}
-			int[] npbackup = new int[populationSize];
-			for(int i=0;i<np.length;i++) {
-				npbackup[i]=np[i];
+		}
+		int[] npbackup = new int[populationSize];
+		for(int i=0;i<np.length;i++) {
+			npbackup[i]=np[i];
+		}
+		// 定义一个集合，用来存储前面已经排好等级的个体在种群的序列号
+		int num = 0;
+		int Rank =0;
+		int total=0;
+		while (num < populationSize) {
+			List<Integer> FRank = new ArrayList<Integer>(); // FRank是种群中，非支配的不同等级,如F1，F2...
+			for (int i = 0; i < populationSize; i++) {
+				if (np[i] == 0) {
+					FRank.add(i); //将所有没有被任何其他个体支配的个体加入到层级
+					individuals[i].setNon_dominatedRank(Rank);
+					np[i] = -1; //标记个体已处理
+					num ++;  //已处理的个体数量计数，当已处理个体个数达到种群人数上线即可终止处理
+				}
 			}
-			// 定义一个集合，用来存储前面已经排好等级的个体在种群的序列号
-			int num = 0;
-			int Rank =0;
-			int total=0;
-			while (num < populationSize) {
-				List<Integer> FRank = new ArrayList<Integer>(); // FRank是种群中，非支配的不同等级,如F1，F2...
-				for (int i = 0; i < populationSize; i++) {
-					if (np[i] == 0) {
-						FRank.add(i); //将所有没有被任何其他个体支配的个体加入到层级
-						individuals[i].setNon_dominatedRank(Rank);
-						np[i] = -1; //标记个体已处理
-						num ++;  //已处理的个体数量计数，当已处理个体个数达到种群人数上线即可终止处理
-					}
+			if(total+FRank.size()<newnum) {
+				for(int k=0;k<FRank.size();k++) {
+					newPopulation.setIndividual(total, individuals[FRank.get(k)]);
+					total++;
 				}
-				if(total+FRank.size()<newnum) {
-					for(int k=0;k<FRank.size();k++) {
-						newPopulation.setIndividual(total, individuals[FRank.get(k)]);
-						total++;
-					}
-				}else {
-					Population FP = new Population(FRank.size(),project);
-					for (int i = 0; i < FRank.size(); i++) {
-						//产生当前层的种群
-						FP.setIndividual(i, individuals[FRank.get(i)]);
-					}
-					Tools.setHyperVolum(FP,project);
-					List<Integer> ind = Tools.sortByConsAndHyper(FP,npbackup,FRank);
-					int lack=newnum-total;
-					for(int k=0;k<lack;k++) {
-						newPopulation.setIndividual(total, individuals[ind.get(k)]);
-						total++;
-					}
-					break;
-					
-				}
-				//被分层的个体所支配的个体的被支配个体数量减1
+			}else {
+				Population FP = new Population(FRank.size(),project);
 				for (int i = 0; i < FRank.size(); i++) {
-					for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
-						np[spList.get(FRank.get(i)).get(j)]--;
-						npbackup[spList.get(FRank.get(i)).get(j)]--;
-					}
+					//产生当前层的种群
+					FP.setIndividual(i, individuals[FRank.get(i)]);
 				}
-				indivIndexRank.add(FRank);
-				Rank ++;
-			}
-			return newPopulation;
-		}
-		public Population getOffSpring_TLBO() {
-			Population OffSpring = new Population(TLBO.populationSize,project,false);
-			// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
-			Population teachers = selectTeachers();
-			//teacher时期
-			Population teacherPhase = crossTeachers(teachers);
-			//student时期
-			Population studentPhase = teacherPhase.crossStudents();
-			//reinforcement时期
-			OffSpring = studentPhase.reinforcement();
-
-			return OffSpring;
-		}
-		//老师个体变异操作
-		public Population reinforcement() {
-			int popsize=TLBOF.populationSize;
-			Population rein = new Population(popsize, project);
-			for(int i=0; i<popsize; i++){
-				Individual result = this.getPopulation()[i];
-				if(result.getTeacher()){
-					//引入强化次数
-					result.mutationPopulation(TLBOF.probp, 0);
-					result = result.binaryTournament(this.getPopulation()[i], result);
+				Tools.setHyperVolum(FP,project);
+				List<Integer> ind = Tools.sortByConsAndHyper(FP,npbackup,FRank);
+				int lack=newnum-total;
+				for(int k=0;k<lack;k++) {
+					newPopulation.setIndividual(total, individuals[ind.get(k)]);
+					total++;
 				}
-				rein.setIndividual(i, result);
+				break;
+				
 			}
-			return rein;
-		}
-		
-	
-		//学生个体之间交叉
-		public Population crossStudents() {
-			Individual[] individuals = this.getPopulation();
-			Population offSpring = new Population(TLBOF.populationSize, project);
-			int range = individuals.length;
-			for(int i=0; i<range; i++){
-				Individual result = individuals[i];
-				int r = (int)(Math.random()*range);
-				if(r!=i
-					&&!individuals[i].getTeacher()
-					&&!individuals[r].getTeacher()){
-					Individual newIndiv = individuals[i].mating_tlbo(individuals[r]);
-					result = newIndiv.binaryTournament(newIndiv, individuals[i]);
-				}
-				offSpring.setIndividual(i, result);
-			}
-			return offSpring;
-		}
-		
-	
-		//老师和学生个体交叉
-		public Population crossTeachers(Population teachers){
-			Individual[] individuals = this.getPopulation();
-			Population students = new Population(TLBOF.populationSize, project);
-			for(int i = 0; i<individuals.length; i++){
-				Individual resultIndividual = individuals[i];
-				if(!resultIndividual.getTeacher()){
-					int r = (int) (Math.random() * teachers.size());
-					Individual newIndividual = individuals[i].mating_tlbo(teachers.getPopulation()[r]);
-					resultIndividual = newIndividual.binaryTournament(newIndividual, individuals[i]);
-				}
-				students.setIndividual(i, resultIndividual);
-			}
-			//融合筛选
-			return students;
-		}
-		
-	
-		//选择老师种群
-		public Population selectTeachers(){
-			List<List<Integer>> indexs = Tools.setRankAndCrowD(this, project);
-			int tSize = indexs.get(0).size();
-			Population teachers = new Population(tSize,project);
-			for(int i = 0; i<tSize; i++){
-				Individual teacher = this.getPopulation()[indexs.get(0).get(i)];
-				teacher.setTeacher(true);
-				teachers.setIndividual(i, teacher);
-			}
-			return teachers;
-		}
-
-
-		////遗传算法/////////////////////////////////////////////////////////////////
-		/**
-		 * 使用遗传算法获得下一代种群
-		 * 
-		 * @param project
-		 *            案例集
-		 * @return 下一代种群
-		 */
-		public Population getOffSpring_NSGA() {
-		
-			Population OffSpring = new Population(NSGA_II.populationSize,project,false);
-			// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
-			//Tools.setRankAndCrowD(this, project);
-			// 
-			Tools.setRankAndConsAndHyperVolume(this, project);
-			// 选择出交配池
-			Population matePool = getMatePool();
-
-			// 将交配池中的个体按指定的概率进行交配
-			Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
-
-			// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
-			Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
-
-			// 将两个种群合并
-			Population mergedPopulation = merged(this,p2);
-
-			// 从混合种群中选择前populationSize个个体作为新一代父代种群
-			OffSpring = mergedPopulation.slectPopulationC(NSGA_II.populationSize);
-
-			return OffSpring;
-		}
-	
-	
-	
-
-		/**
-		 * 获取用于交叉的交配池，其中个体数量等于输入种群的个体数量
-		 * 
-		 * @param population
-		 *            父代种群
-		 * @return 用于交叉的交配池
-		 */
-		public Population getMatePool() {
-			Population matePool = new Population(populationsize,project);
-			for (int i = 0; i < matePool.size(); i++) {
-				int m, n;
-				while (true) {
-					m = (int) (Math.random() * populationsize);
-					n = (int) (Math.random() * populationsize);
-					if (m == n)
-						continue; 
-					else
-						break;
-				}
-				matePool.setIndividual(i, population[m].binaryTournament(population[m], population[n]));
-			}
-			return matePool;
-		}
-	
-
-		/**
-		 * 单点交叉方法 任务执行链表和资源分配链表使用同一个交叉点，交叉后，子代个体的任务链表仍然是紧前关系可行链表
-		 * 
-		 * @param matePool
-		 *            交配池种群
-		 * @return 返回新一代种群
-		 */
-		public Population crossoverPopulaiton(double crossoverRate) {
-			Population newPopulation = new Population(populationsize,project);
-			for (int i = 0; i < populationsize - 1; i += 2) {
-				Individual parent1 = population[i];
-				Individual parent2 = population[i + 1];
-				if (crossoverRate > Math.random()) {
-					
-					// 获取任务链表的交叉点[1,chromosomeLength]
-					int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
-					Individual son1 = parent1.Mating(parent2, swapPoint);
-					Individual son2 = parent2.Mating(parent1, swapPoint);
-					newPopulation.setIndividual(i, son1);
-					newPopulation.setIndividual(i + 1, son2);
-					
-				}else{
-					newPopulation.setIndividual(i, parent1);
-					newPopulation.setIndividual(i + 1, parent2);				
+			//被分层的个体所支配的个体的被支配个体数量减1
+			for (int i = 0; i < FRank.size(); i++) {
+				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
+					np[spList.get(FRank.get(i)).get(j)]--;
+					npbackup[spList.get(FRank.get(i)).get(j)]--;
 				}
 			}
-			return newPopulation;
+			indivIndexRank.add(FRank);
+			Rank ++;
 		}
+		return newPopulation;
+	}
+	public Population getOffSpring_TLBO() {
+		Population OffSpring = new Population(TLBO.populationSize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Population teachers = selectTeachers();
+		//teacher时期
+		Population teacherPhase = crossTeachers(teachers);
+		//student时期
+		Population studentPhase = teacherPhase.crossStudents();
+		//reinforcement时期
+		OffSpring = studentPhase.reinforcement();
 
-		/**
-		 * 变异
-		 * 
-		 * @param population
-		 *            种群
-		 * @return 返回新一代种群
-		 */
-		public Population mutationPopulation(double tMutationRate,double rMutationRate) {
-			// 创建新的种群
-			Population newPopulation = new Population(populationsize,project);
-			for (int i = 0; i < populationsize; i++) {
-				Individual parent = population[i];
-				Individual son = parent.mutationPopulation(tMutationRate,rMutationRate);
-				newPopulation.setIndividual(i, son);
+		return OffSpring;
+	}
+	//老师个体变异操作
+	public Population reinforcement() {
+		int popsize=TLBOF.populationSize;
+		Population rein = new Population(popsize, project);
+		for(int i=0; i<popsize; i++){
+			Individual result = this.getPopulation()[i];
+			if(result.getTeacher()){
+				//引入强化次数
+				result.mutationPopulation(TLBOF.probp, 0);
+				result = result.binaryTournament(this.getPopulation()[i], result);
 			}
-			return newPopulation;
+			rein.setIndividual(i, result);
 		}
+		return rein;
+	}
+	
 
-
-
-
-		/////NSFFA/////////////////////////////////////////////////////////////////////////
-
-		/**
-		 * 使用遗传算法获得下一代种群
-		 * 
-		 * @param project
-		 *            案例集
-		 * @return 下一代种群
-		 */
-		public Population getOffSpring_NSFFA() {
-		
-			Population OffSpring = new Population(NSFFA.NS,project);
-			// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
-			Tools.setRankAndCrowD(this, project);
-			// 
-			// 基于气味搜索，每个个体生成S个个体，种群大小为NS*S
-			Population p1 = this.smell_BasedSearch();
-			// 将两个种群合并
-			Population mp1 = merged(this,p1);
-			// 从混合种群中选择前populationSize个个体作为新一代父代种群
-			Population p2 = mp1.slectPopulation(NSFFA.NS);
-			
-			 // 基于知识的搜索
-			Population Q = p2.knowledge_BasedSearch();
-			// 将两个种群合并
-			Population mp2 = merged(p2,Q);
-			// 从混合种群中选择前populationSize个个体作为新一代父代种群
-			OffSpring = mp2.slectPopulation(NSFFA.NS);
-
-			return OffSpring;
+	//学生个体之间交叉
+	public Population crossStudents() {
+		Individual[] individuals = this.getPopulation();
+		Population offSpring = new Population(TLBOF.populationSize, project);
+		int range = individuals.length;
+		for(int i=0; i<range; i++){
+			Individual result = individuals[i];
+			int r = (int)(Math.random()*range);
+			if(r!=i
+				&&!individuals[i].getTeacher()
+				&&!individuals[r].getTeacher()){
+				Individual newIndiv = individuals[i].mating_tlbo(individuals[r]);
+				result = newIndiv.binaryTournament(newIndiv, individuals[i]);
+			}
+			offSpring.setIndividual(i, result);
 		}
+		return offSpring;
+	}
+	
+
+	//老师和学生个体交叉
+	public Population crossTeachers(Population teachers){
+		Individual[] individuals = this.getPopulation();
+		Population students = new Population(TLBOF.populationSize, project);
+		for(int i = 0; i<individuals.length; i++){
+			Individual resultIndividual = individuals[i];
+			if(!resultIndividual.getTeacher()){
+				int r = (int) (Math.random() * teachers.size());
+				Individual newIndividual = individuals[i].mating_tlbo(teachers.getPopulation()[r]);
+				resultIndividual = newIndividual.binaryTournament(newIndividual, individuals[i]);
+			}
+			students.setIndividual(i, resultIndividual);
+		}
+		//融合筛选
+		return students;
+	}
+	
+
+	//选择老师种群
+	public Population selectTeachers(){
+		List<List<Integer>> indexs = Tools.setRankAndCrowD(this, project);
+		int tSize = indexs.get(0).size();
+		Population teachers = new Population(tSize,project);
+		for(int i = 0; i<tSize; i++){
+			Individual teacher = this.getPopulation()[indexs.get(0).get(i)];
+			teacher.setTeacher(true);
+			teachers.setIndividual(i, teacher);
+		}
+		return teachers;
+	}
+
+
+	////遗传算法/////////////////////////////////////////////////////////////////
+	/**
+	 * 使用遗传算法获得下一代种群
+	 * 
+	 * @param project
+	 *            案例集
+	 * @return 下一代种群
+	 */
+	public Population getOffSpring_NSGA() {
+	
+		Population OffSpring = new Population(NSGA_II.populationSize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		//Tools.setRankAndCrowD(this, project);
+		// 
+		Tools.setRankAndConsAndHyperVolume(this, project);
+		// 选择出交配池
+		Population matePool = getMatePool();
+
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
+
+		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
+		//Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
+        //使用变邻搜索  B-VND first-improvement
+		Population p2 = p1.variableNeighborhoodDescent();
+		// 将两个种群合并
+		Population mergedPopulation = merged(this,p2);
+
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		OffSpring = mergedPopulation.slectPopulationC(NSGA_II.populationSize);
+
+		return OffSpring;
+	}
+
+
+
+
+	private Population variableNeighborhoodDescent() {
+		Population newPopulation = new Population(populationsize,project);
+		for (int i = 0; i < populationsize; i++) {
+			Individual parent = population[i];
+			Individual son = parent.variableNeighborDecent();
+			newPopulation.setIndividual(i, son);
+			System.out.println(i);
+		}
+		return newPopulation;
+	}
+	/**
+	 * 获取用于交叉的交配池，其中个体数量等于输入种群的个体数量
+	 * 
+	 * @param population
+	 *            父代种群
+	 * @return 用于交叉的交配池
+	 */
+	public Population getMatePool() {
+		Population matePool = new Population(populationsize,project);
+		for (int i = 0; i < matePool.size(); i++) {
+			int m, n;
+			while (true) {
+				m = (int) (Math.random() * populationsize);
+				n = (int) (Math.random() * populationsize);
+				if (m == n)
+					continue; 
+				else
+					break;
+			}
+			matePool.setIndividual(i, population[m].binaryTournament(population[m], population[n]));
+		}
+		return matePool;
+	}
+
+
+	/**
+	 * 单点交叉方法 任务执行链表和资源分配链表使用同一个交叉点，交叉后，子代个体的任务链表仍然是紧前关系可行链表
+	 * 
+	 * @param matePool
+	 *            交配池种群
+	 * @return 返回新一代种群
+	 */
+	public Population crossoverPopulaiton(double crossoverRate) {
+		Population newPopulation = new Population(populationsize,project);
+		for (int i = 0; i < populationsize - 1; i += 2) {
+			Individual parent1 = population[i];
+			Individual parent2 = population[i + 1];
+			if (crossoverRate > Math.random()) {
+				
+				// 获取任务链表的交叉点[1,chromosomeLength]
+				int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
+				Individual son1 = parent1.Mating(parent2, swapPoint);
+				Individual son2 = parent2.Mating(parent1, swapPoint);
+				newPopulation.setIndividual(i, son1);
+				newPopulation.setIndividual(i + 1, son2);
+				
+			}else{
+				newPopulation.setIndividual(i, parent1);
+				newPopulation.setIndividual(i + 1, parent2);				
+			}
+		}
+		return newPopulation;
+	}
+
+	/**
+	 * 变异
+	 * 
+	 * @param population
+	 *            种群
+	 * @return 返回新一代种群
+	 */
+	public Population mutationPopulation(double tMutationRate,double rMutationRate) {
+		// 创建新的种群
+		Population newPopulation = new Population(populationsize,project);
+		for (int i = 0; i < populationsize; i++) {
+			Individual parent = population[i];
+			Individual son = parent.mutationPopulation(tMutationRate,rMutationRate);
+			newPopulation.setIndividual(i, son);
+		}
+		return newPopulation;
+	}
+
+
+
+
+	/////NSFFA/////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 使用遗传算法获得下一代种群
+	 * 
+	 * @param project
+	 *            案例集
+	 * @return 下一代种群
+	 */
+	public Population getOffSpring_NSFFA() {
+	
+		Population OffSpring = new Population(NSFFA.NS,project);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndCrowD(this, project);
+		// 
+		// 基于气味搜索，每个个体生成S个个体，种群大小为NS*S
+		Population p1 = this.smell_BasedSearch();
+		// 将两个种群合并
+		Population mp1 = merged(this,p1);
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		Population p2 = mp1.slectPopulation(NSFFA.NS);
 		
-		
-	
-	
-	
+		 // 基于知识的搜索
+		Population Q = p2.knowledge_BasedSearch();
+		// 将两个种群合并
+		Population mp2 = merged(p2,Q);
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		OffSpring = mp2.slectPopulation(NSFFA.NS);
+
+		return OffSpring;
+	}
 	/**
 	 * 基于气味搜索方法 遍历输入种群中的每个个体，每个个体经过操作，生成S个子个体
 	 * 
