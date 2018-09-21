@@ -318,9 +318,9 @@ public class Population {
 	 *            案例集
 	 * @return 下一代种群
 	 */
-	public Population getOffSpring_NSGA() {
+	public Population getOffSpring_NSGAV() {
 	
-		Population OffSpring = new Population(NSGA_II.populationSize,project,false);
+		Population OffSpring = new Population(NSGAV_II.populationSize,project,false);
 		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
 		//Tools.setRankAndCrowD(this, project);
 		// 
@@ -329,8 +329,8 @@ public class Population {
 		Population matePool = getMatePool();
 
 		// 将交配池中的个体按指定的概率进行交配
-		Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
-
+		Population p1 = matePool.crossoverPopulaiton(NSGAV_II.crossoverRate);
+        
 		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
 		//Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
         //使用变邻搜索  B-VND first-improvement
@@ -339,7 +339,7 @@ public class Population {
 		Population mergedPopulation = merged(this,p2);
 
 		// 从混合种群中选择前populationSize个个体作为新一代父代种群
-		OffSpring = mergedPopulation.slectPopulationC(NSGA_II.populationSize);
+		OffSpring = mergedPopulation.slectPopulationC(NSGAV_II.populationSize);
 
 		return OffSpring;
 	}
@@ -353,7 +353,7 @@ public class Population {
 			Individual parent = population[i];
 			Individual son = parent.variableNeighborDecent();
 			newPopulation.setIndividual(i, son);
-			System.out.println(i);
+			//System.out.println(i);
 		}
 		return newPopulation;
 	}

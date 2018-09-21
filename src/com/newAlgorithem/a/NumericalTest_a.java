@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class NumericalTest_new1 {
+public class NumericalTest_a {
 	public static void main(String[] args) {
 		
         if (args.length==1){
@@ -29,8 +29,8 @@ public class NumericalTest_new1 {
 	               	f.mkdirs();
     				for(int i = 0; i<fl.length; i++){
                    	 String _fn =  "case_def/" + fl[i];
-                   	 String _fo = "data/NSGA_H"+head+"/nsgah_"+j+"/NSGAH_"+fl[i]+".txt";
-                   	 NSGA_algorithm(_fn,_fo);
+                   	 String _fo = dic+"/NSGAH_"+fl[i]+".txt";
+                   	NSGAV_algorithm(_fn,_fo);
                    }
     			}
                 System.out.println(fl.length +"个案例遗传算法计算完成"); 
@@ -94,12 +94,13 @@ public class NumericalTest_new1 {
 		
 		int generationCount = 0;
         //循环迭代 算法指定的次数
-		while (generationCount < TLBO.maxGenerations ) {
+	 	while (generationCount < TLBO.maxGenerations ) {
 
 			P = P.getOffSpring_TLBO();
 
 			generationCount++;
 		}
+	
 		//从最后得到种群中获取最优解集
 		Population solutions = Tools.getbestsolution(P,1, project);		
 		
@@ -122,30 +123,32 @@ public class NumericalTest_new1 {
 	
 	/*@param caseFile:案例读取目录
 	 * @param dataFile:案例计算结果写入目录*/
-	public static void NSGA_algorithm(String casefile,String datafile){
+	public static void NSGAV_algorithm(String casefile,String datafile){
 	       //记录开始计算的时间，用于统计本算法的总时间
 			long startTime = System.currentTimeMillis();
 			// 创建案例类对象
 			Case project = new Case(casefile);
 
 			// 初始化种群
-			Population P = new Population(NSGA_II.populationSize,project,true);
+			Population P = new Population(NSGAV_II.populationSize,project,true);
 			
 			int generationCount = 0;
 	        //循环迭代 算法指定的次数
-			while (generationCount < NSGA_II.maxGenerations ) {
-
-				P = P.getOffSpring_NSGA();
-
+			/*while (generationCount < NSGAV_II.maxGenerations ) {
+				P = P.getOffSpring_NSGAV();
 				generationCount++;
+			}*/
+			long time=0;
+			long t2 = 0;
+			while (time < 60 ) {
+				P = P.getOffSpring_NSGAV();
+				t2=System.currentTimeMillis();
+				time=(t2-startTime)/1000;
 			}
 			//从最后得到种群中获取最优解集
 			Population solutions = Tools.getbestsolution(P,1, project);
-			
 		    //输出最优解集
 			//Tools.printsolutions(solutions,startTime,datafile);		
-			
-			
 			 File f = new File(datafile);
 			 PrintStream ps = null;
 			 try {
@@ -249,7 +252,7 @@ public class NumericalTest_new1 {
 		 Date date = new Date();
 	 
 	     //格式化
-		 SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+		 SimpleDateFormat sdf = new SimpleDateFormat("MMddHHmm");
 	     //格式化时间，并且作为文件名
 		 return sdf.format(date);
 	 }

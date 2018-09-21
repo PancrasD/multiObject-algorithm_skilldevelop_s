@@ -21,7 +21,7 @@ public class ITask {
 		pretasknum=task.getpretasknum();
 		standardDuration = task.getStandardDuration();
 		skill = task.getSkill();
-		skillType = skill.split(":")[0];
+		skillType = skill.split(":")[0].trim();
 		skillLevel = Integer.valueOf(skill.split(":")[1])+1;
 		predecessorIDs = task.getPredecessorIDs();
 		resourceIDs = task.getresourceIDs();

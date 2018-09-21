@@ -694,7 +694,6 @@ public class Individual {
 					}
 				}
 			});
-		resourceid=list1.get(0);
 		}else if(rand<1&&list1.size()>1) {
 			//-------->最早完成
 			//升序排序
@@ -712,7 +711,6 @@ public class Individual {
 					}
 				}
 			});
-			resourceid = list1.get(0);
 		}else if(list1.size()>1){
 			//最早可以升级的
 			String qtype = curTask.getSkillType();
@@ -735,8 +733,8 @@ public class Individual {
 				}
 				
 			});
-			resourceid=list1.get(0);
 		}
+		resourceid=list1.get(0);
 		return resourceid;
 		
 	}
@@ -1138,10 +1136,12 @@ public class Individual {
 			Individual son=compare.variableNeighborWithFirst(k);
 			if(Tools.Dominated(son,compare,this.project)==1) {
 				compare=son;
-				break;
 			}else {
 				k++;
 			}
+		}
+		if(Tools.Dominated(this,compare,this.project)==1) {
+			compare=this;
 		}
 		return compare;
 	}
