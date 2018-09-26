@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-public class NumericalTest {
+public class NumericalTest_s {
 	public static void main(String[] args) {
 		/*
         File ff = new File("case_def");
@@ -27,16 +31,24 @@ public class NumericalTest {
             File ff = new File("case_def");
             //获取案例库case_def文件目录
             String[] fl = ff.list(); 
+            List<List<Double>> countResult=new ArrayList<>();
             if (fl==null){
             	System.out.print("没有在case_def目录下找到算例文件");
             	return;           	
             }
     		if (args[0].trim().toLowerCase().equals("g")){
-    			for(int j = 0; j < 10; j++){
+    			String head=buildFileName();
+    			for(int j = 0; j < NSGA_II.RunTime; j++){
+    				 String dic = "data/NSGA_"+head+"/nsga"+j;
+	   				 File f=new File(dic);
+	               	 if(f.exists()) {
+	               		 f.delete();
+	               	 }
+	               	 f.mkdirs();
     				for(int i = 0; i<fl.length; i++){
                    	 String _fn =  "case_def/" + fl[i];
-                   	 String _fo = "data/numerical/learn"+j+"/NSGA_"+fl[i]+".txt";
-                   	 NSGA_algorithm(_fn,_fo);
+                   	 String _fo = "data/NSGA_"+head+"/nsga"+j+"/NSGA_"+fl[i]+".txt";
+                   	 NSGA_algorithm(_fn,_fo,countResult);
                    }
     			}
                 System.out.println(fl.length +"个案例遗传算法计算完成"); 
@@ -47,17 +59,24 @@ public class NumericalTest {
                 for(int i = 0; i<fl.length; i++){
                 	 String _fn =  "case_def/" + fl[i];
                 	 String _fo = "data/NSFFA_"+fl[i]+".txt";
-                	 NSFFA_algorithm(_fn,_fo);
+                	 NSFFA_algorithm(_fn,_fo,countResult);
                 }
                 System.out.println(fl.length +"个案例果蝇算法计算完成"); 
                 return;
     		}
     		if (args[0].trim().toLowerCase().equals("t")){
+    			String head=buildFileName();
     			for(int j = 0; j < 10; j++){
+    				String dic = "data/TLBO_"+head+"/tlbo"+j;
+	   				 File f=new File(dic);
+	               	 if(f.exists()) {
+	               		 f.delete();
+	               	 }
+	               	 f.mkdirs();
                 for(int i = 0; i<fl.length; i++){
                 	 String _fn =  "case_def/" + fl[i];
-                	 String _fo = "data/numerical/tlbo"+j+"/TLBO_"+fl[i]+".txt";
-                	 TLBO_algorithm(_fn,_fo);
+                	 String _fo = "data/TLBO_"+head+"/tlbo"+j+"/TLBO_L_"+fl[i]+".txt";
+                	 TLBO_algorithm(_fn,_fo,countResult);
                 }
     			}
                 System.out.println(fl.length +"个案例教学优化算法计算完成"); 
@@ -71,7 +90,7 @@ public class NumericalTest {
 
 	}
 	
-	public static void TLBO_algorithm(String casefile, String datafile) {
+	public static void TLBO_algorithm(String casefile, String datafile,List<List<Double>> countResult) {
 		 //记录开始计算的时间，用于统计本算法的总时间
 		long startTime = System.currentTimeMillis();
 		// 创建案例类对象
@@ -100,7 +119,7 @@ public class NumericalTest {
 		   ps = new PrintStream(fos);
 		   System.setOut(ps);
 		   //输出最优解集
-		   Tools.printsolutions(solutions,startTime);			   
+		   Tools.printsolutions(solutions,startTime,countResult);			   
 		 } catch (IOException e) {
 			e.printStackTrace();
 		 }  finally {
@@ -110,7 +129,7 @@ public class NumericalTest {
 	
 	/*@param caseFile:案例读取目录
 	 * @param dataFile:案例计算结果写入目录*/
-	public static void NSGA_algorithm(String casefile,String datafile){
+	public static void NSGA_algorithm(String casefile,String datafile,List<List<Double>> countResult){
 	       //记录开始计算的时间，用于统计本算法的总时间
 			long startTime = System.currentTimeMillis();
 			// 创建案例类对象
@@ -143,7 +162,7 @@ public class NumericalTest {
 			   ps = new PrintStream(fos);
 			   System.setOut(ps);
 			   //输出最优解集
-			   Tools.printsolutions(solutions,startTime);			   
+			   Tools.printsolutions(solutions,startTime,countResult);			   
 			 } catch (IOException e) {
 				e.printStackTrace();
 			 }  finally {
@@ -153,7 +172,7 @@ public class NumericalTest {
 		          	
 	}
 	//教学算法用于操作序列搜索  使用果蝇算法用于资源序列搜索
-	public static void TLBO_F_algorithm(String casefile, String datafile) {
+	public static void TLBO_F_algorithm(String casefile, String datafile,List<List<Double>> countResult) {
 		 //记录开始计算的时间，用于统计本算法的总时间
 		long startTime = System.currentTimeMillis();
 		// 创建案例类对象
@@ -184,14 +203,14 @@ public class NumericalTest {
 		   ps = new PrintStream(fos);
 		   System.setOut(ps);
 		   //输出最优解集
-		   Tools.printsolutions(solutions,startTime);			   
+		   Tools.printsolutions(solutions,startTime,countResult);			   
 		 } catch (IOException e) {
 			e.printStackTrace();
 		 }  finally {
 	        if(ps != null) 	ps.close();
 	     }
 	}
-	public static void NSFFA_algorithm(String casefile,String datafile){
+	public static void NSFFA_algorithm(String casefile,String datafile,List<List<Double>> countResult){
 	       //记录开始计算的时间，用于统计本算法的总时间
 			long startTime = System.currentTimeMillis();
 			// 创建案例类对象
@@ -221,11 +240,20 @@ public class NumericalTest {
 			   ps = new PrintStream(fos);
 			   System.setOut(ps);
 			   //输出最优解集
-			   Tools.printsolutions(solutions,startTime);			   
+			   Tools.printsolutions(solutions,startTime,countResult);			   
 			 } catch (IOException e) {
 				e.printStackTrace();
 			 }  finally {
 		        if(ps != null) 	ps.close();
 		     }
 	}
+	 public static String buildFileName()
+	 {
+		 //new一个时间对象date
+		 Date date = new Date();
+	     //格式化
+		 SimpleDateFormat sdf = new SimpleDateFormat("MMddHHmm");
+	     //格式化时间，并且作为文件名
+		 return sdf.format(date);
+	 }
 }
