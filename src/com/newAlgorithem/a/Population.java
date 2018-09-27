@@ -31,7 +31,7 @@ public class Population {
 		this.population = new Individual[populationSize];
 		if (initial) {
 			for (int i = 0; i < populationSize; i++) {
-				Individual individual = new Individual(project);
+				Individual individual = new Individual(project,initial);
 				this.population[i] = individual;
 			}
 			this.populationObj = populationObjCompute(this.population);
@@ -220,7 +220,7 @@ public class Population {
 			for (int i = 0; i < FRank.size(); i++) {
 				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
 					np[spList.get(FRank.get(i)).get(j)]--;
-					npbackup[spList.get(FRank.get(i)).get(j)]--;
+					//npbackup[spList.get(FRank.get(i)).get(j)]--;
 				}
 			}
 			indivIndexRank.add(FRank);
@@ -327,7 +327,7 @@ public class Population {
 		Tools.setRankAndConsAndHyperVolume(this, project);
 		// 选择出交配池
 		Population matePool = getMatePool();
-
+        
 		// 将交配池中的个体按指定的概率进行交配
 		Population p1 = matePool.crossoverPopulaiton(NSGAV_II.crossoverRate);
         

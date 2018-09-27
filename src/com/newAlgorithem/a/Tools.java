@@ -1,17 +1,17 @@
 package com.newAlgorithem.a;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 /**
  * 定义一个工具类，主要功能有: 1.计算各pareto前沿中每个解的拥挤度 2.非支配排序
  * 
- * @author 熊凯 2017年3月28日
+ * 
  *
  */
 public class Tools {
@@ -164,9 +164,12 @@ public class Tools {
 				FP.setIndividual(i, individuals[FRank.get(i)]);
 			}
 			setHyperVolum(FP,project);
-			List<Integer> ind = sortByConsAndHyper(FP,npbackup,FRank);
+			/*List<Integer> ind = sortByConsAndHyper(FP,npbackup,FRank);
 			for (int i = 0; i <FP.size();i++){
 				FRank2.add(ind.get(i));
+			}*/
+			for (int i = 0; i <FP.size();i++){
+				FRank2.add(FRank.get(i));
 			}
 			//对当前层的个体按拥挤度排序
 			indivIndexRank.add(FRank2);
@@ -438,10 +441,11 @@ public class Tools {
 			HyperVmap.put(fRank.get(i), FP.getPopulation()[i].getHyperVolume());
 		}
 		Collections.sort(rank,new Comparator<Integer>() {
-
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				int flag=0;
+				int li=npbackup[o1];
+				int l2=npbackup[o2];
 			    if(npbackup[o1]>npbackup[o2]) {
 			    	flag=1;
 			    }else if(npbackup[o1]<npbackup[o2]) {
@@ -574,12 +578,14 @@ public class Tools {
 	
 	/**
 	 * 选择种群中个体指定目标函数的最大值
+	 * @param countResult 
 	 * 
 	 * @param index_objList
 	 * @param m
 	 * @return
 	 */
-	public static void printsolutions(Population solutions,long startTime) {
+	public static void printsolutions(Population solutions,long startTime, List<List<Double>> countResult) {
+		long endTime = System.currentTimeMillis();
 		if (solutions.getPopulationsize()>0){
 			   
 			Individual[] bestIndividuals = solutions.getPopulation();
@@ -597,18 +603,69 @@ public class Tools {
 				betterObjs.add(obj);
 				System.out.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
 			}
-
+			 //计算反转超体积  反转的工期为所有工期之和  反转的成本为工期*最大的薪水
+			double MaxDuration=0;
+			double MaxCost=0;
+			Case project=solutions.getPopulation()[0].getProject();
+			List<Task>tasks=project.getTasks();
+			for(int i=0;i<tasks.size();i++) {
+				MaxDuration+=tasks.get(i).getDuaration();
+				List<Integer> canR=(List<Integer>) tasks.get(i).getresourceIDs();
+				int maxSaIndex=0;
+				double  maxSa=project.getResources().get(canR.get(maxSaIndex)-1).getSalary();
+				for(int k=1;k<canR.size();k++) {
+					if(maxSa<project.getResources().get(canR.get(k)-1).getSalary()) {
+						maxSaIndex=k;
+						maxSa=project.getResources().get(canR.get(k)-1).getSalary();
+					}
+				}
+				MaxCost+=tasks.get(i).getDuaration()*maxSa;
+			}
+			//反转   归一   计算超体积
+			List<double[]> inversObj=new ArrayList<>();
+			double hyperVolume=0;
+			for(int i=0;i<betterObjs.size();i++) {
+				double dura=(MaxDuration-betterObjs.get(i)[0])/MaxDuration;
+				double cost=(MaxCost-betterObjs.get(i)[1])/MaxCost;
+				inversObj.add(new double[]{dura,cost});
+				if(i==0) {
+					hyperVolume+=inversObj.get(i)[0]*inversObj.get(i)[1];
+				}else {
+					hyperVolume+=(inversObj.get(i)[1]-inversObj.get(i-1)[1])*inversObj.get(i)[0];
+				}
+			}
+			List<Double> result=new ArrayList<>();
+			result.add(hyperVolume);
+			result.add((double) ((endTime-startTime)/1000));
+			countResult.add(result);
+			System.out.println("超体积:"+hyperVolume);
+			if(countResult.size()==NSGAV_II.RunTime) {
+				double countHyper=0;
+				double countTime=0;
+				int maxHyperVolumIndex=0;
+				double maxHyperVolum=countResult.get(maxHyperVolumIndex).get(0);
+				for(int i=0;i<countResult.size();i++) {
+					countHyper+=countResult.get(i).get(0);
+					countTime+=countResult.get(i).get(1);
+					if(maxHyperVolum<countResult.get(i).get(0)) {
+						maxHyperVolum=countResult.get(i).get(0);
+						maxHyperVolumIndex=i;
+					}
+				}
+				System.out.println("平均超体积:"+countHyper/countResult.size());
+				System.out.println("平均时间:"+countTime/countResult.size());
+				System.out.println(Arrays.toString(countResult.toArray()));
+				System.out.println("最大超体积位置:"+(maxHyperVolumIndex+1)+":最大超体积"+maxHyperVolum);
+			}
 			// 性能评价标准：MID、SM、DM、SNS
 			// 对于100_10_65_15而言
-			double best_f1 = 0;
-	     	double best_f2 = 0;
-
+			//double best_f1 = 0;
+	     	//double best_f2 = 0;
 			// 对于200_20_145_15而言
 			 //double best_f1=198;
 			 //double best_f2=143497;
-
-			double MID = calMeanIdealDistance(betterObjs, best_f1, best_f2);
-			double DM = calDiversification(betterObjs);
+			//double MID = calMeanIdealDistance(betterObjs, best_f1, best_f2);
+			//double DM = calDiversification(betterObjs);
 			//double SNS = calSNS(betterObjs, MID, best_f1, best_f2);
 			//double SM = calSpace_Metric(betterObjs);
 			// // 输出变量
@@ -616,15 +673,11 @@ public class Tools {
 			//System.out.println("DM=" + DM);
 			//System.out.println("SNS=" + SNS);
 			//System.out.println("SM=" + SM);			
-			
-			
-
 			// 输出变量
-
-			double MOCV = MID / DM;
-			System.out.println("指标MID:"+MID);
-			System.out.println("指标DM:"+DM);
-			System.out.println("指标MOCV:"+MOCV);
+			//double MOCV = MID / DM;
+			//System.out.println("指标MID:"+MID);
+			//System.out.println("指标DM:"+DM);
+			//System.out.println("指标MOCV:"+MOCV);
 			/*System.out.println("指标MID:"+MID);
 			System.out.println("指标DM:"+DM);*/
 			//System.out.println(betterObjs.size());
@@ -634,7 +687,6 @@ public class Tools {
 		else {
 			System.out.println("该算法无法求得最优解");
 		}
-		long endTime = System.currentTimeMillis();
 		System.out.println("共计用时：" + (endTime - startTime) / 1000 + "秒");
 
 	

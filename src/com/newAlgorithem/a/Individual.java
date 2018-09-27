@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
 public class Individual {
 	// 个体染色体的维数
 	static final int chromosomeLayer = 2;
@@ -75,6 +76,18 @@ public class Individual {
 		/*objCompute(project);*/
 
 	}
+    //初始化建立 资源random
+	public Individual(Case project, boolean initial) {
+		this.project = project;
+		settaskslist(project);
+		setResourcesList(project);
+		//随机产生DNA及任务序列
+		deciphering( project);
+		//随机产生资源序列，计算目标函数值
+		learnObjCompute(initial);
+	}
+
+	
 
 	private void settaskslist(Case project){
 		for (int i = 0; i < project.getTasks().size();i++){
@@ -641,7 +654,34 @@ public class Individual {
 			}
 		}
 	}
-
+	private void learnObjCompute(boolean initial) {
+		List<Integer> resourceList = new ArrayList<Integer>();
+		List<Integer> taskList = this.chromosome.get(0);
+		List<Double> _list2 = new ArrayList<>();
+		int[] endtime_res = new int[project.getM()];
+		int workload[]= new int[project.getM()];
+		for (int j = 0; j < endtime_res.length ; j++) {
+			//用于记录每个资源释放时间
+			endtime_res[j] = 0;
+			workload[j]=0;
+		}
+		
+		for(int i = 0; i <taskList.size(); i++){
+			ITask curTask = taskslist.get(taskList.get(i) -1);
+			//资源的选择 引入四种规则  随机  最便宜的资源 最早空闲资源   最小负载资源  最先可以升级的
+			//int resourceid=selectResourceC(curTask,endtime_res,workload);
+			double rand2 = Math.random();
+			List<Integer> list = curTask.getresourceIDs();
+			int B = (int) (rand2 * list.size());
+			_list2.add(rand2);
+			int resourceid = list.get(B);
+			resourceList.add(resourceid);
+			
+			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res,workload);//动态计算
+		}
+		this.chromosome.add(resourceList);
+		
+	}
 	public void learnObjCompute() {
 		List<Integer> resourceList = new ArrayList<Integer>();
 		List<Integer> taskList = this.chromosome.get(0);
@@ -677,7 +717,7 @@ public class Individual {
 		double rand=Math.random();
 		int resourceid=list.get(0);
 		List<Integer> list1=new ArrayList<>(list);
-		if(rand<0.5&&list1.size()>1) {
+		if(rand<NSGAV_II.pr&&list1.size()>1) {
 			//-------->成本最低
 			//升序排序
 			Collections.sort(list1, new Comparator<Integer>() {
@@ -711,7 +751,7 @@ public class Individual {
 					}
 				}
 			});
-		}else if(list1.size()>1){
+		}/*else if(list1.size()>1){
 			//最早可以升级的
 			String qtype = curTask.getSkillType();
 			//升序排列
@@ -733,7 +773,7 @@ public class Individual {
 				}
 				
 			});
-		}
+		}*/
 		resourceid=list1.get(0);
 		return resourceid;
 		
