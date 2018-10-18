@@ -21,7 +21,8 @@ public class Case {
 	private List<Task> tasks = new ArrayList<>();//任务数组
 	private List<Resource> resources = new ArrayList<>();//资源数组
 	private List<Integer> characteristics = new ArrayList<>();//特征信息数组[任务数量，资源数量，紧前任务数量，技能种类]
-
+    private double borderDuration=0;
+	private double borderCost=0;
 	public Case() {
 		caseDefinition();
 	}
@@ -42,8 +43,30 @@ public class Case {
 		setTaskCapapleResource();
 		setPrePre();
 		setSucSuc();
+		computeBorderValue();
 	}
 
+
+	private void computeBorderValue() {
+		double MaxDuration=0;
+		double MaxCost=0;
+		List<Task>tasks=this.getTasks();
+		for(int i=0;i<tasks.size();i++) {
+			MaxDuration+=tasks.get(i).getDuaration();
+			List<Integer> canR=(List<Integer>) tasks.get(i).getresourceIDs();
+			int maxSaIndex=0;
+			double  maxSa=this.getResources().get(canR.get(maxSaIndex)-1).getSalary();
+			for(int k=1;k<canR.size();k++) {
+				if(maxSa<this.getResources().get(canR.get(k)-1).getSalary()) {
+					maxSaIndex=k;
+					maxSa=this.getResources().get(canR.get(k)-1).getSalary();
+				}
+			}
+			MaxCost+=tasks.get(i).getDuaration()*maxSa;
+		}
+		this.setBorderCost(MaxCost);
+		this.setBorderDuration(MaxDuration);
+	}
 
 	//round-robin原则设置学习能力
 	public void setResourceLearnbility() {
@@ -338,6 +361,22 @@ public class Case {
 			tasks.get(i).setSucSucIDS(new ArrayList<>(sucsuc));
 		}
 		
+	}
+
+	public double getBorderDuration() {
+		return borderDuration;
+	}
+
+	public void setBorderDuration(double borderDuration) {
+		this.borderDuration = borderDuration;
+	}
+
+	public double getBorderCost() {
+		return borderCost;
+	}
+
+	public void setBorderCost(double borderCost) {
+		this.borderCost = borderCost;
 	}
 
 }

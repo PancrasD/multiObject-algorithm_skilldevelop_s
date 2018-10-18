@@ -14,20 +14,15 @@ public class Individual {
 	// 每个个体的目标函数个数
 	static final int objNum = 2;
 	// 个体中任务
-	private List<ITask> taskslist = new ArrayList<ITask>(); 
+	private List<ITask> taskslist = new ArrayList<ITask>();//ITask在计算目标时随着资源的执行后续任务能够执行的资源数在更新
 	//个体中资源
 	private List<IResource> resourceslist = new ArrayList<IResource>();
 	// 染色体
 	private List<List<Integer>> chromosome = new ArrayList<List<Integer>>();
-	
-	// 目标函数
+	// 目标函数 duration  cost
 	private double[] obj = new double[objNum];
 	private int maxtime = 0;
 	private double cost = 0.0;
-	/*//记录技能跃迁次数
-	private int jumpTimes = 0;
-	//记录受影响任务数量
-	private int influenceTasks = 0;*/
     private int[] heuristics=new int[New1.heuristics];
 	// 个体在种群中的非支配等级
 	private int non_dominatedRank;
@@ -35,17 +30,13 @@ public class Individual {
 	private double crowDistance;
 	private double hyperVolume;
 	private Case project;
-	
 	private boolean isTeacher = false;
-
-		
 	public Individual(List<List<Integer>> _chromosome,List<List<Double>> _chromosomemDNA,Case project) {
 		// 创建个体的染色体
 		this.project = project;
 		settaskslist(project);
 		setResourcesList(project);
 		this.chromosome = _chromosome;
-
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
 		learnObjCompute();		
 	}
@@ -56,8 +47,6 @@ public class Individual {
 		settaskslist(project);	
 		setResourcesList(project);
 		this.chromosome = _chromosome;
-		//this.chromosomeDNA = _chromosomemDNA;
-
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
 		learnObjCompute();		
 	}
@@ -71,7 +60,6 @@ public class Individual {
 		deciphering( project);
 		//随机产生资源序列，计算目标函数值
 		learnObjCompute();
-		
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
 		/*objCompute(project);*/
 
@@ -86,12 +74,17 @@ public class Individual {
 		//随机产生资源序列，计算目标函数值
 		learnObjCompute(initial);
 	}
-
-	
-
+	//复制个体
+	public Individual(Individual son) {
+		this.project = son.project;
+		settaskslist(project);
+		setResourcesList(project);
+		this.chromosome = son.chromosome;//复制引用即可
+		this.obj=son.obj;
+	}
 	private void settaskslist(Case project){
 		for (int i = 0; i < project.getTasks().size();i++){
-			ITask itask = new ITask(project.getTasks().get(i));
+			ITask itask = new ITask(project.getTasks().get(i));//完全新建避免复制引用
 			taskslist.add(itask);
 		}
 	}
@@ -693,31 +686,45 @@ public class Individual {
 			endtime_res[j] = 0;
 			workload[j]=0;
 		}
-		
+	   double rand=Math.random();
+	    int select=0;
+	    if(rand<NSGAV_II.pr) {
+	    	select=1;//成本&&工期
+		}else {
+			double rand1=Math.random();
+			if(rand1<0.5) {
+				select=2;//成本
+			}else {
+				select=3;//工期
+			}
+		}
 		for(int i = 0; i <taskList.size(); i++){
 			ITask curTask = taskslist.get(taskList.get(i) -1);
 			//资源的选择 引入四种规则  随机  最便宜的资源 最早空闲资源   最小负载资源  最先可以升级的
-			int resourceid=selectResourceC(curTask,endtime_res,workload);
-			
+			//int resourceid=selectResourceC(curTask,endtime_res,workload);
 			/*int B = (int) (rand2 * list.size());
 			_list2.add(rand2);
 			int resourceid = list.get(B);*/
-			
+			int resourceid=0;
+			switch(select) {
+			case 1:resourceid=selectResourceB(curTask,endtime_res,workload,0.5);break;//成本&&工期
+			case 2:resourceid=selectResourceB(curTask,endtime_res,workload,1);break;//成本
+			case 3:resourceid=selectResourceB(curTask,endtime_res,workload,0);break;//工期
+			}
 			resourceList.add(resourceid);
-			
 			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res,workload);//动态计算
 		}
 		this.chromosome.add(resourceList);
 	}
 	//选择资源
-	private int selectResourceC(ITask curTask, int[] endtime_res, int[] workload) {
+	private int selectResourceB(ITask curTask, int[] endtime_res, int[] workload,double pp) {
 		//两个规则 成本最低  工期最短
 		List<IResource> ress=this.resourceslist;
 		List<Integer> list = curTask.getresourceIDs();
 		double rand=Math.random();
 		int resourceid=list.get(0);
 		List<Integer> list1=new ArrayList<>(list);
-		if(rand<NSGAV_II.pr&&list1.size()>1) {
+		if(rand<pp&&list1.size()>1) {
 			//-------->成本最低
 			//升序排序
 			Collections.sort(list1, new Comparator<Integer>() {
@@ -771,12 +778,10 @@ public class Individual {
 						return 0;
 					}
 				}
-				
 			});
 		}*/
 		resourceid=list1.get(0);
 		return resourceid;
-		
 	}
 	//选择资源
 	private int selectResource(ITask curTask, int[] endtime_res, int[] workload) {
@@ -840,7 +845,6 @@ public class Individual {
 					}else {
 						return 0;
 					}
-					
 				}
 			});
 			resourceid=list1.get(0);
@@ -865,7 +869,6 @@ public class Individual {
 						return 0;
 					}
 				}
-				
 			});
 			resourceid=list1.get(0);
 		}
@@ -888,7 +891,7 @@ public class Individual {
 			this.obj = aimCompute(task, resource,endtime_res);//左移调度下移动插入点的技能必须高于任务的所需技能  采用资源更新
 		}
 	}
-	
+	//每次遍历 花费时间  直接将改变endTime的资源同maxTime对比
 	public double[] aimCompute(ITask curTask, IResource curResource, int[] endtime_res){
 		for(int i=0;i<endtime_res.length;i++) {
 			if(this.maxtime<endtime_res[i]){
@@ -898,7 +901,6 @@ public class Individual {
 		int realDuration = curTask.getFinishTime() - curTask.getStartTime();
 		double salary = curResource.getSalary();
 		this.cost += realDuration*salary;
-		
 		return new double[]{this.maxtime, this.cost};
 	}
 	
@@ -935,11 +937,10 @@ public class Individual {
 		int dstan = task.getStandardDuration();
 		double M = 0.25;
 		
-		double sstart = Math.pow(((1-M)*qinit)/(1-M*qinit), 1/m);
+		double sstart = Math.pow(((1-M)*qinit)/(1-M*qinit), 1/m);//每次计算 耗费时间
 		double sdura = dstan/(qinit*8);
 		double tmp = Math.pow((sstart+sdura), m);
 		double qfinal = tmp/(M*tmp+1-M);
-		
 		//更新当前技能水平表
 		resource.putSkillsInfo(qtype, qfinal);
 		//更新技能执行时间表
@@ -1168,7 +1169,17 @@ public class Individual {
 	public void setHyperVolume(double hyperVolume) {
 		this.hyperVolume = hyperVolume;
 	}
-    //个体变邻搜索
+    
+	/*
+	 * else if(Tools.Dominated(son,compare,this.project)==0){
+				  double hyperv1=(son.getProject().getBorderDuration()-son.getObj()[0])*(son.getProject().getBorderCost()-son.getObj()[1]);
+				  double hyperv2=(compare.getProject().getBorderDuration()-compare.getObj()[0])*(compare.getProject().getBorderCost()-compare.getObj()[1]);
+				  if(hyperv1>hyperv2) {
+					  compare=son; 
+				  }
+			}
+	 */
+	//个体变邻搜索
 	public Individual variableNeighborDecent() {
 		Individual compare=this;
 		int k=1;//第一个邻结构的序号
@@ -1185,9 +1196,31 @@ public class Individual {
 		}
 		return compare;
 	}
-
+	//个体变邻搜索 将互不支配的解存储
+	public List<Individual> variableNeighborDecentVP() {
+		List<Individual> savelist=new ArrayList<>();
+		Individual compare=this;
+		int k=1;//第一个邻结构的序号
+		while(k<=5) {
+			Individual son=compare.variableNeighborWithFirst(k);
+			int flag=Tools.Dominated(son,compare,this.project);
+			if(flag==1) {
+				compare=son;
+			}else {
+				if(flag==0) {
+					savelist.add(new Individual(son));
+				}
+				k++;
+			}
+		}
+		if(Tools.Dominated(this,compare,this.project)==1) {
+			compare=this;
+		}
+		savelist.add(compare);
+		return savelist;
+	}
+    //第一个提高 变邻搜索
 	private Individual variableNeighborWithFirst(int k) {
-		
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
 		List<Integer> _tasks = new ArrayList<>();
 		int taskLength = this.chromosome.get(0).size();

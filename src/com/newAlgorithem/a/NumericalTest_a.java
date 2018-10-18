@@ -23,16 +23,16 @@ public class NumericalTest_a {
             List<List<Double>> countResult=new ArrayList<>();
     		if (args[0].trim().toLowerCase().equals("g")){
     			String head=buildFileName();
-    			for(int j = 0; j < 10; j++){
-    				String dic = "data/NSGA_H"+head+"/nsgah_"+j;
+    			for(int j = 0; j <  NSGAV_II.RunTime; j++){
+    				String dic = "data/NSGAV_H"+head+"/nsgah_"+j;
 	   				File f=new File(dic);
 	               	if(f.exists()) {
 	               		 f.delete();
 	               	}
 	               	f.mkdirs();
     				for(int i = 0; i<fl.length; i++){
-                   	 String _fn =  "case_def/" + fl[i];
-                   	 String _fo = dic+"/NSGAH_"+fl[i]+".txt";
+                   	String _fn =  "case_def/" + fl[i];
+                   	String _fo = dic+"//NSGAVH_"+fl[i]+".txt";
                    	NSGAV_algorithm(_fn,_fo,countResult);
                    }
     			}
@@ -142,11 +142,15 @@ public class NumericalTest_a {
 			}*/
 			long time=0;
 			long t2 = 0;
-			while (generationCount < NSGAV_II.maxGenerations ) {
+		/*	while (generationCount < NSGAV_II.maxGenerations ) {
 				P = P.getOffSpring_NSGAV();
 				generationCount++;
-				//t2=System.currentTimeMillis();
-				//time=(t2-startTime)/1000;
+			}*/
+			while (time < 30 ) {
+				P = P.getOffSpring_NSGAV();
+				generationCount++;
+				t2=System.currentTimeMillis();
+				time=(t2-startTime)/1000;
 			}
 			//从最后得到种群中获取最优解集
 			Population solutions = Tools.getbestsolution(P,1, project);

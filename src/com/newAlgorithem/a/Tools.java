@@ -241,7 +241,7 @@ public class Tools {
 				}
 			}
 			indivIndexRank.add(FRank);
-			Rank ++;
+			Rank ++;//Rank(0-->1)>=level=1
 			if ((level != 0)&&(Rank >= level)){
 				break;
 			}
@@ -283,9 +283,6 @@ public class Tools {
 		return flag;
 	}
 
-	
-	
-	
 	/**
 	 * 计算pareto前沿中每个解的拥挤度，每个pareto前沿的第一个和最后一个解的拥挤度都为无穷大，便于计算，用1000表示
 	 * 
@@ -349,7 +346,7 @@ public class Tools {
 			hpervolume[j]=0.5*(Math.abs(y*(x1-x0)+y1*(x0-x)+y0*(x-x1))+Math.abs(y*(x2-x0)+y2*(x0-x)+y0*(x-x2)));
 			/*hpervolume[j] = hpervolume[j]*0.5*Math.abs(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))/(x0*y0);*/
 		}
-	/*	for (int i = 0; i < index_objList.get(0).getValue().length; i++) { // i表示第几个目标函数
+	 	/*for (int i = 0; i < index_objList.get(0).getValue().length; i++) { // i表示第几个目标函数
 			for (int j = 1; j < L - 1; j++) {
 				hpervolume[j] = hpervolume[j]*(index_objList.get(j + 1).getValue()[i] - index_objList.get(j - 1).getValue()[i]);
 			}
@@ -604,10 +601,10 @@ public class Tools {
 				System.out.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
 			}
 			 //计算反转超体积  反转的工期为所有工期之和  反转的成本为工期*最大的薪水
-			double MaxDuration=0;
-			double MaxCost=0;
 			Case project=solutions.getPopulation()[0].getProject();
-			List<Task>tasks=project.getTasks();
+			double MaxDuration=project.getBorderDuration();
+			double MaxCost=project.getBorderCost();
+			/*List<Task>tasks=project.getTasks();
 			for(int i=0;i<tasks.size();i++) {
 				MaxDuration+=tasks.get(i).getDuaration();
 				List<Integer> canR=(List<Integer>) tasks.get(i).getresourceIDs();
@@ -620,7 +617,7 @@ public class Tools {
 					}
 				}
 				MaxCost+=tasks.get(i).getDuaration()*maxSa;
-			}
+			}*/
 			//反转   归一   计算超体积
 			List<double[]> inversObj=new ArrayList<>();
 			double hyperVolume=0;

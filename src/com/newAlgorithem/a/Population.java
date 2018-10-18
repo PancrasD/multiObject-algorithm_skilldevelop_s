@@ -323,30 +323,23 @@ public class Population {
 		Population OffSpring = new Population(NSGAV_II.populationSize,project,false);
 		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
 		//Tools.setRankAndCrowD(this, project);
-		// 
 		Tools.setRankAndConsAndHyperVolume(this, project);
 		// 选择出交配池
 		Population matePool = getMatePool();
-        
 		// 将交配池中的个体按指定的概率进行交配
 		Population p1 = matePool.crossoverPopulaiton(NSGAV_II.crossoverRate);
-        
 		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
 		//Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
         //使用变邻搜索  B-VND first-improvement
 		Population p2 = p1.variableNeighborhoodDescent();
+		//Population p2 = p1.variableNeighborhoodDescentVP();
 		// 将两个种群合并
 		Population mergedPopulation = merged(this,p2);
-
 		// 从混合种群中选择前populationSize个个体作为新一代父代种群
 		OffSpring = mergedPopulation.slectPopulationC(NSGAV_II.populationSize);
-
 		return OffSpring;
 	}
-
-
-
-
+	//变邻搜索
 	private Population variableNeighborhoodDescent() {
 		Population newPopulation = new Population(populationsize,project);
 		for (int i = 0; i < populationsize; i++) {
@@ -354,6 +347,21 @@ public class Population {
 			Individual son = parent.variableNeighborDecent();
 			newPopulation.setIndividual(i, son);
 			//System.out.println(i);
+		}
+		return newPopulation;
+	}
+	//变邻搜索  保存非支配解
+	private Population variableNeighborhoodDescentVP() {
+		List<Individual>indivs=new ArrayList<>();
+		for (int i = 0; i < populationsize; i++) {
+			Individual parent = population[i];
+			List<Individual> vs = parent.variableNeighborDecentVP();
+			indivs.addAll(vs);
+			//System.out.println(i);
+		}
+		Population newPopulation = new Population(indivs.size(),project);
+		for(int i=0;i<indivs.size();i++) {
+			newPopulation.setIndividual(i, indivs.get(i));
 		}
 		return newPopulation;
 	}
