@@ -1,4 +1,4 @@
-package com.newAlgorithem.a;
+package com.newAlgorithem.gavn;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class NumericalTest_a {
+public class NumericalTest_gvn {
 	public static void main(String[] args) {
 		
         if (args.length==1){

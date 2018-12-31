@@ -1,4 +1,4 @@
-package com.newAlgorithem.a;
+package com.newAlgorithem.gavn;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -854,7 +854,6 @@ public class Individual {
 			String qtype = curTask.getSkillType();
 			//升序排列
 			Collections.sort(list1, new Comparator<Integer>() {
- 
 				@Override
 				public int compare(Integer o1, Integer o2) {
 					IResource iRes1=ress.get(o1-1);
@@ -910,7 +909,6 @@ public class Individual {
 		String qtype = curtask.getSkill().split(":")[0].trim();
 		IResource resource = resourceslist.get(rid-1);
 		double qinit = resource.getSkillsInfo().get(qtype); 
-		
 		//得到所有前置任务,循环每一前置任务，取最晚结束时间
 		List<Integer> pretaskids = curtask.getPredecessorIDs();
 		for (int j = 0; j < pretaskids.size();j++){
@@ -922,7 +920,6 @@ public class Individual {
 		if (endtime < endtime_res[rid-1]){
 			endtime = endtime_res[rid-1];
 		}
-		
 		//设置当前任务的开始时间及完成时间
 		taskslist.get(tid-1).setstarttime(endtime,qinit);//间隔1可以取消
 		//更新当前任务资源的最后完工时间

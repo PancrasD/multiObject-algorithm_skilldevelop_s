@@ -1,4 +1,4 @@
-package com.newAlgorithem.a;
+package com.newAlgorithem.gavn;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

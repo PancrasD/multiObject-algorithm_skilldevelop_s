@@ -1,4 +1,4 @@
-package com.newAlgorithem.a;
+package com.newAlgorithem.gavn;
 
 public class New1 {
 	 // 种群大小

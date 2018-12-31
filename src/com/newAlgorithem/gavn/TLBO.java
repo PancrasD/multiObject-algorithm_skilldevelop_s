@@ -1,4 +1,4 @@
-package com.newAlgorithem.a;
+package com.newAlgorithem.gavn;
 
 public class TLBO {
 	    // 种群大小
