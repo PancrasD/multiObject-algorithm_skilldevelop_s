@@ -72,7 +72,7 @@ public class Individual {
 		settaskslist(project);
 		setResourcesList(project);
 		//随机产生DNA及任务序列
-		deciphering( project);
+		deciphering(project);
 		//随机产生资源序列，计算目标函数值
 		learnObjCompute(initial);
 	}
@@ -81,7 +81,16 @@ public class Individual {
 		this.project = son.project;
 		settaskslist(project);
 		setResourcesList(project);
-		this.chromosome = son.chromosome;//复制引用即可
+		List<List<Integer>> chro=new ArrayList<>();
+		for(int i=0;i<son.chromosome.size();i++) {
+			List<Integer> list=son.chromosome.get(i);
+			List<Integer> list1=new ArrayList<>();
+			for(int j=0;list!=null&&j<list.size();j++) {
+				list1.add(list.get(j));
+			}
+			chro.add(list1);
+		}
+		this.chromosome = chro;
 		this.obj=son.obj;
 	}
 	private void settaskslist(Case project){
@@ -443,25 +452,12 @@ public class Individual {
 	public void deciphering(Case project) {
 		
 		List<Integer> taskList = new ArrayList<Integer>();
-		/*List<Integer> resourceList = new ArrayList<Integer>();*/
 		// 可执行任务集合
 		List<Integer> executableTaskIDS = new ArrayList<Integer>();	
 		List<Task> tasks = project.getTasks();
-
 		List<Double> _list1 = new ArrayList<>();
-		/*List<Double> _list2 = new ArrayList<>();*/
-		
-		/*int[] endtime_res = new int[project.getM()];
-		for (int j = 0; j < endtime_res.length ; j++) {
-			//用于记录每个资源释放时间
-			endtime_res[j] = 0;
-		}*/
-
-		// 求taskList任务执行序列和resourceList资源分配序列
 		for (int i = 0; i < project.getN(); i++) {  
-			
 			executableTaskIDS.clear();
-			
 			for (int k = 0; k < tasks.size(); k++) {
 				if (taskslist.get(k).pretasknum == 0){//找到没有紧前任务的任务集合作为优先执行任务集合
 					executableTaskIDS.add(tasks.get(k).getTaskID());
@@ -474,7 +470,7 @@ public class Individual {
 			}
 			//1随机  2最大紧后集   34先选择资源然后选择任务3最大执行时间 4 最大紧后集执行时间和
 			double rand3=Math.random();
-			if(rand3<0.7) {
+			/*if(rand3<0.7) {
 			   scheduleTaskByRandomRule(executableTaskIDS,taskList);
 			}else if(rand3<0.8) {
 				scheduleTaskByMaxSuccessorsRule(executableTaskIDS,taskList);
@@ -482,20 +478,25 @@ public class Individual {
 				scheduleTaskByMaxProcessTimeRule(executableTaskIDS,taskList);
 			}else {
 				scheduleTaskByMaxSumSuccessorsProcessTimeRule(executableTaskIDS,taskList);
-			}
-			// 求对应的资源分配序列resourceList
-			// 可执行该任务的资源集合
-			/*ITask curTask = taskslist.get(currentTaskID -1);
-			List<Integer> list = curTask.getresourceIDs();
-			int B = (int) (rand2 * list.size());
-			int resourceid = list.get(B);
-			resourceList.add( resourceid );*/
-			//单步计算目标值
-			/*singleCompute(resourceid,currentTaskID,endtime_res);*/
+			}*/
+			int A = (int) ( rand3 * executableTaskIDS.size());
+			int currentTaskID = executableTaskIDS.get(A);//优先任务集合中随机选择一个作为当前执行任务
+			taskList.add(currentTaskID);
+            taskslist.get(currentTaskID -1).pretasknum = -1;   //当前任务已经被使用，做上标记以防止下次被选用
+			//处理后续任务
+            List<Integer> suc=this.project.getTasks().get(currentTaskID-1).getsuccessortaskIDS();
+            for(int k=0;suc!=null&&k<suc.size();k++) {
+            	taskslist.get(suc.get(k)-1).pretasknum--;	
+            }
+			/*for (int k = 0; k < tasks.size(); k++) {//可以优化  遍历紧后集
+				//把所有以任务j为前置任务的前置任务数减1；
+				if (tasks.get(k).getPredecessorIDs().contains(currentTaskID)){
+					taskslist.get(k).pretasknum--;	
+					//？？？应该将该任务从前序任务集中删除
+				}
+			}*/
 		}
-		/*this.chromosomeDNA.add(_list2);*/
 		this.chromosome.add(taskList);
-		/*this.chromosome.add(resourceList);*/
 		return ;
 	}
 	private void scheduleTaskByMaxSumSuccessorsProcessTimeRule(List<Integer> executableTaskIDS,
@@ -640,7 +641,6 @@ public class Individual {
 	private void learnObjCompute(boolean initial) {
 		List<Integer> resourceList = new ArrayList<Integer>();
 		List<Integer> taskList = this.chromosome.get(0);
-		List<Double> _list2 = new ArrayList<>();
 		int[] endtime_res = new int[project.getM()];
 		int workload[]= new int[project.getM()];
 		for (int j = 0; j < endtime_res.length ; j++) {
@@ -648,7 +648,6 @@ public class Individual {
 			endtime_res[j] = 0;
 			workload[j]=0;
 		}
-		
 		for(int i = 0; i <taskList.size(); i++){
 			ITask curTask = taskslist.get(taskList.get(i) -1);
 			//资源的选择 引入四种规则  随机  最便宜的资源 最早空闲资源   最小负载资源  最先可以升级的
@@ -656,7 +655,6 @@ public class Individual {
 			double rand2 = Math.random();
 			List<Integer> list = curTask.getresourceIDs();
 			int B = (int) (rand2 * list.size());
-			_list2.add(rand2);
 			int resourceid = list.get(B);
 			resourceList.add(resourceid);
 			
@@ -677,8 +675,12 @@ public class Individual {
 		}
 	   double rand=Math.random();
 	    int select=0;
-	    if(rand<NSGAV_II.pr) {
-	    	select=1;//成本&&工期
+	    if(rand<NSGAV_II.pr) {//平衡加入随机
+	    	/*double rand1=Math.random();
+	    	if(rand1<0.5) {
+	    		select=0;
+	    	}else*/
+	         select=1;//成本&&工期
 		}else {
 			double rand1=Math.random();
 			if(rand1<0.5) {//0.5
@@ -697,9 +699,16 @@ public class Individual {
 			int resourceid = list.get(B);*/
 			int resourceid=0;
 			switch(select) {//可以提到前面进行优化
+			case 0:{
+				List<Integer> list = curTask.getresourceIDs();
+				double rand2=Math.random();
+				int B = (int) (rand2 * list.size());
+				resourceid = list.get(B);
+			}
 			case 1:resourceid=selectResourceB(curTask,endtime_res,workload,0.5);break;//成本&&工期
 			case 2:resourceid=selectResourceB(curTask,endtime_res,workload,1);break;//成本
 			case 3:resourceid=selectResourceB(curTask,endtime_res,workload,0);break;//工期
+			
 			}
 			resourceList.add(resourceid);
 			this.singleCompute(resourceid,taskList.get(i),endtime_res,workload);//动态计算

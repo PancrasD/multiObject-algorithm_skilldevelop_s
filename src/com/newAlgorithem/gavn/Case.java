@@ -290,10 +290,8 @@ public class Case {
 				int num =  tasks.get(j).getpretasknum();
 			   if (num > 0) {
 					List<Integer> pre_IDs = tasks.get(j).getPredecessorIDs();
-					for (int k=0;k<num;k++) {
-						if (pre_IDs.get(k)==i+1){
-							successorIDS.add(tasks.get(j).getTaskID());
-						}
+					if(pre_IDs.contains(i+1)) {
+						successorIDS.add(tasks.get(j).getTaskID());
 					}
 				}
 			}
