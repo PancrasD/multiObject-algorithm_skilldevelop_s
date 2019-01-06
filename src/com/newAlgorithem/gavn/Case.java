@@ -21,8 +21,9 @@ public class Case {
 	private List<Task> tasks = new ArrayList<>();//任务数组
 	private List<Resource> resources = new ArrayList<>();//资源数组
 	private List<Integer> characteristics = new ArrayList<>();//特征信息数组[任务数量，资源数量，紧前任务数量，技能种类]
-    private double borderDuration=0;
-	private double borderCost=0;
+	private double borderDuration=0;//最大工期 累计加和
+	private double borderCost=0;//最大成本  最大工期*最大薪水
+	private double[] tempObj;//传递参数用的
 	public Case() {
 		caseDefinition();
 	}
@@ -377,6 +378,14 @@ public class Case {
 
 	public void setBorderCost(double borderCost) {
 		this.borderCost = borderCost;
+	}
+
+	public double[] getTempObj() {
+		return tempObj;
+	}
+
+	public void setTempObj(double[] tempObj) {
+		this.tempObj = tempObj;
 	}
 
 }

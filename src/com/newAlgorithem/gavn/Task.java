@@ -25,7 +25,7 @@ public class Task implements Cloneable {
 	//紧前任务数
 	private int pretasknum;
 	//标准工期
-	private int standardDuration;
+	private double standardDuration;
 	//紧后任务IDS
 	private List<Integer> successorTaskIDS = new  ArrayList<>();
 	//紧后追溯任务IDs
@@ -41,23 +41,26 @@ public class Task implements Cloneable {
 	//任务的结束时间
 	private int finishTime;
 	//技能水平
-	private int skillLevel;
-	
+	private double skillLevel;
+	private String skillType;
 	
 	public Task(){}
 	public Task(int taskID,int duaration,String skill){
 		this.taskID=taskID;
 		this.duaration=duaration;
 		this.skill=skill;
+		this.skillLevel = Integer.valueOf(skill.split(":")[1])+1;
+		this.skillType=skill.split(":")[0].trim();
 		this.pretasknum = 0;
 		this.skillLevel = Integer.valueOf(skill.split(":")[1])+1;
-		this.standardDuration = duaration*skillLevel;
+		this.standardDuration =duaration*skillLevel;
 	}
 	public Task(int taskID,int duaration,String skill,String pretaskIDs){
 		this.taskID=taskID;
 		this.duaration=duaration;
 		this.skill=skill;
 		this.skillLevel = Integer.valueOf(skill.split(":")[1])+1;
+		this.skillType=skill.split(":")[0].trim();
 		this.standardDuration = duaration*skillLevel;
 		String[] pre_IDs = pretaskIDs.trim().split(" ");
 		this.pretasknum =  pre_IDs.length;
@@ -74,7 +77,7 @@ public class Task implements Cloneable {
 	public void setTaskID(int taskID) {
 		this.taskID = taskID;
 	}
-	public int getStandardDuration() {
+	public double getStandardDuration() {
 		return standardDuration;
 	}
 	public void setStandardDuration(int dura) {
@@ -158,6 +161,18 @@ public class Task implements Cloneable {
 	}
 	public void setSucSucIDS(List<Integer> sucSucIDS) {
 		this.sucSucIDS = sucSucIDS;
+	}
+	public double getSkillLevel() {
+		return skillLevel;
+	}
+	public void setSkillLevel(int skillLevel) {
+		this.skillLevel = skillLevel;
+	}
+	public String getSkillType() {
+		return skillType;
+	}
+	public void setSkillType(String skillType) {
+		this.skillType = skillType;
 	}
 
 	

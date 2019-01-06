@@ -1,6 +1,7 @@
 package com.newAlgorithem.gavn;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class IResource {
 		//资源ID
@@ -11,10 +12,9 @@ public class IResource {
 		private String skils;
 		//资源学习能力
 		private double learnbility;
-		
 		private HashMap<String,Double> skillsInfo = new HashMap<String,Double>();
 		private HashMap<String,HashMap<int[],Double>> skillTimetable = new HashMap<String,HashMap<int[],Double>>();
-		
+		private HashMap<String,LinkedList<int[]>> skillTime=new HashMap<>();
 		@SuppressWarnings("null")
 		public IResource(Resource resource){
 			this.resourceID=resource.getResourceID();
@@ -27,8 +27,12 @@ public class IResource {
 				this.skillsInfo.put(skillInfo[0], Double.valueOf(skillInfo[1])+1);
 						
 				HashMap<int[], Double> table = new HashMap<int[], Double>();
-				table.put(new int[]{0,0}, Double.valueOf(skillInfo[1])+1);
+				int[] zero=new int[]{0,0};
+				table.put(zero,Double.valueOf(skillInfo[1])+1);
 				this.skillTimetable.put(skillInfo[0], table);
+				LinkedList<int[]> list=new LinkedList<>();
+				list.add(zero);
+				skillTime.put(skillInfo[0], list);
 			}
 		}
 		//
@@ -46,7 +50,13 @@ public class IResource {
 		
 		public void putSkillTimetable(String type, int[] time, Double level){
 			skillTimetable.get(type).put(time, level);
-			
+			if(this.getSkillTime().get(type)==null) {
+				LinkedList<int[]> list=new LinkedList<>();
+				list.add(time);
+				this.skillTime.put(type, list);
+			}else {
+			this.getSkillTime().get(type).add(time);
+			}
 		}
 		
 		public int getResourceID() {
@@ -75,4 +85,11 @@ public class IResource {
 		public double getLearnbility(){
 			return learnbility;
 		}
+		public HashMap<String, LinkedList<int[]>> getSkillTime() {
+			return skillTime;
+		}
+		public void setSkillTime(HashMap<String, LinkedList<int[]>> skillTime) {
+			this.skillTime = skillTime;
+		}
+		
 }

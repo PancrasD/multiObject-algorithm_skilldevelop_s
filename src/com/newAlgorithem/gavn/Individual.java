@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeMap;
 
 public class Individual {
 	// 个体染色体的维数
@@ -83,15 +85,17 @@ public class Individual {
 		this.obj=son.obj;
 	}
 	private void settaskslist(Case project){
-		for (int i = 0; i < project.getTasks().size();i++){
-			ITask itask = new ITask(project.getTasks().get(i));//完全新建避免复制引用
+		List<Task> tasks=project.getTasks();
+		for (int i = 0; i < tasks.size();i++){
+			ITask itask = new ITask(tasks.get(i));//完全新建避免复制引用
 			taskslist.add(itask);
 		}
 	}
 	
 	private void setResourcesList(Case project) {
-		for(int i = 0; i<project.getResources().size(); i++){
-			IResource iresource = new IResource(project.getResources().get(i));
+		List<Resource> ress=project.getResources();
+		for(int i = 0; i<ress.size(); i++){
+			IResource iresource = new IResource(ress.get(i));
 			resourceslist.add(iresource);
 		}
 	}
@@ -155,33 +159,19 @@ public class Individual {
 	public Individual Mating(Individual husband, int crosspoint) {
 
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
-
-		
 		List<Integer> _tasks = new ArrayList<>();
-		
-		/*List<Integer> _resources = new ArrayList<>();
-		 * List<Double> _resourcesdna = new ArrayList<>();*/
-
+		int[] taskIndex=new int[this.chromosome.get(0).size()];
 		for (int i = 0; i < crosspoint;i++){
 			_tasks.add(this.chromosome.get(0).get(i));
-			/*_resources.add(this.chromosome.get(1).get(i));*/
-			/*_resourcesdna.add(this.chromosomeDNA.get(1).get(i));*/
+			taskIndex[this.chromosome.get(0).get(i)-1]=1;
 		}
-				
 		for (int i = 0; i<husband.chromosome.get(0).size();i++){
-			if (!_tasks.contains(husband.chromosome.get(0).get(i))){
+			if (taskIndex[husband.chromosome.get(0).get(i)-1]!=1){//可以优化 不用每次判断迭代!_tasks.contains(husband.chromosome.get(0).get(i)
 				_tasks.add(husband.chromosome.get(0).get(i));
-				/*_resources.add(husband.chromosome.get(1).get(i));
-				
-				_resourcesdna.add(husband.chromosomeDNA.get(1).get(i));*/
-
 			}
 		}
 		son_chromosome.add(_tasks);
-		/*son_chromosome.add(_resources);
-		son_chromosomeDNA.add(_taskdna);*/
-		Individual son = new Individual(son_chromosome, project);
-		/*Individual son = new Individual(son_chromosome,son_chromosomeDNA,project);*/	
+		Individual son = new Individual(son_chromosome, project);	
 		return son;
 	}
 	
@@ -670,7 +660,7 @@ public class Individual {
 			int resourceid = list.get(B);
 			resourceList.add(resourceid);
 			
-			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res,workload);//动态计算
+			this.singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res,workload);//动态计算
 		}
 		this.chromosome.add(resourceList);
 		
@@ -678,7 +668,6 @@ public class Individual {
 	public void learnObjCompute() {
 		List<Integer> resourceList = new ArrayList<Integer>();
 		List<Integer> taskList = this.chromosome.get(0);
-		List<Double> _list2 = new ArrayList<>();
 		int[] endtime_res = new int[project.getM()];
 		int workload[]= new int[project.getM()];
 		for (int j = 0; j < endtime_res.length ; j++) {
@@ -692,7 +681,7 @@ public class Individual {
 	    	select=1;//成本&&工期
 		}else {
 			double rand1=Math.random();
-			if(rand1<0.5) {
+			if(rand1<0.5) {//0.5
 				select=2;//成本
 			}else {
 				select=3;//工期
@@ -702,20 +691,59 @@ public class Individual {
 			ITask curTask = taskslist.get(taskList.get(i) -1);
 			//资源的选择 引入四种规则  随机  最便宜的资源 最早空闲资源   最小负载资源  最先可以升级的
 			//int resourceid=selectResourceC(curTask,endtime_res,workload);
-			/*int B = (int) (rand2 * list.size());
-			_list2.add(rand2);
-			int resourceid = list.get(B);*/
-			int resourceid=0;
-			switch(select) {
+			List<Integer> list = curTask.getresourceIDs();
+			double rand2=Math.random();
+			int B = (int) (rand2 * list.size());
+			int resourceid = list.get(B);
+			/*int resourceid=0;
+			switch(select) {//可以提到前面进行优化
 			case 1:resourceid=selectResourceB(curTask,endtime_res,workload,0.5);break;//成本&&工期
 			case 2:resourceid=selectResourceB(curTask,endtime_res,workload,1);break;//成本
 			case 3:resourceid=selectResourceB(curTask,endtime_res,workload,0);break;//工期
-			}
+			}*/
 			resourceList.add(resourceid);
-			singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res,workload);//动态计算
+			this.singleCompute(resourceid,taskList.get(i),endtime_res,workload);//动态计算
 		}
 		this.chromosome.add(resourceList);
 	}
+	/*
+	 * 加权成本和工期
+	 */
+	private int selectResourceW(ITask curTask, int[] endtime_res, int[] workload,double pp) {
+		List<IResource> ress=this.resourceslist;
+		List<Integer> list = curTask.getresourceIDs();
+		double rand=Math.random();
+		int resourceid=list.get(0);
+		List<Integer> list1=new ArrayList<>(list);
+		double Obj[]=this.getProject().getTempObj();
+		if(Obj==null) {
+			Obj=new double[2];
+			Obj[0]=this.getProject().getBorderDuration();
+			Obj[1]=this.getProject().getBorderCost();
+		}
+		final double[] tempObj=Obj;
+		Collections.sort(list1, new Comparator<Integer>() {
+
+			@Override
+			public int compare(Integer arg0, Integer arg1) {
+				double cost1=ress.get(arg0-1).getSalary()*curTask.getStandardDuration()/Math.floor(ress.get(arg0-1).getSkillsInfo().get(curTask.getSkillType()));
+				double cost2=ress.get(arg1-1).getSalary()*curTask.getStandardDuration()/Math.floor(ress.get(arg1-1).getSkillsInfo().get(curTask.getSkillType()));
+				double finish1=endtime_res[arg0-1]+curTask.getStandardDuration()/Math.floor(ress.get(arg0-1).getSkillsInfo().get(curTask.getSkillType()));
+				double finish2=endtime_res[arg1-1]+curTask.getStandardDuration()/Math.floor(ress.get(arg1-1).getSkillsInfo().get(curTask.getSkillType()));
+				double weight1=(tempObj[1]-cost1)/tempObj[1]+(tempObj[0]-finish1)/tempObj[0];
+				double weight2=(tempObj[1]-cost2)/tempObj[1]+(tempObj[0]-finish2)/tempObj[0];
+				if(weight1>weight2) {
+					return 1;
+				}else if(weight1<weight2) {
+					return -1;
+				}
+				return 0;
+			}
+		});
+		resourceid=list1.get(0);
+		return resourceid;
+	}
+	
 	//选择资源
 	private int selectResourceB(ITask curTask, int[] endtime_res, int[] workload,double pp) {
 		//两个规则 成本最低  工期最短
@@ -730,8 +758,8 @@ public class Individual {
 			Collections.sort(list1, new Comparator<Integer>() {
 				@Override
 				public int compare(Integer arg0, Integer arg1) {
-					double cost1=ress.get(arg0-1).getSalary()*curTask.getStandardDuration()/ress.get(arg0-1).getSkillsInfo().get(curTask.getSkillType());
-					double cost2=ress.get(arg1-1).getSalary()*curTask.getStandardDuration()/ress.get(arg1-1).getSkillsInfo().get(curTask.getSkillType());
+					double cost1=ress.get(arg0-1).getSalary()*curTask.getStandardDuration()/Math.floor(ress.get(arg0-1).getSkillsInfo().get(curTask.getSkillType()));
+					double cost2=ress.get(arg1-1).getSalary()*curTask.getStandardDuration()/Math.floor(ress.get(arg1-1).getSkillsInfo().get(curTask.getSkillType()));
 					if(cost1>cost2) {
 						return 1;
 					}else if(cost1<cost2) {
@@ -747,8 +775,8 @@ public class Individual {
 			Collections.sort(list1, new Comparator<Integer>() {
 				@Override
 				public int compare(Integer o1, Integer o2) {
-					double finish1=endtime_res[o1-1]+curTask.getStandardDuration()/ress.get(o1-1).getSkillsInfo().get(curTask.getSkillType());
-					double finish2=endtime_res[o2-1]+curTask.getStandardDuration()/ress.get(o2-1).getSkillsInfo().get(curTask.getSkillType());
+					double finish1=endtime_res[o1-1]+curTask.getStandardDuration()/Math.floor(ress.get(o1-1).getSkillsInfo().get(curTask.getSkillType()));
+					double finish2=endtime_res[o2-1]+curTask.getStandardDuration()/Math.floor(ress.get(o2-1).getSkillsInfo().get(curTask.getSkillType()));
 					if(finish1>finish2) {
 						return 1;
 					}else if(finish1<finish2) {
@@ -758,7 +786,8 @@ public class Individual {
 					}
 				}
 			});
-		}/*else if(list1.size()>1){
+		}
+		/*else if(list1.size()>1){
 			//最早可以升级的
 			String qtype = curTask.getSkillType();
 			//升序排列
@@ -883,15 +912,22 @@ public class Individual {
 			//更新技能水平：当前技能表，技能执行时间表	
 			updateSkill(resource, task);
 			//计算目标值： 工期 成本 
-			this.obj = aimCompute(task, resource,endtime_res);
+			aimCompute(task, resource,endtime_res);
 		}else{
 			//仅更新目标值和任务开始结束时间，不更新技能is wrong   需要更新该资源分配的任务的完成时间和资源技能
 			//updateResourceAnd
-			this.obj = aimCompute(task, resource,endtime_res);//左移调度下移动插入点的技能必须高于任务的所需技能  采用资源更新
-		}
+			aimCompute(task, resource,endtime_res);//左移调度下移动插入点的技能必须高于任务的所需技能  采用资源更新
+		} 
+		/*phaseCompute(rid, tid, endtime_res,workload);
+		//更新技能水平：当前技能表，技能执行时间
+		updateSkill(resource, task);
+		//计算目标值： 工期 成本 
+		aimCompute(task, resource,endtime_res);*/
+		this.obj=new double[]{this.maxtime, this.cost};
+		
 	}
 	//每次遍历 花费时间  直接将改变endTime的资源同maxTime对比
-	public double[] aimCompute(ITask curTask, IResource curResource, int[] endtime_res){
+	public void aimCompute(ITask curTask, IResource curResource, int[] endtime_res){
 		for(int i=0;i<endtime_res.length;i++) {
 			if(this.maxtime<endtime_res[i]){
 				this.maxtime =endtime_res[i];
@@ -899,16 +935,16 @@ public class Individual {
 		}
 		int realDuration = curTask.getFinishTime() - curTask.getStartTime();
 		double salary = curResource.getSalary();
-		this.cost += realDuration*salary;
-		return new double[]{this.maxtime, this.cost};
+		this.cost +=Math.ceil (realDuration*salary);
 	}
 	
 	public void phaseCompute(int rid, int tid, int[] endtime_res, int[] workload){
 		int endtime = 0;
 		ITask curtask = taskslist.get(tid-1);
-		String qtype = curtask.getSkill().split(":")[0].trim();
+		String qtype = curtask.getSkillType();
 		IResource resource = resourceslist.get(rid-1);
-		double qinit = resource.getSkillsInfo().get(qtype); 
+		double qinit = resource.getSkillsInfo().get(qtype);
+		qinit=Math.floor(qinit);//1.3 add
 		//得到所有前置任务,循环每一前置任务，取最晚结束时间
 		List<Integer> pretaskids = curtask.getPredecessorIDs();
 		for (int j = 0; j < pretaskids.size();j++){
@@ -921,19 +957,18 @@ public class Individual {
 			endtime = endtime_res[rid-1];
 		}
 		//设置当前任务的开始时间及完成时间
-		taskslist.get(tid-1).setstarttime(endtime,qinit);//间隔1可以取消
+		taskslist.get(tid-1).setstarttime(endtime,qinit);
 		//更新当前任务资源的最后完工时间
 		endtime_res[rid-1] = taskslist.get(tid-1).finishTime;
 		workload[rid-1]+=(int)taskslist.get(tid-1).getStandardDuration()/qinit;
 	}
 	
 	public boolean updateSkill(IResource resource, ITask task){
-		String qtype = task.getSkill().split(":")[0].trim();
+		String qtype = task.getSkillType();
 		double qinit = resource.getSkillsInfo().get(qtype);
 		double m = resource.getLearnbility();
-		int dstan = task.getStandardDuration();
+		double dstan = task.getStandardDuration();
 		double M = 0.25;
-		
 		double sstart = Math.pow(((1-M)*qinit)/(1-M*qinit), 1/m);//每次计算 耗费时间
 		double sdura = dstan/(qinit*8);
 		double tmp = Math.pow((sstart+sdura), m);
@@ -941,22 +976,14 @@ public class Individual {
 		//更新当前技能水平表
 		resource.putSkillsInfo(qtype, qfinal);
 		//更新技能执行时间表
-		resource.putSkillTimetable(qtype, new int[]{task.getStartTime(),task.getFinishTime()}, qfinal);		
-		
-		if(Math.floor(qfinal)-Math.floor(qinit)>=1){//技能跃迁，重新分配任务可用资源
-			/*System.out.println(resource.getSkillTimetable().get(qtype));*/
-			Iterator<int[]> timeline = resource.getSkillTimetable().get(qtype).keySet().iterator();
-			//遍历时间表
-			/*while(timeline.hasNext()){
-				int[] now = timeline.next();
-				System.out.println((Object)now);
-				System.out.println(resource.getSkillTimetable().get(qtype).get(now));
-			}*/                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+		int[] time={task.getStartTime(),task.getFinishTime()};
+		resource.putSkillTimetable(qtype,time, qfinal);		
+		if(Math.floor(qfinal)-Math.floor(qinit)>=1){//技能跃迁，重新分配任务可用资源   
 			/*this.jumpTimes++;*/
-			for(int i = 0; i < taskslist.size(); i++){
+			for(int i = 0; i < taskslist.size(); i++){//可以优化  使用关联技能的任务集循环
 				ITask tmptask = taskslist.get(i);
 				if(tmptask.getSkillType().equals(qtype) 
-						&& (double)tmptask.getSkillLevel()<qfinal
+						&& tmptask.getSkillLevel()<=qfinal
 						&& !tmptask.getresourceIDs().contains(resource.getResourceID())){
 							tmptask.addResourceIDs(resource.getResourceID());
 							/*this.influenceTasks++;*/
@@ -966,16 +993,40 @@ public class Individual {
 		return false;
 	}
 	
-	//紧前调度  是否可以左移调度 ？ 但是未将时间表排序判断
+	//紧前调度  是否可以左移调度 ？ 但是未将时间表排序判断   
 	public boolean canInsert(IResource resource, ITask task, int[] workload){
 		@SuppressWarnings("rawtypes")
-		String skillType = task.getSkill().split(":")[0].trim();
-		int stanDuration = task.getStandardDuration();
+		String skillType = task.getSkillType();
+		double stanDuration = task.getStandardDuration();
 		HashMap<String,HashMap<int[],Double>> timetable = resource.getSkillTimetable();
-		double skillLevel = Double.valueOf(task.getSkill().split(":")[1]);
+		double skillLevel = task.getSkillLevel();
 		//得到资源执行时间表
 		HashMap<int[],Double> skilltime = timetable.get(skillType);//int[] 为什么迭代没问题
-		@SuppressWarnings("rawtypes")
+		LinkedList<int[]> skillTime=resource.getSkillTime().get(skillType);
+		if(skillTime!=null&&skillTime.size()>=2) {
+			for(int j=0;j<skillTime.size()-1;j++) {
+				int[] last=skillTime.get(j);
+				int[] time=skillTime.get(j+1);
+				double rightskill = skilltime.get(last);
+				rightskill=Math.floor(rightskill);//1.3 add按照技能整数计算
+				//是否满足技能水平和时长条件
+				if(rightskill >= skillLevel && stanDuration/rightskill <= time[0]-last[1]){
+					List<Integer> preids = task.getPredecessorIDs();
+					//是否满足紧前关系
+					for(int i = 0; i < preids.size();i++){
+						if(taskslist.get(preids.get(i)-1).getFinishTime() >= last[1]){
+							return false;
+						};
+					}
+					task.setstarttime(last[1], rightskill);
+					workload[resource.getResourceID()-1]+=stanDuration/rightskill;
+					//更新资源技能及资源安排的任务的执行时间 好像不可行  影响是全局的
+					return true;
+				}
+			}
+		}
+		
+		/*@SuppressWarnings("rawtypes")
 		Iterator timeline = skilltime.keySet().iterator();
 		int[] lasttime = (int[])timeline.next();
         
@@ -983,6 +1034,7 @@ public class Individual {
 		while(timeline.hasNext()){
 			int[] time = (int[])timeline.next();
 			double rightskill = skilltime.get(lasttime);
+			rightskill=Math.floor(rightskill);//1.3 add按照技能整数计算
 			//是否满足技能水平和时长条件
 			if(rightskill >= skillLevel && stanDuration/rightskill <= time[0]-lasttime[1]){
 				List<Integer> preids = task.getPredecessorIDs();
@@ -998,7 +1050,7 @@ public class Individual {
 				return true;
 			}
 			lasttime = time;
-		}
+		}*/
 		
 		return false;
 	}
@@ -1179,18 +1231,24 @@ public class Individual {
 	//个体变邻搜索
 	public Individual variableNeighborDecent() {
 		Individual compare=this;
+		//随机序列 1-5
+		List<Integer> sequence=new ArrayList<>();
+		for(int i=0;i<5;i++) {
+			sequence.add(i+1);
+		}
+		Collections.shuffle(sequence);
 		int k=1;//第一个邻结构的序号
 		while(k<=5) {
-			Individual son=compare.variableNeighborWithFirst(k);
+			Individual son=compare.variableNeighborWithFirst(sequence.get(k-1));//使用随机序列顺序搜索
 			if(Tools.Dominated(son,compare,this.project)==1) {
 				compare=son;
 			}else {
 				k++;
 			}
 		}
-		if(Tools.Dominated(this,compare,this.project)==1) {
+		/*if(Tools.Dominated(this,compare,this.project)==1) {
 			compare=this;
-		}
+		}*/
 		return compare;
 	}
 	//个体变邻搜索 将互不支配的解存储

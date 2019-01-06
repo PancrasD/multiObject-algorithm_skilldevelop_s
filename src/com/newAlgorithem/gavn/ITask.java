@@ -8,28 +8,27 @@ public class ITask {
 	public int pretasknum;
 	public int startTime;
 	public int finishTime;
-	private int standardDuration;
-	private String skill;
+	private double standardDuration;
+	//private String skill;
 	private String skillType;
-	private int skillLevel;
+	private double skillLevel;
 	private List<Integer> predecessorIDs = new  ArrayList<>();
 	
-	private List<Integer> resourceIDs = new ArrayList<>();
+	private List<Integer> resourceIDs ;
 	
 	public ITask(Task task){
 		taskid = task.getTaskID();
 		pretasknum=task.getpretasknum();
 		standardDuration = task.getStandardDuration();
-		skill = task.getSkill();
-		skillType = skill.split(":")[0].trim();
-		skillLevel = Integer.valueOf(skill.split(":")[1])+1;
+		skillType = task.getSkillType();
+		skillLevel = task.getSkillLevel();
 		predecessorIDs = task.getPredecessorIDs();
-		resourceIDs = task.getresourceIDs();
+		resourceIDs = new ArrayList<>(task.getresourceIDs());//传递有问题
 	}
 	
 	public void setstarttime(int starttime, double qlevel){
 		startTime = starttime;
-		finishTime = (int)(startTime + standardDuration/qlevel - 1);
+		finishTime =(int) Math.ceil(startTime + standardDuration/qlevel);//- 1
 	}
 	
 	public int getStartTime() {
@@ -39,15 +38,15 @@ public class ITask {
 	public int getFinishTime (){
 		return finishTime;
 	}
-	public int getStandardDuration(){
+	public double getStandardDuration(){
 		return standardDuration;
 	}
 	
-	public String getSkill(){
+	/*public String getSkill(){
 		return skill;
-	}
+	}*/
 	
-	public int getSkillLevel(){
+	public double getSkillLevel(){
 		return skillLevel;
 	}
 	

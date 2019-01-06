@@ -139,14 +139,10 @@ public class Tools {
 				}
 			}
 		}
-		int[] npbackup = new int[populationSize];
-		for(int i=0;i<np.length;i++) {
-			npbackup[i]=np[i];
-		}
 		// 定义一个集合，用来存储前面已经排好等级的个体在种群的序列号
 		int num = 0;
 		int Rank =0;
-		while (num < populationSize) {
+		while (num < populationSize) {//可以优化 k*n->n
 			List<Integer> FRank = new ArrayList<Integer>(); // FRank是种群中，非支配的不同等级,如F1，F2...
 			List<Integer> FRank2 = new ArrayList<Integer>();  //按拥挤度排序后的个体索引集
 			for (int i = 0; i < populationSize; i++) {
@@ -157,6 +153,7 @@ public class Tools {
 					num ++;  //已处理的个体数量计数，当已处理个体个数达到种群人数上线即可终止处理
 				}
 			}
+			/***似乎可以去掉***/
 			//按被支配个体数量及超体积排序
 			Population FP = new Population(FRank.size(),project);
 			for (int i = 0; i < FRank.size(); i++) {
@@ -164,13 +161,10 @@ public class Tools {
 				FP.setIndividual(i, individuals[FRank.get(i)]);
 			}
 			setHyperVolum(FP,project);
-			/*List<Integer> ind = sortByConsAndHyper(FP,npbackup,FRank);
-			for (int i = 0; i <FP.size();i++){
-				FRank2.add(ind.get(i));
-			}*/
 			for (int i = 0; i <FP.size();i++){
 				FRank2.add(FRank.get(i));
 			}
+			/***似乎可以去掉***/
 			//对当前层的个体按拥挤度排序
 			indivIndexRank.add(FRank2);
 			Rank ++;
@@ -178,7 +172,6 @@ public class Tools {
 				//被分层的个体所支配的个体的被支配个体数量减1
 				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
 					np[spList.get(FRank.get(i)).get(j)]--;
-					npbackup[spList.get(FRank.get(i)).get(j)]--;
 				}
 			}
 			
@@ -584,19 +577,12 @@ public class Tools {
 	public static void printsolutions(Population solutions,long startTime, List<List<Double>> countResult) {
 		long endTime = System.currentTimeMillis();
 		if (solutions.getPopulationsize()>0){
-			   
 			Individual[] bestIndividuals = solutions.getPopulation();
-
 			// 存储个体的目标函数
 			List<double[]> betterObjs = new ArrayList<>();
-
 			// 遍历输出每个个体,并格式化输出染色体结构以及目标函数
 			for (int i = 0; i < bestIndividuals.length; i++) {
-				//System.out.print("染色体结构为:\n" + bestIndividuals[i].getChromosome().get(0).toString());
-
-
 				double[] obj = bestIndividuals[i].getObj();
-
 				betterObjs.add(obj);
 				System.out.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
 			}
@@ -604,20 +590,6 @@ public class Tools {
 			Case project=solutions.getPopulation()[0].getProject();
 			double MaxDuration=project.getBorderDuration();
 			double MaxCost=project.getBorderCost();
-			/*List<Task>tasks=project.getTasks();
-			for(int i=0;i<tasks.size();i++) {
-				MaxDuration+=tasks.get(i).getDuaration();
-				List<Integer> canR=(List<Integer>) tasks.get(i).getresourceIDs();
-				int maxSaIndex=0;
-				double  maxSa=project.getResources().get(canR.get(maxSaIndex)-1).getSalary();
-				for(int k=1;k<canR.size();k++) {
-					if(maxSa<project.getResources().get(canR.get(k)-1).getSalary()) {
-						maxSaIndex=k;
-						maxSa=project.getResources().get(canR.get(k)-1).getSalary();
-					}
-				}
-				MaxCost+=tasks.get(i).getDuaration()*maxSa;
-			}*/
 			//反转   归一   计算超体积
 			List<double[]> inversObj=new ArrayList<>();
 			double hyperVolume=0;
@@ -654,30 +626,8 @@ public class Tools {
 				System.out.println(Arrays.toString(countResult.toArray()));
 				System.out.println("最大超体积位置:"+(maxHyperVolumIndex+1)+":最大超体积"+maxHyperVolum);
 			}
-			// 性能评价标准：MID、SM、DM、SNS
-			// 对于100_10_65_15而言
-			//double best_f1 = 0;
-	     	//double best_f2 = 0;
-			// 对于200_20_145_15而言
-			 //double best_f1=198;
-			 //double best_f2=143497;
-			//double MID = calMeanIdealDistance(betterObjs, best_f1, best_f2);
-			//double DM = calDiversification(betterObjs);
-			//double SNS = calSNS(betterObjs, MID, best_f1, best_f2);
-			//double SM = calSpace_Metric(betterObjs);
-			// // 输出变量
-			//System.out.println("MID=" + MID);
-			//System.out.println("DM=" + DM);
-			//System.out.println("SNS=" + SNS);
-			//System.out.println("SM=" + SM);			
-			// 输出变量
-			//double MOCV = MID / DM;
-			//System.out.println("指标MID:"+MID);
-			//System.out.println("指标DM:"+DM);
-			//System.out.println("指标MOCV:"+MOCV);
-			/*System.out.println("指标MID:"+MID);
-			System.out.println("指标DM:"+DM);*/
-			//System.out.println(betterObjs.size());
+			//输出资源技能水平
+			outPutResource(solutions.getPopulation()[0]);
 			
 		}
 		// 如果没有非支配解
@@ -689,6 +639,18 @@ public class Tools {
 	
 	}
 	
+	private static void outPutResource(Individual individual) {
+		for(int i=0;i<individual.getProject().getResources().size();i++) {
+			List<Resource> res1=individual.getProject().getResources();
+			List<IResource> res2=individual.getResourceslist();
+			for(int k=0;k<res2.size();k++) {
+			HashMap<String,Double> skillsInfo=res2.get(k).getSkillsInfo();
+			
+		}
+		}
+	}
+
+
 	/**
 	 * 计算Mean Ideal Distance
 	 * 

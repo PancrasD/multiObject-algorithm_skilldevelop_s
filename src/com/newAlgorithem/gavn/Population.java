@@ -7,13 +7,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+
 public class Population {
 
 	private int populationsize;
 	private Individual[] population;
 	private List<double[]> populationObj;
 	private Case project;
-
+    private double[] MaxObj;
 	public Population(int populationSize, Case project) {
 		this.populationsize = populationSize;
 		this.project = project;
@@ -47,14 +48,12 @@ public class Population {
 	 */
 	public List<double[]> populationObjCompute(Individual[] population) {
 		List<double[]> populationObj = new ArrayList<>();
+		
 		for (Individual individual : population) {
 			populationObj.add(individual.getObj());
 		}
 		return populationObj;
 	}
-	
-	
-	
 	
 	// 获取种群的个体成员
 	public Individual[] getPopulation() {
@@ -150,12 +149,15 @@ public class Population {
 
 		return newPopulation;
 	}
+	/*
+	 * 淘汰重复的
+	 */
 	public Population slectPopulationC(int newnum) {
 		// 创建新的种群
 		Population newPopulation = new Population(newnum,project);
+		
 		int populationSize = this.getPopulationsize();
 		Individual[] individuals =this.getPopulation();
-
 		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // 按非支配等级排序后，各个体在种群中对应的序列号的集合
 		// 每个解都可以分成两个实体部分:1、支配该解的其他解的数量np;2、被该解支配的解集合Sp
 		List<List<Integer>> spList = new ArrayList<List<Integer>>();// 存储的是个体在种群中的序列号
@@ -165,7 +167,6 @@ public class Population {
 		int[] np = new int[populationSize];
 		for (int i = 0; i < populationSize; i++) {
 			for (int j = i+1; j < populationSize; j++) {
-
 				int flag=Tools.Dominated(individuals[i], individuals[j],project);
 				if (flag == 1) { // 前者支配后者
 					spList.get(i).add(j); // 将个体j加入个体i的支配个体队列
@@ -185,6 +186,7 @@ public class Population {
 		int num = 0;
 		int Rank =0;
 		int total=0;
+		Map<Double,HashMap<Double,Boolean>> map=new HashMap<Double,HashMap<Double,Boolean>>();//去重
 		while (num < populationSize) {
 			List<Integer> FRank = new ArrayList<Integer>(); // FRank是种群中，非支配的不同等级,如F1，F2...
 			for (int i = 0; i < populationSize; i++) {
@@ -197,8 +199,20 @@ public class Population {
 			}
 			if(total+FRank.size()<newnum) {
 				for(int k=0;k<FRank.size();k++) {
+					double[] obj= individuals[FRank.get(k)].getObj();
+					if(map.get(obj[0])!=null&&map.get(obj[0]).get(obj[1])!=null) {
+						continue;
+					}
+					if(map.get(obj[0])==null) {
+						HashMap<Double,Boolean> map1=new HashMap<Double,Boolean>();
+						map1.put(obj[1], true);
+						map.put(obj[0], map1);
+					}else {
+						map.get(obj[0]).put(obj[1], true);
+					}
 					newPopulation.setIndividual(total, individuals[FRank.get(k)]);
 					total++;
+					
 				}
 			}else {
 				Population FP = new Population(FRank.size(),project);
@@ -208,23 +222,42 @@ public class Population {
 				}
 				Tools.setHyperVolum(FP,project);
 				List<Integer> ind = Tools.sortByConsAndHyper(FP,npbackup,FRank);
-				int lack=newnum-total;
+				/*int lack=newnum-total;
 				for(int k=0;k<lack;k++) {
 					newPopulation.setIndividual(total, individuals[ind.get(k)]);
 					total++;
+				}*/
+				for(int k=0;k<FRank.size()&&total<newnum;k++) {
+					double[] obj= individuals[FRank.get(k)].getObj();
+					if(map.get(obj[0])!=null&&map.get(obj[0]).get(obj[1])!=null) {
+						continue;
+					}
+					if(map.get(obj[0])==null) {
+						HashMap<Double,Boolean> map1=new HashMap<Double,Boolean>();
+						map1.put(obj[1], true);
+						map.put(obj[0], map1);
+					}else {
+						map.get(obj[0]).put(obj[1], true);
+					}
+					newPopulation.setIndividual(total, individuals[ind.get(k)]);
+					total++;
 				}
-				break;
-				
+				if(total==newnum) {
+			    	break;
+				}
 			}
 			//被分层的个体所支配的个体的被支配个体数量减1
 			for (int i = 0; i < FRank.size(); i++) {
 				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
 					np[spList.get(FRank.get(i)).get(j)]--;
-					//npbackup[spList.get(FRank.get(i)).get(j)]--;
 				}
 			}
 			indivIndexRank.add(FRank);
 			Rank ++;
+		}
+		if(total<newnum) {
+			newPopulation.setIndividual(total, new Individual(this.project,true));
+			total++;
 		}
 		return newPopulation;
 	}
@@ -238,7 +271,6 @@ public class Population {
 		Population studentPhase = teacherPhase.crossStudents();
 		//reinforcement时期
 		OffSpring = studentPhase.reinforcement();
-
 		return OffSpring;
 	}
 	//老师个体变异操作
@@ -319,15 +351,15 @@ public class Population {
 	 * @return 下一代种群
 	 */
 	public Population getOffSpring_NSGAV() {
-	
+		//computeMax();
 		Population OffSpring = new Population(NSGAV_II.populationSize,project,false);
 		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
 		//Tools.setRankAndCrowD(this, project);
 		Tools.setRankAndConsAndHyperVolume(this, project);
 		// 选择出交配池
-		Population matePool = getMatePool();
+		//Population matePool = getMatePool();//1随机 2this相邻
 		// 将交配池中的个体按指定的概率进行交配
-		Population p1 = matePool.crossoverPopulaiton(NSGAV_II.crossoverRate);
+		Population p1 = this.crossoverPopulaiton(NSGAV_II.crossoverRate);
 		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
 		//Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
         //使用变邻搜索  B-VND first-improvement
@@ -339,6 +371,15 @@ public class Population {
 		OffSpring = mergedPopulation.slectPopulationC(NSGAV_II.populationSize);
 		return OffSpring;
 	}
+	private void computeMax() {
+	   double[] max= {0,0};
+       for(Individual individual:this.population) {
+    	   max[0]= max[0]==0?individual.getObj()[0]:max[0]<individual.getObj()[0]?individual.getObj()[0]:max[0];
+    	   max[1]= max[1]==0?individual.getObj()[1]:max[1]<individual.getObj()[1]?individual.getObj()[1]:max[1];
+       }
+       //setMaxObj(max);
+	   initialHeuristic().project.setTempObj(max);
+	}
 	//变邻搜索
 	private Population variableNeighborhoodDescent() {
 		Population newPopulation = new Population(populationsize,project);
@@ -346,7 +387,6 @@ public class Population {
 			Individual parent = population[i];
 			Individual son = parent.variableNeighborDecent();
 			newPopulation.setIndividual(i, son);
-			//System.out.println(i);
 		}
 		return newPopulation;
 	}
@@ -732,6 +772,13 @@ public class Population {
 	public void setPopulation(Individual[] population) {
 		this.population = population;
 	}
+	
+	public double[] getMaxObj() {
+		return MaxObj;
+	}
+	public void setMaxObj(double[] maxObj) {
+		MaxObj = maxObj;
+	}
 	public Population initialHeuristic() {
 		Individual[] indivs=this.getPopulation();
 		for(int i=0;i<this.getPopulationsize();i++) {
@@ -739,6 +786,6 @@ public class Population {
 		}
 		return this;
 	}
-	
+
 	
 }
