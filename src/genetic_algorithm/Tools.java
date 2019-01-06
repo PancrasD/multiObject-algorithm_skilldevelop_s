@@ -508,6 +508,16 @@ public class Tools {
 				System.out.println(Arrays.toString(countResult.toArray()));
 				System.out.println("最大超体积位置:"+(maxHyperVolumIndex+1)+":最大超体积"+maxHyperVolum);
 			}
+			/*for(int i=0;i<3;i++) {
+				Individual indiv=bestIndividuals[i];
+				List<Integer> ts=indiv.getChromosome().get(0);
+				List<Integer> rs=indiv.getChromosome().get(1);
+				for(int k=0;k<indiv.getTaskslist().size();k++) {
+					System.out.print(ts.get(k)+"--"+rs.get(k)+" ");
+				}
+				System.out.println();
+				System.out.println();
+			}*/
 			// 性能评价标准：MID、SM、DM、SNS
 			// 对于100_10_65_15而言
 			//double best_f1 = 0;
@@ -692,6 +702,23 @@ public class Tools {
 		sort(objs, m);
 		max = objs.get(objs.size() - 1)[m];
 		return max;
+	}
+
+
+	public static void printSkill(Population solutions) {
+		Individual[] indivs=solutions.getPopulation();
+		Case project=indivs[0].getProject();
+		List<Resource> rs=project.getResources();
+		for(int i=0;i<indivs.length;i++) {
+			List<IResource> newrs=indivs[0].getResourceslist();
+			for(int j=0;j<rs.size();j++) {
+				System.out.print(rs.get(j).getSkils()+" "+newrs.get(j).getSkillsInfo());
+				System.out.println();
+			}
+			System.out.println("-----------------------------------");
+		}
+		
+		
 	}
 
 

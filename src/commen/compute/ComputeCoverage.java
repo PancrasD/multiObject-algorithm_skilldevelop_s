@@ -20,11 +20,13 @@ import java.util.Map.Entry;
 public class ComputeCoverage {
    //计算帕累托前沿的约束覆盖率
 	public static void main(String[]args) {
-		String input1="data\\NSGA_bestNSGA_0925230209262149";
-		String input2="D:\\workspace\\RCSPSP\\new_multiObjective_algorithm_x\\new_multiObjective_algorithm\\"
-				+ "data\\NSGA_bestNSGANoSkill_110409261755";
+		String cdic="30s/";
+		String name1="NSGA_bestNSGAV_H0930153010090852";
+		String name2="NSGA_bestNSGA_1008222210090851";
+		String input1="data/"+cdic+name1;
+		String input2="data/"+cdic+name2;
 		String head=buildFileName();
-		String output="data\\coverage"+head;
+		String output="data/"+cdic+"coverage"+head;
 		Map<String,List<List<Double>>> result1=new TreeMap<>();
 		Map<String,List<List<Double>>> result2=new TreeMap<>();
 		result1=readData(input1);
@@ -188,7 +190,7 @@ public class ComputeCoverage {
 					datas.add(data);
 				}
 			}
-			map.put(list[i], datas);
+			map.put(list[i].substring(list[i].indexOf('_')+1, list[i].length()-1), datas);
 		   }catch(Exception e) {
 			   e.printStackTrace();
 		   }

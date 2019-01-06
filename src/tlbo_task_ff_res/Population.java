@@ -167,8 +167,9 @@ public class Population {
 		}
 		//老师个体变异操作
 		public Population reinforcement() {
-			Population rein = new Population(TLBO.populationSize, project);
-			for(int i=0; i<TLBO.populationSize; i++){
+			int popsize=TLBOF.populationSize;
+			Population rein = new Population(popsize, project);
+			for(int i=0; i<popsize; i++){
 				Individual result = this.getPopulation()[i];
 				if(result.getTeacher()){
 					//引入强化次数
@@ -184,7 +185,7 @@ public class Population {
 		//学生个体之间交叉
 		public Population crossStudents() {
 			Individual[] individuals = this.getPopulation();
-			Population offSpring = new Population(TLBO.populationSize, project);
+			Population offSpring = new Population(TLBOF.populationSize, project);
 			int range = individuals.length;
 			for(int i=0; i<range; i++){
 				Individual result = individuals[i];
@@ -204,7 +205,7 @@ public class Population {
 		//老师和学生个体交叉
 		public Population crossTeachers(Population teachers){
 			Individual[] individuals = this.getPopulation();
-			Population students = new Population(TLBO.populationSize, project);
+			Population students = new Population(TLBOF.populationSize, project);
 			for(int i = 0; i<individuals.length; i++){
 				Individual resultIndividual = individuals[i];
 				if(!resultIndividual.getTeacher()){
@@ -229,7 +230,6 @@ public class Population {
 				teacher.setTeacher(true);
 				teachers.setIndividual(i, teacher);
 			}
-			
 			return teachers;
 		}
 
@@ -607,7 +607,7 @@ public class Population {
 
 	public Population getOffSpring_TLBO_F() {
 		// TODO Auto-generated method stub
-		Population OffSpring = new Population(TLBO.populationSize,project,false);
+		Population OffSpring = new Population(TLBOF.populationSize,project,false);
 		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
 		Population teachers = selectTeachers();
 		//teacher时期

@@ -1,17 +1,17 @@
-package tlbo_task_ff_res;
+package com.newAlgorithem.gavn.divideGeneration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 /**
  * 定义一个工具类，主要功能有: 1.计算各pareto前沿中每个解的拥挤度 2.非支配排序
  * 
- * @author 熊凯 2017年3月28日
+ * 
  *
  */
 public class Tools {
@@ -103,7 +103,91 @@ public class Tools {
 		}
 	}
 	
-	
+	public static void setHyperVolum(Population fp,Case project){
+		Map<Integer,double[]> indexAndObj=new HashMap<>();
+		for(int k=0;k<fp.size();k++){
+			indexAndObj.put(k, fp.getPopulation()[k].getObj());
+		}
+		Map<Integer,Double> hypervolum=hyperVolumeCompute(indexAndObj);
+		for(Integer index:hypervolum.keySet()){
+			Individual individual2=fp.getPopulation()[index];
+			individual2.setHyperVolume(hypervolum.get(index));
+		}
+	}
+	/*
+	 * 计算非支配排序   统一非支配层按照约束度和超体积依次排序
+	 */
+	public static List<List<Integer>> setRankAndConsAndHyperVolume (Population population,Case project) {
+		int populationSize = population.size();
+		Individual[] individuals = population.getPopulation();
+
+		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // 按非支配等级排序后，各个体在种群中对应的序列号的集合
+		// 每个解都可以分成两个实体部分:1、支配该解的其他解的数量np;2、被该解支配的解集合Sp
+		List<List<Integer>> spList = new ArrayList<List<Integer>>();// 存储的是个体在种群中的序列号
+		for (int i = 0; i < populationSize; i++) {
+			spList.add(new ArrayList<Integer>());
+		}
+		int[] np = new int[populationSize];
+		for (int i = 0; i < populationSize; i++) {
+			for (int j = i+1; j < populationSize; j++) {
+
+				int flag=Dominated(individuals[i], individuals[j],project);
+				if (flag == 1) { // 前者支配后者
+					spList.get(i).add(j); // 将个体j加入个体i的支配个体队列
+					np[j]++;  // 支配个体j的个体数+1
+				}
+				if (flag == 2) { // 后者支配前者
+					spList.get(j).add(i);
+					np[i]++;
+				}
+			}
+		}
+		int[] npbackup = new int[populationSize];
+		for(int i=0;i<np.length;i++) {
+			npbackup[i]=np[i];
+		}
+		// 定义一个集合，用来存储前面已经排好等级的个体在种群的序列号
+		int num = 0;
+		int Rank =0;
+		while (num < populationSize) {
+			List<Integer> FRank = new ArrayList<Integer>(); // FRank是种群中，非支配的不同等级,如F1，F2...
+			List<Integer> FRank2 = new ArrayList<Integer>();  //按拥挤度排序后的个体索引集
+			for (int i = 0; i < populationSize; i++) {
+				if (np[i] == 0) {
+					FRank.add(i); //将所有没有被任何其他个体支配的个体加入到层级
+					individuals[i].setNon_dominatedRank(Rank);
+					np[i] = -1; //标记个体已处理
+					num ++;  //已处理的个体数量计数，当已处理个体个数达到种群人数上线即可终止处理
+				}
+			}
+			//按被支配个体数量及超体积排序
+			Population FP = new Population(FRank.size(),project);
+			for (int i = 0; i < FRank.size(); i++) {
+				//产生当前层的种群
+				FP.setIndividual(i, individuals[FRank.get(i)]);
+			}
+			setHyperVolum(FP,project);
+			/*List<Integer> ind = sortByConsAndHyper(FP,npbackup,FRank);
+			for (int i = 0; i <FP.size();i++){
+				FRank2.add(ind.get(i));
+			}*/
+			for (int i = 0; i <FP.size();i++){
+				FRank2.add(FRank.get(i));
+			}
+			//对当前层的个体按拥挤度排序
+			indivIndexRank.add(FRank2);
+			Rank ++;
+			for (int i = 0; i < FRank.size(); i++) {
+				//被分层的个体所支配的个体的被支配个体数量减1
+				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
+					np[spList.get(FRank.get(i)).get(j)]--;
+					npbackup[spList.get(FRank.get(i)).get(j)]--;
+				}
+			}
+			
+		}
+		return indivIndexRank;
+	}
 	
 
 	/**
@@ -115,7 +199,7 @@ public class Tools {
 	 * @return 返回种群分成不同非支配等级后，每个个体在对应种群中序列号集合
 	 */
 	
-		public static List<List<Integer>> non_Dominated_Sort(Population population,int level,Case project) {
+ public static List<List<Integer>> non_Dominated_Sort(Population population,int level,Case project) {
 		int populationSize = population.size();
 		Individual[] individuals = population.getPopulation();
 
@@ -159,14 +243,11 @@ public class Tools {
 					np[spList.get(FRank.get(i)).get(j)]--;
 				}
 			}
-			
 			indivIndexRank.add(FRank);
-			
-			Rank ++;
+			Rank ++;//Rank(0-->1)>=level=1
 			if ((level != 0)&&(Rank >= level)){
 				break;
 			}
-			
 		}
 		return indivIndexRank;
 	}
@@ -205,9 +286,6 @@ public class Tools {
 		return flag;
 	}
 
-	
-	
-	
 	/**
 	 * 计算pareto前沿中每个解的拥挤度，每个pareto前沿的第一个和最后一个解的拥挤度都为无穷大，便于计算，用1000表示
 	 * 
@@ -240,7 +318,50 @@ public class Tools {
 
 		return crowMap;
 	}
+	public static Map<Integer, Double> hyperVolumeCompute(Map<Integer, double[]> indexAndObj) {
+		Map<Integer, Double> HyperVMap = new HashMap<>();
 
+		double[] hpervolume = new double[indexAndObj.size()]; // 拥挤度距离数组
+		for(int i=0;i<hpervolume.length;i++) {
+			hpervolume[i]=1;
+		}
+		List<Map.Entry<Integer, double[]>> index_objList = new ArrayList<>(indexAndObj.entrySet());
+
+		int L = index_objList.size();
+		sortByObj(index_objList, 0);//按工期升序排列
+		hpervolume[0] = Double.MAX_VALUE;
+		hpervolume[L - 1] = Double.MAX_VALUE;
+		for (int j = 1; j < L - 1; j++) {
+			double x0=index_objList.get(L-1).getValue()[0];
+			double y0=index_objList.get(0).getValue()[1];
+			double x1=index_objList.get(j-1).getValue()[0];
+			double y1=index_objList.get(j-1).getValue()[1];
+			double x=index_objList.get(j).getValue()[0];
+			double y=index_objList.get(j).getValue()[1];
+			double x2=index_objList.get(j+1).getValue()[0];
+			double y2=index_objList.get(j+1).getValue()[1];
+			
+			/*hpervolume[j] = hpervolume[j]*(index_objList.get(L-1).getValue()[0] - index_objList.get(j).getValue()[0])/
+					(index_objList.get(L-1).getValue()[0] - index_objList.get(0).getValue()[0])
+					*(index_objList.get(0).getValue()[1] - index_objList.get(j).getValue()[1])/
+					(index_objList.get(0).getValue()[1] - index_objList.get(L-1).getValue()[0]);*/
+			/*hpervolume[j] =0.5*(Math.abs(x*(y1-y0)+x1*(y0-y)+x0*(y-y1))+Math.abs(x*(y2-y0)+x2*(y0-y)+x0*(y-y2)));*/
+			hpervolume[j]=0.5*(Math.abs(y*(x1-x0)+y1*(x0-x)+y0*(x-x1))+Math.abs(y*(x2-x0)+y2*(x0-x)+y0*(x-x2)));
+			/*hpervolume[j] = hpervolume[j]*0.5*Math.abs(x1*(y2-y0)+x2*(y0-y1)+x0*(y1-y2))/(x0*y0);*/
+		}
+	 	/*for (int i = 0; i < index_objList.get(0).getValue().length; i++) { // i表示第几个目标函数
+			for (int j = 1; j < L - 1; j++) {
+				hpervolume[j] = hpervolume[j]*(index_objList.get(j + 1).getValue()[i] - index_objList.get(j - 1).getValue()[i]);
+			}
+		}*/
+		for (int i = 0; i < index_objList.size(); i++) {
+			HyperVMap.put(index_objList.get(i).getKey(), hpervolume[i]);
+			
+		}
+		return HyperVMap;
+		
+	}
+	
 	
 	/**
 	 * 根据指定的目标函数值大小，按升序排列各解
@@ -288,7 +409,7 @@ public class Tools {
 			crowMap.put(i, FP.getPopulation()[i].getCrowDistance());
 		}
 		List<Map.Entry<Integer, Double>> crowSort = new ArrayList<>(crowMap.entrySet());
-	//根据拥挤度进行排序
+	   //根据拥挤度进行排序 
 		Collections.sort(crowSort, new Comparator<Map.Entry<Integer, Double>>() {
 
 			@Override
@@ -310,8 +431,34 @@ public class Tools {
 			}
 		return indexlist;
 	}
-	
-	
+	//按约束个数和超体积排序  约束个数升序排 超体积降序排
+	public static List<Integer>  sortByConsAndHyper(Population FP, int[] npbackup, List<Integer> fRank) {
+		List<Integer> rank=new ArrayList<>(fRank);
+		Map<Integer, Double> HyperVmap = new HashMap<>();
+		for (int i = 0; i< FP.size(); i++){
+			HyperVmap.put(fRank.get(i), FP.getPopulation()[i].getHyperVolume());
+		}
+		Collections.sort(rank,new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				int flag=0;
+				int li=npbackup[o1];
+				int l2=npbackup[o2];
+			    if(npbackup[o1]>npbackup[o2]) {
+			    	flag=1;
+			    }else if(npbackup[o1]<npbackup[o2]) {
+			    	flag=-1;
+			    }else if(HyperVmap.get(o1)>HyperVmap.get(o1)){
+			    	flag=-1;
+			    }else if(HyperVmap.get(o1)<HyperVmap.get(o1)) {
+			    	flag=1;
+			    }
+				return flag;
+			}
+			
+		});
+		return rank;
+	}
 	/**
 	 * 根据指定的目标函数值大小，按升序排列各解
 	 * 
@@ -429,12 +576,14 @@ public class Tools {
 	
 	/**
 	 * 选择种群中个体指定目标函数的最大值
+	 * @param countResult 
 	 * 
 	 * @param index_objList
 	 * @param m
 	 * @return
 	 */
-	public static void printsolutions(Population solutions,long startTime) {
+	public static void printsolutions(Population solutions,long startTime, List<List<Double>> countResult) {
+		long endTime = System.currentTimeMillis();
 		if (solutions.getPopulationsize()>0){
 			   
 			Individual[] bestIndividuals = solutions.getPopulation();
@@ -452,18 +601,69 @@ public class Tools {
 				betterObjs.add(obj);
 				System.out.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
 			}
-
+			 //计算反转超体积  反转的工期为所有工期之和  反转的成本为工期*最大的薪水
+			Case project=solutions.getPopulation()[0].getProject();
+			double MaxDuration=project.getBorderDuration();
+			double MaxCost=project.getBorderCost();
+			/*List<Task>tasks=project.getTasks();
+			for(int i=0;i<tasks.size();i++) {
+				MaxDuration+=tasks.get(i).getDuaration();
+				List<Integer> canR=(List<Integer>) tasks.get(i).getresourceIDs();
+				int maxSaIndex=0;
+				double  maxSa=project.getResources().get(canR.get(maxSaIndex)-1).getSalary();
+				for(int k=1;k<canR.size();k++) {
+					if(maxSa<project.getResources().get(canR.get(k)-1).getSalary()) {
+						maxSaIndex=k;
+						maxSa=project.getResources().get(canR.get(k)-1).getSalary();
+					}
+				}
+				MaxCost+=tasks.get(i).getDuaration()*maxSa;
+			}*/
+			//反转   归一   计算超体积
+			List<double[]> inversObj=new ArrayList<>();
+			double hyperVolume=0;
+			for(int i=0;i<betterObjs.size();i++) {
+				double dura=(MaxDuration-betterObjs.get(i)[0])/MaxDuration;
+				double cost=(MaxCost-betterObjs.get(i)[1])/MaxCost;
+				inversObj.add(new double[]{dura,cost});
+				if(i==0) {
+					hyperVolume+=inversObj.get(i)[0]*inversObj.get(i)[1];
+				}else {
+					hyperVolume+=(inversObj.get(i)[1]-inversObj.get(i-1)[1])*inversObj.get(i)[0];
+				}
+			}
+			List<Double> result=new ArrayList<>();
+			result.add(hyperVolume);
+			result.add((double) ((endTime-startTime)/1000));
+			countResult.add(result);
+			System.out.println("超体积:"+hyperVolume);
+			if(countResult.size()==NSGAV_II.RunTime) {
+				double countHyper=0;
+				double countTime=0;
+				int maxHyperVolumIndex=0;
+				double maxHyperVolum=countResult.get(maxHyperVolumIndex).get(0);
+				for(int i=0;i<countResult.size();i++) {
+					countHyper+=countResult.get(i).get(0);
+					countTime+=countResult.get(i).get(1);
+					if(maxHyperVolum<countResult.get(i).get(0)) {
+						maxHyperVolum=countResult.get(i).get(0);
+						maxHyperVolumIndex=i;
+					}
+				}
+				System.out.println("平均超体积:"+countHyper/countResult.size());
+				System.out.println("平均时间:"+countTime/countResult.size());
+				System.out.println(Arrays.toString(countResult.toArray()));
+				System.out.println("最大超体积位置:"+(maxHyperVolumIndex+1)+":最大超体积"+maxHyperVolum);
+			}
 			// 性能评价标准：MID、SM、DM、SNS
 			// 对于100_10_65_15而言
-			double best_f1 = 0;
-	     	double best_f2 = 0;
-
+			//double best_f1 = 0;
+	     	//double best_f2 = 0;
 			// 对于200_20_145_15而言
 			 //double best_f1=198;
 			 //double best_f2=143497;
-
-			double MID = calMeanIdealDistance(betterObjs, best_f1, best_f2);
-			double DM = calDiversification(betterObjs);
+			//double MID = calMeanIdealDistance(betterObjs, best_f1, best_f2);
+			//double DM = calDiversification(betterObjs);
 			//double SNS = calSNS(betterObjs, MID, best_f1, best_f2);
 			//double SM = calSpace_Metric(betterObjs);
 			// // 输出变量
@@ -471,15 +671,11 @@ public class Tools {
 			//System.out.println("DM=" + DM);
 			//System.out.println("SNS=" + SNS);
 			//System.out.println("SM=" + SM);			
-			
-			
-
 			// 输出变量
-
-			double MOCV = MID / DM;
-			System.out.println("指标MID:"+MID);
-			System.out.println("指标DM:"+DM);
-			System.out.println("指标MOCV:"+MOCV);
+			//double MOCV = MID / DM;
+			//System.out.println("指标MID:"+MID);
+			//System.out.println("指标DM:"+DM);
+			//System.out.println("指标MOCV:"+MOCV);
 			/*System.out.println("指标MID:"+MID);
 			System.out.println("指标DM:"+DM);*/
 			//System.out.println(betterObjs.size());
@@ -489,7 +685,6 @@ public class Tools {
 		else {
 			System.out.println("该算法无法求得最优解");
 		}
-		long endTime = System.currentTimeMillis();
 		System.out.println("共计用时：" + (endTime - startTime) / 1000 + "秒");
 
 	
@@ -671,6 +866,102 @@ public class Tools {
 		}
 		
 		return p;
+	}
+
+    /*
+     * 计算非支配排序   超体积(反转归一)  超体积+成本+工期的加权和(反转归一)
+     */
+	public static List<List<Integer>> setRankAndHyperVolumeAndSumWeight(Population population, Case project, Map<Integer, List<Integer>> ranks) {
+		int populationSize = population.size();
+		Individual[] individuals = population.getPopulation();
+		List<List<Integer>> indivIndexRank = new ArrayList<List<Integer>>(); // 按非支配等级排序后，各个体在种群中对应的序列号的集合
+		// 每个解都可以分成两个实体部分:1、支配该解的其他解的数量np;2、被该解支配的解集合Sp
+		List<List<Integer>> spList = new ArrayList<List<Integer>>();// 存储的是个体在种群中的序列号
+		for (int i = 0; i < populationSize; i++) {
+			spList.add(new ArrayList<Integer>());
+		}
+		int[] np = new int[populationSize];
+		for (int i = 0; i < populationSize; i++) {
+			for (int j = i+1; j < populationSize; j++) {
+				int flag=Dominated(individuals[i], individuals[j],project);
+				if (flag == 1) { // 前者支配后者
+					spList.get(i).add(j); // 将个体j加入个体i的支配个体队列
+					np[j]++;  // 支配个体j的个体数+1
+				}
+				if (flag == 2) { // 后者支配前者
+					spList.get(j).add(i);
+					np[i]++;
+				}
+			}
+		}
+		// 定义一个集合，用来存储前面已经排好等级的个体在种群的序列号
+		int num = 0;
+		int Rank =0;
+		while (num < populationSize) {
+			List<Integer> FRank = new ArrayList<Integer>(); // FRank是种群中，非支配的不同等级,如F1，F2...
+			List<Integer> FRank2 = new ArrayList<Integer>();  //按拥挤度排序后的个体索引集
+			for (int i = 0; i < populationSize; i++) {
+				if (np[i] == 0) {
+					FRank.add(i); //将所有没有被任何其他个体支配的个体加入到层级
+					individuals[i].setNon_dominatedRank(Rank);
+					np[i] = -1; //标记个体已处理
+					num ++;  //已处理的个体数量计数，当已处理个体个数达到种群人数上线即可终止处理
+				}
+			}
+			ranks.put(Rank, FRank);
+			//按被支配个体数量及超体积排序
+			Population FP = new Population(FRank.size(),project);
+			for (int i = 0; i < FRank.size(); i++) {
+				//产生当前层的种群
+				FP.setIndividual(i, individuals[FRank.get(i)]);
+			}
+			setHyperVolumAndWeightMaxEvalute(FP,population.getMaxObj());
+			for (int i = 0; i <FP.size();i++){
+				FRank2.add(FRank.get(i));
+			}
+			//对当前层的个体按拥挤度排序
+			indivIndexRank.add(FRank2);
+			Rank ++;
+			for (int i = 0; i < FRank.size(); i++) {
+				//被分层的个体所支配的个体的被支配个体数量减1
+				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
+					np[spList.get(FRank.get(i)).get(j)]--;
+				}
+			}
+			
+		}
+		return indivIndexRank;
+		
+	}
+
+    /*
+     * @param fP 种群
+     * @param maxObj 种群的最大目标值
+     * 计算超体积 加权值
+     */
+	private static void setHyperVolumAndWeightMaxEvalute(Population fP, double[] maxObj) {
+		for(Individual p:fP.getPopulation()) {
+			double obj[]=p.getObj();
+			double revert[]=revertAdjust(obj,maxObj);
+			double hyper=revert[0]*revert[1];
+			p.setHyperVolume(hyper);
+			double weight=0.4*hyper+0.3*revert[0]+0.3*revert[1];
+			p.setWeightSum(weight);
+		}
+	}
+
+    /*
+     * @param obj 当前个体的目标值
+     * @param maxObj 种群的最大目标值
+     * @return revert 反转和归一调整后的目标
+     * 使用上一代的最大目标值反转且归一  使得转化为目标最大化作比较
+     */
+	private static double[] revertAdjust(double[] obj, double[] maxObj) {
+		double revert[]=new double[obj.length];
+		for(int i=0;i<obj.length;i++) {
+			revert[i]=(maxObj[i]-obj[i])/maxObj[i];
+		}
+		return revert;
 	}
 
 

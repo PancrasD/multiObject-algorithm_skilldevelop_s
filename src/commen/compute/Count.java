@@ -24,16 +24,18 @@ import java.util.TreeMap;
 public class Count {
    public static void main(String[]args) {
 	   String path="";
-	   String name="NSGA_09252302";
-	   String  dic="data/"+name;
+	   String cdic="30s/";//子文件夹
+	   String name="NSFFA_11011402";
+	   String  dic="data/"+cdic+name;
 	   String head=buildFileName();
-	   String out_dic="data/result"+name+head;
-	   String aver_out="data/average"+name+head;
-	   String best_out="data/NSGA_best"+name+head;
+	   String out_dic="data/"+cdic+"result"+name+head;
+	   String aver_out="data/"+cdic+"average"+name+head;
+	   String best_out="data/"+cdic+"best"+name+head;
 	   File dic_f=new File(dic);
 	   String[] childDics=dic_f.list();
+	   String childdicHead=childDics[0].substring(0, childDics[0].lastIndexOf('_')+1);
 	   //文件夹排序 按照数字编号 以标识最大超体积文件所在的文件夹位置
-	   childDics=sortDic(childDics);
+	   childDics=sortDic(childDics,childdicHead);
 	   //从案例的运行实验结果读出结果值
 	   List<Map<String,List<String>>> countAll=new ArrayList<>();
 	   countAll=countAll(dic,childDics);
@@ -72,12 +74,13 @@ public class Count {
 	   outputResult(countH,out_dic);
 	   //总的统计输出
 	   outprintAverage(countresultH,aver_out);
-	   copyBestToDic(best_out,countresultH,dic);
+	   copyBestToDic(best_out,countresultH,dic,childdicHead);
 	  
    } 
      //复制最佳的超体积结果对应的案例到同意文件夹下
-     private static void copyBestToDic(String best_out, Map<String, List<Double>> countresultH, String dic) {
-         File f=new File(best_out);
+     private static void copyBestToDic(String best_out, Map<String, List<Double>> countresultH, String dic,String childdicHead) {
+    	 
+    	 File f=new File(best_out);
          if(f.exists()) f.delete();
     	   f.mkdirs();
     	 BufferedReader read=null;
@@ -86,7 +89,7 @@ public class Count {
     		 String filename=entry.getKey();
     		 int id=(int)(double)(entry.getValue().get(1));//这个位置确定
     		 String outPath=best_out+"/"+filename;
-    		 String inputPath=dic+"/"+"nsga"+id+"/"+filename;
+    		 String inputPath=dic+"/"+childdicHead+id+"/"+filename;
     		 File out =new File(outPath);
     		 if(out.exists())out.delete();
     		 try {
@@ -251,16 +254,15 @@ public class Count {
   		}
       }
 	 //文件夹按照数字编码排序
-	 private static String[] sortDic(String[] childDics) {
+	 private static String[] sortDic(String[] childDics,String childdicHead) {
 		 List<String> cds=Arrays.asList(childDics);
 		   Collections.sort(cds, new Comparator<String>() {
-
 			@Override
 			public int compare(String o1, String o2) {
 				int flag=0;
-				if(Integer.valueOf(o1.replace("nsga", ""))<Integer.valueOf(o2.replace("nsga", ""))) {
+				if(Integer.valueOf(o1.replace(childdicHead, ""))<Integer.valueOf(o2.replace(childdicHead, ""))) {
 					flag=-1;
-				}else if(Integer.valueOf(o1.replace("nsga", ""))>Integer.valueOf(o2.replace("nsga", ""))) {
+				}else if(Integer.valueOf(o1.replace(childdicHead, ""))>Integer.valueOf(o2.replace(childdicHead, ""))) {
 					flag=1;
 				}
 				return flag;

@@ -1,4 +1,6 @@
-package genetic_algorithm;
+package com.newAlgorithem.gavn.divideGeneration;
+
+
 /**
  * 定义一个资源类，包含属性：
  * 资源ID，每小时的薪水，掌握的技能
@@ -22,6 +24,7 @@ public class Resource {
 		this.skils=skills;
 		
 	}
+	
 	public int getResourceID() {
 		return resourceID;
 	}
@@ -44,6 +47,7 @@ public class Resource {
 	public void setLearnbility(double learn){
 		this.learnbility = learn;
 	}
+	
 	public double getLearnbility(){
 		return learnbility;
 	}

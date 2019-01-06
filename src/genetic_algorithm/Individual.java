@@ -58,7 +58,6 @@ public class Individual {
 		setResourcesList(project);
 		this.chromosome = _chromosome;
 		//this.chromosomeDNA = _chromosomemDNA;
-
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
 		learnObjCompute();		
 	}
@@ -72,7 +71,6 @@ public class Individual {
 		deciphering( project);
 		//随机产生资源序列，计算目标函数值
 		learnObjCompute();
-		
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
 		/*objCompute(project);*/
 
@@ -236,81 +234,7 @@ public class Individual {
 		return son;
 	}
 
-	// 获取该个体的染色体结构(taskid)
-	public List<List<Integer>> getChromosome() {
-		return this.chromosome;
-	}
-	public List<List<Double>> getchromosomeDNA() {
-		return this.chromosomeDNA;
-	}
-	public void setchromosomeDNA(List<List<Double>> dna) {
-		this.chromosomeDNA = dna;
-	}
-	
-	public List<ITask> getTaskslist() {
-		return taskslist;
-	}
 
-	public void setTaskslist(List<ITask> taskslist) {
-		this.taskslist = taskslist;
-	}
-
-	
-	// 设置染色体任务序列指定位置的任务编号
-	public void setTaskGene(int offset, int gene) {
-		this.chromosome.get(0).set(offset, gene);
-	}
-
-	// 获取染色体任务序列指定位置的任务编号
-	public int getTaskGene(int offset) {
-		return this.chromosome.get(0).get(offset);
-	}
-
-	// 设置染色体资源分配序列指定位置的资源编号
-	public void setResourceGene(int offset, int gene) {
-		this.chromosome.get(1).set(offset, gene);
-	}
-
-	// 获取染色体资源分配序列指定位置的资源编号
-	public int getResourceGene(int offset) {
-		return this.chromosome.get(1).get(offset);
-	}
-
-	// 获取该个体的目标函数值
-	public double[] getObj() {
-		return this.obj;
-	}
-	
-	public void setObj(double[] obj) {
-		this.obj = obj;
-	}
-	// non_dominatedRank的getter方法
-	public int getNon_dominatedRank() {
-		return non_dominatedRank;
-	}
-
-	// non_dominatedRank的setter方法
-	public void setNon_dominatedRank(int non_dominatedRank) {
-		this.non_dominatedRank = non_dominatedRank;
-	}
-
-	// crowDistance的getter方法
-	public double getCrowDistance() {
-		return crowDistance;
-	}
-
-	// crowDistance的setter方法
-	public void setCrowDistance(double crowDistance) {
-		this.crowDistance = crowDistance;
-	}
-	
-	public void setTeacher(boolean flag) {
-		this.isTeacher = flag;
-	}
-	
-	public boolean getTeacher() {
-		return this.isTeacher;
-	}
 
 	/**
 	 * 个体的toString方法
@@ -583,7 +507,6 @@ public class Individual {
 		@SuppressWarnings("rawtypes")
 		Iterator timeline = skilltime.keySet().iterator();
 		int[] lasttime = (int[])timeline.next();
-        
 		//遍历时间表  +需要排序
 		while(timeline.hasNext()){
 			int[] time = (int[])timeline.next();
@@ -605,16 +528,6 @@ public class Individual {
 		
 		return false;
 	}
-
-	public Case getProject() {
-		return project;
-	}
-
-	public void setProject(Case project) {
-		this.project = project;
-	}
-
-
 	/**
 	 * 二元锦标赛选择方法，参数为两个个体对象
 	 * 
@@ -653,5 +566,94 @@ public class Individual {
 		}
 		return individual;
 	}
+	public Case getProject() {
+		return project;
+	}
 
+	public void setProject(Case project) {
+		this.project = project;
+	}
+    
+	public List<IResource> getResourceslist() {
+		return resourceslist;
+	}
+
+	public void setResourceslist(List<IResource> resourceslist) {
+		this.resourceslist = resourceslist;
+	}
+	// 获取该个体的染色体结构(taskid)
+	public List<List<Integer>> getChromosome() {
+		return this.chromosome;
+	}
+	public List<List<Double>> getchromosomeDNA() {
+		return this.chromosomeDNA;
+	}
+	public void setchromosomeDNA(List<List<Double>> dna) {
+		this.chromosomeDNA = dna;
+	}
+	
+	public List<ITask> getTaskslist() {
+		return taskslist;
+	}
+
+	public void setTaskslist(List<ITask> taskslist) {
+		this.taskslist = taskslist;
+	}
+
+	
+	// 设置染色体任务序列指定位置的任务编号
+	public void setTaskGene(int offset, int gene) {
+		this.chromosome.get(0).set(offset, gene);
+	}
+
+	// 获取染色体任务序列指定位置的任务编号
+	public int getTaskGene(int offset) {
+		return this.chromosome.get(0).get(offset);
+	}
+
+	// 设置染色体资源分配序列指定位置的资源编号
+	public void setResourceGene(int offset, int gene) {
+		this.chromosome.get(1).set(offset, gene);
+	}
+
+	// 获取染色体资源分配序列指定位置的资源编号
+	public int getResourceGene(int offset) {
+		return this.chromosome.get(1).get(offset);
+	}
+
+	// 获取该个体的目标函数值
+	public double[] getObj() {
+		return this.obj;
+	}
+	
+	public void setObj(double[] obj) {
+		this.obj = obj;
+	}
+	// non_dominatedRank的getter方法
+	public int getNon_dominatedRank() {
+		return non_dominatedRank;
+	}
+
+	// non_dominatedRank的setter方法
+	public void setNon_dominatedRank(int non_dominatedRank) {
+		this.non_dominatedRank = non_dominatedRank;
+	}
+
+	// crowDistance的getter方法
+	public double getCrowDistance() {
+		return crowDistance;
+	}
+
+	// crowDistance的setter方法
+	public void setCrowDistance(double crowDistance) {
+		this.crowDistance = crowDistance;
+	}
+	
+	public void setTeacher(boolean flag) {
+		this.isTeacher = flag;
+	}
+	
+	public boolean getTeacher() {
+		return this.isTeacher;
+	}
 }

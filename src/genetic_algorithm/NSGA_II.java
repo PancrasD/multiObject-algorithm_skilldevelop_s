@@ -11,7 +11,7 @@ public class NSGA_II {
 	// 资源序列变异概率
 	public static final double rMutationRate = 0.1;//没有用
 	// 迭代次数
-	public static final double maxGenerations = 500;
+	public static final double maxGenerations = 300;
 	
-    public static final int RunTime=20;
+    public static final int RunTime=10;
 }
