@@ -25,7 +25,6 @@ public class IResource {
 			for(String skill:resource.getSkils().trim().split(" ")){
 				String[] skillInfo = skill.trim().split(":");
 				this.skillsInfo.put(skillInfo[0], Double.valueOf(skillInfo[1])+1);
-						
 				HashMap<int[], Double> table = new HashMap<int[], Double>();
 				int[] zero=new int[]{0,0};
 				table.put(zero,Double.valueOf(skillInfo[1])+1);

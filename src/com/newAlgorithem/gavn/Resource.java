@@ -22,7 +22,6 @@ public class Resource {
 		this.resourceID=resourceID;
 		this.salary=salary;
 		this.skils=skills;
-		
 	}
 	
 	public int getResourceID() {

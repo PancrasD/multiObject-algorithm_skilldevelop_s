@@ -170,8 +170,9 @@ public class Tools {
 			Rank ++;
 			for (int i = 0; i < FRank.size(); i++) {
 				//被分层的个体所支配的个体的被支配个体数量减1
-				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
-					np[spList.get(FRank.get(i)).get(j)]--;
+				List<Integer> sp=spList.get(FRank.get(i));
+				for (int j = 0; j < sp.size(); j++) {
+					np[sp.get(j)]--;
 				}
 			}
 			
@@ -189,7 +190,7 @@ public class Tools {
 	 * @return 返回种群分成不同非支配等级后，每个个体在对应种群中序列号集合
 	 */
 	
-		public static List<List<Integer>> non_Dominated_Sort(Population population,int level,Case project) {
+	public static List<List<Integer>> non_Dominated_Sort(Population population,int level,Case project) {
 		int populationSize = population.size();
 		Individual[] individuals = population.getPopulation();
 
@@ -229,8 +230,9 @@ public class Tools {
 			}
 			//被分层的个体所支配的个体的被支配个体数量减1
 			for (int i = 0; i < FRank.size(); i++) {
-				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
-					np[spList.get(FRank.get(i)).get(j)]--;
+				List<Integer> sp=spList.get(FRank.get(i));
+				for (int j = 0; j < sp.size(); j++) {
+					np[sp.get(j)]--;
 				}
 			}
 			indivIndexRank.add(FRank);
@@ -547,21 +549,29 @@ public class Tools {
 	 * @return
 	 */
 	public static Population getbestsolution(Population p,int le,Case project) {
-		Population solutions;
+		Population[] pop=new Population[le];
+		Population solutions = null;
 		// P种群进行非支配排序
 		List<List<Integer>> indivIndexRank = non_Dominated_Sort(p,le, project);
-		if (indivIndexRank.get(0).size() != 0) {
+		 
+		/*for(int m=0;m<indivIndexRank.size();m++) {*/
+			List<Integer> rank0=indivIndexRank.get(0);
+		if (rank0.size() != 0) {
 			// 算法求得的最优解集
-			solutions = new Population(indivIndexRank.get(0).size(),project);
-			for (int i = 0; i < indivIndexRank.get(0).size(); i++) {
-				solutions.setIndividual(i, p.getPopulation()[indivIndexRank.get(0).get(i)]);
+			solutions = new Population(rank0.size(),project);
+			for (int i = 0; i < rank0.size(); i++) {
+				solutions.setIndividual(i, p.getPopulation()[rank0.get(i)]);
 			}
 			solutions = sortByObj(solutions, 0);
 			
 		}else{
 			solutions = new Population(0,project);
 		}
-		return solutions;	
+	/*	pop[m]=solutions;
+		}
+		Population mergedPopulation =solutions.merged(pop);
+		return mergedPopulation;	*/
+		return solutions;
 	}
 	
 	
@@ -827,6 +837,33 @@ public class Tools {
 		}
 		
 		return p;
+	}
+
+
+	public static Population getbestsolution(Population p, Case project,int... ranks) {
+		Population solutions ;
+		Individual indiv[]=p.getPopulation();
+		List<Integer> indexs=new ArrayList<>();
+		for(int i=0;i<ranks.length;i++) {
+			int rank=ranks[i];
+			for(int k=0;k<indiv.length;k++) {
+				if(indiv[k].getNon_dominatedRank()==rank) {
+					indexs.add(k);
+				}
+			}
+		}
+		if (indexs.size() != 0) {
+			// 算法求得的最优解集
+			solutions = new Population(indexs.size(),project);
+			for (int i = 0; i < indexs.size(); i++) {
+				solutions.setIndividual(i, p.getPopulation()[indexs.get(i)]);
+			}
+			solutions = sortByObj(solutions, 0);
+			
+		}else{
+			solutions = new Population(0,project);
+		}
+		return solutions;
 	}
 
 

@@ -13,7 +13,6 @@ public class ITask {
 	private String skillType;
 	private double skillLevel;
 	private List<Integer> predecessorIDs = new  ArrayList<>();
-	
 	private List<Integer> resourceIDs ;
 	
 	public ITask(Task task){
@@ -23,7 +22,7 @@ public class ITask {
 		skillType = task.getSkillType();
 		skillLevel = task.getSkillLevel();
 		predecessorIDs = task.getPredecessorIDs();
-		resourceIDs = new ArrayList<>(task.getresourceIDs());//传递有问题
+		resourceIDs = new ArrayList<>(task.getresourceIDs());
 	}
 	
 	public void setstarttime(int starttime, double qlevel){
@@ -72,6 +71,18 @@ public class ITask {
 
 	public void setTaskid(int taskid) {
 		this.taskid = taskid;
+	}
+
+	public int getPretasknum() {
+		return pretasknum;
+	}
+
+	public void setPretasknum(int pretasknum) {
+		this.pretasknum = pretasknum;
+	}
+
+	public void setPredecessorIDs(List<Integer> predecessorIDs) {
+		this.predecessorIDs = predecessorIDs;
 	}
 	
 

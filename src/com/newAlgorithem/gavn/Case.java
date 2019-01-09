@@ -41,7 +41,7 @@ public class Case {
 		//得到每个任务的紧后任务集合
 		countsuccessor();
 		//得到每个任务对应可用资源的使用概率
-		setTaskCapapleResource();
+		//setTaskCapapleResource();
 		setPrePre();
 		setSucSuc();
 		computeBorderValue();
@@ -243,9 +243,6 @@ public class Case {
 	public void setResources(List<Resource> resources) {
 		this.resources = resources;
 	}
-	
-
-
 	public void setCapapleResource() {
 		// 每一种资源拥有的技能集合
 		List<Map<String, Integer>> staffSkillList = new ArrayList<>();
@@ -256,42 +253,42 @@ public class Case {
 			for (String skill : skills) {
 				String[] str = skill.split(":");
 				resourceSkill.put(str[0], Integer.valueOf(str[1]));
-
 			}
 			staffSkillList.add(resourceSkill);
 		}
-
 		// 遍历任务集
 		for (int i = 0; i < tasks.size(); i++) {
 			List<Integer> capapleResourceIDS = new ArrayList<Integer>();
 			// 任务i的所需技能类型和水平
-			String[] skill_level = tasks.get(i).getSkill().trim().split(":");
+			Task task=tasks.get(i);
+			String[] skill_level = task.getSkill().trim().split(":");
+			String skillType=skill_level[0];
+			double skillLevel=Double.valueOf(skill_level[1]);//原始的
 			// 遍历每一种资源拥有的技能集合
 			for (int j = 0; j < staffSkillList.size(); j++) {
 				Map<String, Integer> map = staffSkillList.get(j);
-				if (map.keySet().contains(skill_level[0])
-						&& map.get(skill_level[0]) >= Integer.valueOf(skill_level[1])) {
+				if (map.keySet().contains(skillType)
+						&& map.get(skillType) >=skillLevel) {
 					capapleResourceIDS.add(resources.get(j).getResourceID());
 				}
 			}
-			
-			tasks.get(i).setresourceIDs(capapleResourceIDS);
+			task.setresourceIDs(capapleResourceIDS);
 		}
 		return;
 	}
 	
 	//？？？未找出全部紧后任务
 	public void countsuccessor() {
-		//循环每一列，
-
+		//循环每一列
 		for (int i = 0; i< tasks.size();i++){
 			List<Integer> successorIDS = new ArrayList<>();
 			for (int j = i+1; j < tasks.size(); j++) {
-				int num =  tasks.get(j).getpretasknum();
-			   if (num > 0) {
-					List<Integer> pre_IDs = tasks.get(j).getPredecessorIDs();
+				Task task=tasks.get(j);
+				int num =  task.getpretasknum();
+			    if (num > 0) {
+					List<Integer> pre_IDs = task.getPredecessorIDs();
 					if(pre_IDs.contains(i+1)) {
-						successorIDS.add(tasks.get(j).getTaskID());
+						successorIDS.add(task.getTaskID());
 					}
 				}
 			}

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 
+
 public class Population {
 
 	private int populationsize;
@@ -248,8 +249,9 @@ public class Population {
 			}
 			//被分层的个体所支配的个体的被支配个体数量减1
 			for (int i = 0; i < FRank.size(); i++) {
-				for (int j = 0; j < spList.get(FRank.get(i)).size(); j++) {
-					np[spList.get(FRank.get(i)).get(j)]--;
+				List<Integer> sp=spList.get(FRank.get(i));
+				for (int j = 0; j < sp.size(); j++) {
+					np[sp.get(j)]--;
 				}
 			}
 			indivIndexRank.add(FRank);
@@ -371,6 +373,23 @@ public class Population {
 		OffSpring = mergedPopulation.slectPopulationC(NSGAV_II.populationSize);
 		return OffSpring;
 	}
+	/*
+	 * @param  p种群数组
+	 * 合并多种群
+	 */
+	public Population merged(Population... p){
+		List<Individual> mergedList = new ArrayList<>();
+		for(int j=0;j<p.length;j++) {
+			for (int i = 0; i < p[j].size(); i++) {
+				mergedList.add(p[j].getPopulation()[i]);		
+			}
+		}
+		Population mergedPopulation = new Population(mergedList.size(),project);
+		for (int i =0; i <mergedList.size();i++){
+			mergedPopulation.setIndividual(i, mergedList.get(i));
+		}
+		return mergedPopulation;
+	}
 	private void computeMax() {
 	   double[] max= {0,0};
        for(Individual individual:this.population) {
@@ -446,6 +465,9 @@ public class Population {
 				
 				// 获取任务链表的交叉点[1,chromosomeLength]
 				int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
+				if(parent1.getChromosome().get(0).size()!=parent2.getChromosome().get(0).size()) {
+					System.out.println("parent1!=parent2");
+				}
 				Individual son1 = parent1.Mating(parent2, swapPoint);
 				Individual son2 = parent2.Mating(parent1, swapPoint);
 				newPopulation.setIndividual(i, son1);
@@ -497,11 +519,10 @@ public class Population {
 		// 
 		// 基于气味搜索，每个个体生成S个个体，种群大小为NS*S
 		Population p1 = this.smell_BasedSearch();
-		// 将两个种群合并
-		Population mp1 = merged(this,p1);
+		/*// 将两个种群合并
+		Population mp1 = merged(this,p1);*/
 		// 从混合种群中选择前populationSize个个体作为新一代父代种群
-		Population p2 = mp1.slectPopulation(NSFFA.NS);
-		
+		Population p2 = p1.slectPopulation(NSFFA.NS);
 		 // 基于知识的搜索
 		Population Q = p2.knowledge_BasedSearch();
 		// 将两个种群合并
@@ -786,6 +807,37 @@ public class Population {
 		}
 		return this;
 	}
+	////遗传算法/////////////////////////////////////////////////////////////////
+	/**
+	 * 使用遗传算法获得下一代种群
+	 * 
+	 * @param project
+	 *            案例集
+	 * @return 下一代种群
+	 */
+	public Population getOffSpring_NSGA() {
+	
+		Population OffSpring = new Population(NSGA_II.populationSize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndCrowD(this, project);
+		
+		// 选择出交配池
+		Population matePool = getMatePool();
 
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
+
+		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
+		Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
+
+		// 将两个种群合并
+		Population mergedPopulation = merged(this,p2);
+
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		OffSpring = mergedPopulation.slectPopulation(NSGA_II.populationSize);
+
+		return OffSpring;
+	}
+	
 	
 }

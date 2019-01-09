@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+
 public class NumericalTest_gvn {
 	public static void main(String[] args) {
 		
@@ -79,6 +81,25 @@ public class NumericalTest_gvn {
 	                System.out.println(fl.length +"个案例教学优化果蝇算法计算完成"); 
 	                return;
     		}
+    		if (args[0].trim().toLowerCase().equals("g")){
+    			String head=buildFileName();
+    			for(int j = 0; j < NSGA_II.RunTime; j++){
+    				 String dic = "data/NSGA_"+head+"/nsga_"+j;
+	   				 File f=new File(dic);
+	               	 if(f.exists()) {
+	               		 f.delete();
+	               	 }
+	               	 f.mkdirs();
+    				for(int i = 0; i<fl.length; i++){
+                   	 String _fn =  "case_def/" + fl[i];
+                   	 String _fo = dic+"/NSGA_"+fl[i]+".txt";
+                   	 NSGA_algorithm(_fn,_fo,countResult);
+                   }
+    			}
+                System.out.println(fl.length +"个案例遗传算法计算完成"); 
+                return;
+                
+    		}
         }else{
         	System.out.print("请输入参数：'g'、遗传算法，'f'、果蝇算法，'C'、布谷鸟算法");
         	return;
@@ -137,10 +158,6 @@ public class NumericalTest_gvn {
 			}*/
 			long time=0;
 			long t2 = 0;
-		    /*while (generationCount < NSGAV_II.maxGenerations ) {
-				P = P.getOffSpring_NSGAV();
-				generationCount++;
-			}*/
 			while (time < 30 ) {
 				P = P.getOffSpring_NSGAV();
 				generationCount++;
@@ -148,10 +165,11 @@ public class NumericalTest_gvn {
 				time=(t2-startTime)/1000;
 			}
 			//从最后得到种群中获取最优解集
+			//Population solutions =Tools.getbestsolution(P,project, 0);//输出rank为0  减少一次非支配排序
 			Population solutions = Tools.getbestsolution(P,1, project);
 		    //输出最优解集
-			 File f = new File(datafile);
-			 PrintStream ps = null;
+			File f = new File(datafile);
+			PrintStream ps = null;
 			 try {
 			   if (f.exists()) f.delete();
 			   f.createNewFile();
@@ -234,7 +252,50 @@ public class NumericalTest_gvn {
 		        if(ps != null) 	ps.close();
 		     }
 	}
+	public static void NSGA_algorithm(String casefile,String datafile,List<List<Double>> countResult){
+	       //记录开始计算的时间，用于统计本算法的总时间
+			long startTime = System.currentTimeMillis();
+			// 创建案例类对象
+			Case project = new Case(casefile);
+			// 初始化种群
+			Population P = new Population(NSGA_II.populationSize,project,true);
+			int generationCount = 0;
+	        //循环迭代 算法指定的次数
+			/*while (generationCount < NSGA_II.maxGenerations ) {
 
+				P = P.getOffSpring_NSGA();
+
+				generationCount++;
+			}*/
+			long time=0;
+			long t2 = 0;
+			while (time <30 ) {
+				P = P.getOffSpring_NSGA();
+				t2=System.currentTimeMillis();
+				time=(t2-startTime)/1000;
+			}
+			//从最后得到种群中获取最优解集
+			Population solutions = Tools.getbestsolution(P, project,0);
+		    //输出最优解集
+			//Tools.printsolutions(solutions,startTime,datafile);	
+			 File f = new File(datafile);
+			 PrintStream ps = null;
+			 try {
+			   if (f.exists()) f.delete();
+			   f.createNewFile();
+			   FileOutputStream fos = new FileOutputStream(f);
+			   ps = new PrintStream(fos);
+			   System.setOut(ps);
+			   //输出最优解集
+			   Tools.printsolutions(solutions,startTime,countResult);			   
+			 } catch (IOException e) {
+				e.printStackTrace();
+			 }  finally {
+		        if(ps != null) 	ps.close();
+		     }
+		    
+		          	
+	}
 	 public static String buildFileName(){
 		 //new一个时间对象date
 		 Date date = new Date();

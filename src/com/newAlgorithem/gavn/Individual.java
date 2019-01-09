@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 public class Individual {
 	// 个体染色体的维数
@@ -96,7 +95,7 @@ public class Individual {
 	private void settaskslist(Case project){
 		List<Task> tasks=project.getTasks();
 		for (int i = 0; i < tasks.size();i++){
-			ITask itask = new ITask(tasks.get(i));//完全新建避免复制引用
+			ITask itask = new ITask(tasks.get(i));
 			taskslist.add(itask);
 		}
 	}
@@ -169,15 +168,34 @@ public class Individual {
 
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
 		List<Integer> _tasks = new ArrayList<>();
-		int[] taskIndex=new int[this.chromosome.get(0).size()];
+		List<Integer> taskChrom=this.chromosome.get(0);
+		int[] taskIndex=new int[taskChrom.size()];
 		for (int i = 0; i < crosspoint;i++){
-			_tasks.add(this.chromosome.get(0).get(i));
-			taskIndex[this.chromosome.get(0).get(i)-1]=1;
-		}
-		for (int i = 0; i<husband.chromosome.get(0).size();i++){
-			if (taskIndex[husband.chromosome.get(0).get(i)-1]!=1){//可以优化 不用每次判断迭代!_tasks.contains(husband.chromosome.get(0).get(i)
-				_tasks.add(husband.chromosome.get(0).get(i));
+			int taskID=taskChrom.get(i);
+			_tasks.add(taskID);
+			try {
+				taskIndex[taskID-1]=1;
+			} catch (Exception e) {
+				System.out.println(taskChrom.size()+' ');
+				System.out.println(taskID);
+				e.printStackTrace();
 			}
+		}
+		List<Integer> husbandTaskChrom=husband.chromosome.get(0);
+		for (int i = 0; i<husbandTaskChrom.size();i++){
+			int taskID=husbandTaskChrom.get(i);
+			try {
+				if (taskIndex[taskID-1]!=1){
+					_tasks.add(taskID);
+				}
+			} catch (Exception e) {
+				System.out.println(taskChrom.size()+"问题");
+				System.out.println(taskID);
+				e.printStackTrace();
+			}
+		}
+		if(this.chromosome.get(0).size()!=husbandTaskChrom.size()) {
+			System.out.println("异常");
 		}
 		son_chromosome.add(_tasks);
 		Individual son = new Individual(son_chromosome, project);	
@@ -193,10 +211,10 @@ public class Individual {
 		List<Integer> _tasks = new ArrayList<>();
 		/*List<Integer> _resources = new ArrayList<>();*/
 		/*List<Double> _resourcesdna = new ArrayList<>();*/
-		
-		int chromosomeLength = this.chromosome.get(0).size();
+		List<Integer> taskChrom=this.chromosome.get(0);
+		int chromosomeLength = taskChrom.size();
 		for (int i =0; i<chromosomeLength; i++){
-			_tasks.add(this.chromosome.get(0).get(i));
+			_tasks.add(taskChrom.get(i));
 			/*_resources.add(this.chromosome.get(1).get(i));*/
 			/*_resourcesdna.add(this.chromosomeDNA.get(0).get(i));*/			
 		}
@@ -455,22 +473,21 @@ public class Individual {
 		// 可执行任务集合
 		List<Integer> executableTaskIDS = new ArrayList<Integer>();	
 		List<Task> tasks = project.getTasks();
-		List<Double> _list1 = new ArrayList<>();
+		//double rand3=Math.random();
 		for (int i = 0; i < project.getN(); i++) {  
 			executableTaskIDS.clear();
-			for (int k = 0; k < tasks.size(); k++) {
-				if (taskslist.get(k).pretasknum == 0){//找到没有紧前任务的任务集合作为优先执行任务集合
-					executableTaskIDS.add(tasks.get(k).getTaskID());
-					double rand1 = Math.random();
-					_list1.add(rand1);
+			for (int k = 0; k < taskslist.size(); k++) {
+				ITask itask=taskslist.get(k);
+				if (itask.pretasknum == 0){//找到没有紧前任务的任务集合作为优先执行任务集合
+					executableTaskIDS.add(itask.getTaskid());
 				}
 			}
 			if (executableTaskIDS.size() == 0){
 				break;
 			}
 			//1随机  2最大紧后集   34先选择资源然后选择任务3最大执行时间 4 最大紧后集执行时间和
-			double rand3=Math.random();
-			/*if(rand3<0.7) {
+			/*double rand3=Math.random();
+			if(rand3<0.7) {
 			   scheduleTaskByRandomRule(executableTaskIDS,taskList);
 			}else if(rand3<0.8) {
 				scheduleTaskByMaxSuccessorsRule(executableTaskIDS,taskList);
@@ -479,12 +496,13 @@ public class Individual {
 			}else {
 				scheduleTaskByMaxSumSuccessorsProcessTimeRule(executableTaskIDS,taskList);
 			}*/
+			double rand3=Math.random();
 			int A = (int) ( rand3 * executableTaskIDS.size());
 			int currentTaskID = executableTaskIDS.get(A);//优先任务集合中随机选择一个作为当前执行任务
 			taskList.add(currentTaskID);
             taskslist.get(currentTaskID -1).pretasknum = -1;   //当前任务已经被使用，做上标记以防止下次被选用
 			//处理后续任务
-            List<Integer> suc=this.project.getTasks().get(currentTaskID-1).getsuccessortaskIDS();
+            List<Integer> suc=tasks.get(currentTaskID-1).getsuccessortaskIDS();
             for(int k=0;suc!=null&&k<suc.size();k++) {
             	taskslist.get(suc.get(k)-1).pretasknum--;	
             }
@@ -537,12 +555,16 @@ public class Individual {
 				taskList.add(currentTaskID);
 				taskslist.get(currentTaskID -1).pretasknum = -1;   //当前任务已经被使用，做上标记以防止下次被选用
 				//处理后续任务
-				for (int k = 0; k < tasks.size(); k++) {
+				List<Integer> suc=this.project.getTasks().get(currentTaskID-1).getsuccessortaskIDS();
+	            for(int k=0;suc!=null&&k<suc.size();k++) {
+	            	taskslist.get(suc.get(k)-1).pretasknum--;	
+	            }
+				/*for (int k = 0; k < tasks.size(); k++) {
 					//把所有以任务j为前置任务的前置任务数减1；
 					if (tasks.get(k).getPredecessorIDs().contains(currentTaskID)){
 						taskslist.get(k).pretasknum--;	
 					}
-				}
+				}*/
 		 }
 		
 	}
@@ -571,12 +593,16 @@ public class Individual {
 			taskList.add(currentTaskID);
 			taskslist.get(currentTaskID -1).pretasknum = -1;   //当前任务已经被使用，做上标记以防止下次被选用
 			//处理后续任务
-			for (int k = 0; k < tasks.size(); k++) {
+			List<Integer> suc=this.project.getTasks().get(currentTaskID-1).getsuccessortaskIDS();
+            for(int k=0;suc!=null&&k<suc.size();k++) {
+            	taskslist.get(suc.get(k)-1).pretasknum--;	
+            }
+			/*for (int k = 0; k < tasks.size(); k++) {
 				//把所有以任务j为前置任务的前置任务数减1；
 				if (tasks.get(k).getPredecessorIDs().contains(currentTaskID)){
 					taskslist.get(k).pretasknum--;	
 				}
-			}
+			}*/
 		}
 	
 		
@@ -608,18 +634,21 @@ public class Individual {
 			taskList.add(currentTaskID);
 			taskslist.get(currentTaskID -1).pretasknum = -1;   //当前任务已经被使用，做上标记以防止下次被选用
 			//处理后续任务
-			for (int k = 0; k < tasks.size(); k++) {
+			List<Integer> suc=this.project.getTasks().get(currentTaskID-1).getsuccessortaskIDS();
+            for(int k=0;suc!=null&&k<suc.size();k++) {
+            	taskslist.get(suc.get(k)-1).pretasknum--;	
+            }
+			/*for (int k = 0; k < tasks.size(); k++) {
 				//把所有以任务j为前置任务的前置任务数减1；
 				if (tasks.get(k).getPredecessorIDs().contains(currentTaskID)){
 					taskslist.get(k).pretasknum--;	
 				}
-			}
+			}*/
 		}
 		
 	}
 
 	private void scheduleTaskByRandomRule(List<Integer> executableTaskIDS, List<Integer> taskList) {
-		List<Task> tasks = project.getTasks();
 		double rand1 = Math.random();
 		while(executableTaskIDS.size()>0) {
 			int A = (int) ( rand1 * executableTaskIDS.size());
@@ -629,13 +658,17 @@ public class Individual {
 			taskslist.get(currentTaskID -1).pretasknum = -1;   //当前任务已经被使用，做上标记以防止下次被选用
 			
 			//处理后续任务
-			for (int k = 0; k < tasks.size(); k++) {
+			List<Integer> suc=this.project.getTasks().get(currentTaskID-1).getsuccessortaskIDS();
+            for(int k=0;suc!=null&&k<suc.size();k++) {
+            	taskslist.get(suc.get(k)-1).pretasknum--;	
+            }
+			/*for (int k = 0; k < tasks.size(); k++) {
 				//把所有以任务j为前置任务的前置任务数减1；
 				if (tasks.get(k).getPredecessorIDs().contains(currentTaskID)){
 					taskslist.get(k).pretasknum--;	
 					//？？？应该将该任务从前序任务集中删除
 				}
-			}
+			}*/
 		}
 	}
 	private void learnObjCompute(boolean initial) {
@@ -658,8 +691,9 @@ public class Individual {
 			int resourceid = list.get(B);
 			resourceList.add(resourceid);
 			
-			this.singleCompute(resourceid,this.chromosome.get(0).get(i),endtime_res,workload);//动态计算
+			this.singleCompute(resourceid,taskList.get(i),endtime_res,workload);//动态计算
 		}
+		this.obj=new double[]{this.maxtime, this.cost};
 		this.chromosome.add(resourceList);
 		
 	}
@@ -677,7 +711,7 @@ public class Individual {
 	    int select=0;
 	    if(rand<NSGAV_II.pr) {//平衡加入随机
 	    	/*double rand1=Math.random();
-	    	if(rand1<0.5) {
+	    	if(rand1<1) {
 	    		select=0;
 	    	}else*/
 	         select=1;//成本&&工期
@@ -690,7 +724,8 @@ public class Individual {
 			}
 		}
 		for(int i = 0; i <taskList.size(); i++){
-			ITask curTask = taskslist.get(taskList.get(i) -1);
+			int tid=taskList.get(i);
+			ITask curTask = taskslist.get(tid-1);
 			//资源的选择 引入四种规则  随机  最便宜的资源 最早空闲资源   最小负载资源  最先可以升级的
 			//int resourceid=selectResourceC(curTask,endtime_res,workload);
 			/*List<Integer> list = curTask.getresourceIDs();
@@ -711,8 +746,9 @@ public class Individual {
 			
 			}
 			resourceList.add(resourceid);
-			this.singleCompute(resourceid,taskList.get(i),endtime_res,workload);//动态计算
+			this.singleCompute(resourceid,tid,endtime_res,workload);//动态计算
 		}
+		this.obj=new double[]{this.maxtime, this.cost};
 		this.chromosome.add(resourceList);
 	}
 	/*
@@ -721,7 +757,6 @@ public class Individual {
 	private int selectResourceW(ITask curTask, int[] endtime_res, int[] workload,double pp) {
 		List<IResource> ress=this.resourceslist;
 		List<Integer> list = curTask.getresourceIDs();
-		double rand=Math.random();
 		int resourceid=list.get(0);
 		List<Integer> list1=new ArrayList<>(list);
 		double Obj[]=this.getProject().getTempObj();
@@ -915,7 +950,7 @@ public class Individual {
 	public void singleCompute(int rid, int tid, int[] endtime_res, int[] workload){
 		ITask task = taskslist.get(tid-1);
 		IResource resource = resourceslist.get(rid-1);
-		if(!canInsert(resource, task,workload)){//不存在紧前调度
+	    if(!canInsert(resource, task,workload)){//不存在紧前调度
 			//阶段性计算：更新资源可用时间，更新任务开始结束时间
 			phaseCompute(rid, tid, endtime_res,workload);
 			//更新技能水平：当前技能表，技能执行时间表	
@@ -927,13 +962,11 @@ public class Individual {
 			//updateResourceAnd
 			aimCompute(task, resource,endtime_res);//左移调度下移动插入点的技能必须高于任务的所需技能  采用资源更新
 		} 
-		/*phaseCompute(rid, tid, endtime_res,workload);
+	/*	phaseCompute(rid, tid, endtime_res,workload);
 		//更新技能水平：当前技能表，技能执行时间
 		updateSkill(resource, task);
 		//计算目标值： 工期 成本 
 		aimCompute(task, resource,endtime_res);*/
-		this.obj=new double[]{this.maxtime, this.cost};
-		
 	}
 	//每次遍历 花费时间  直接将改变endTime的资源同maxTime对比
 	public void aimCompute(ITask curTask, IResource curResource, int[] endtime_res){
@@ -1019,7 +1052,7 @@ public class Individual {
 				double rightskill = skilltime.get(last);
 				rightskill=Math.floor(rightskill);//1.3 add按照技能整数计算
 				//是否满足技能水平和时长条件
-				if(rightskill >= skillLevel && stanDuration/rightskill <= time[0]-last[1]){
+				if(rightskill >= skillLevel && stanDuration/rightskill <= (time[0]-last[1])){
 					List<Integer> preids = task.getPredecessorIDs();
 					//是否满足紧前关系
 					for(int i = 0; i < preids.size();i++){
@@ -1228,26 +1261,17 @@ public class Individual {
 		this.hyperVolume = hyperVolume;
 	}
     
-	/*
-	 * else if(Tools.Dominated(son,compare,this.project)==0){
-				  double hyperv1=(son.getProject().getBorderDuration()-son.getObj()[0])*(son.getProject().getBorderCost()-son.getObj()[1]);
-				  double hyperv2=(compare.getProject().getBorderDuration()-compare.getObj()[0])*(compare.getProject().getBorderCost()-compare.getObj()[1]);
-				  if(hyperv1>hyperv2) {
-					  compare=son; 
-				  }
-			}
-	 */
 	//个体变邻搜索
 	public Individual variableNeighborDecent() {
 		Individual compare=this;
 		//随机序列 1-5
 		List<Integer> sequence=new ArrayList<>();
-		for(int i=0;i<5;i++) {
+		for(int i=0;i<3;i++) {
 			sequence.add(i+1);
 		}
 		Collections.shuffle(sequence);
 		int k=1;//第一个邻结构的序号
-		while(k<=5) {
+		while(k<=3) {
 			Individual son=compare.variableNeighborWithFirst(sequence.get(k-1));//使用随机序列顺序搜索
 			if(Tools.Dominated(son,compare,this.project)==1) {
 				compare=son;
@@ -1287,21 +1311,86 @@ public class Individual {
 	private Individual variableNeighborWithFirst(int k) {
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
 		List<Integer> _tasks = new ArrayList<>();
-		int taskLength = this.chromosome.get(0).size();
+		List<Integer> taskChrom=this.chromosome.get(0);
+		int taskLength = taskChrom.size();
 		for (int i =0; i<taskLength; i++){
-			_tasks.add(this.chromosome.get(0).get(i));			
+			_tasks.add(taskChrom.get(i));			
 		}
 		switch(k) {
 		   case 1:  variableNeighbor_NeighborOne(taskLength,_tasks); break;
 		   case 2:  variableNeighbor_NeighborProb(taskLength,_tasks); break;
-		   case 3:  variableNeighbor_ForwardInsert(taskLength,_tasks); break;
+		   /*case 3:  variableNeighbor_ForwardInsert(taskLength,_tasks); break;
 		   case 4:  variableNeighbor_BackWordInsert(taskLength,_tasks); break;
-		   case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;
+		   case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;*/
+		   case 3:  this.variableNeighbor_adjustSequence(taskLength,_tasks);break;
 		}
 		son_chromosome.add(_tasks);
 		Individual son = new Individual(son_chromosome,project);
 		return son;
 	}
+	/*
+	 * @param  taskLength 任务序列长度
+	 * @param _tasks 复制的任务序列及新的任务序列
+	  * 重新调整任务子序列顺序
+	 */
+	private void variableNeighbor_adjustSequence(int taskLength, List<Integer> _tasks) {
+		int geneIndex1=(int)(Math.random()*(taskLength-NSGAV_II.len));//索引
+		int geneIndex2=geneIndex1+NSGAV_II.len;
+
+		List<ITask>  taskslist=this.getTaskslist();
+		List<Integer> childSequence=new ArrayList<>();
+		int[] preNum=new int[taskLength];//两种策略 从前往后到geneIndex2  geneIndex1 geneIndex2单独判断
+		Map<Integer,List<Integer>> suc=new HashMap<>();
+		for(int i=geneIndex2;i>=geneIndex1;i--) {
+			int taskId=_tasks.get(i);
+			List<Integer> pre=taskslist.get(taskId-1).getPredecessorIDs();
+			childSequence.add(taskId);
+			for(int j=i-1;j>=geneIndex1;j--) {
+				int taskPre=_tasks.get(j);
+				if(pre.contains(taskPre)) {
+					preNum[taskId-1]++;
+					List<Integer> sucList=suc.get(taskPre);
+					if(sucList==null) {
+						sucList=new ArrayList<>();
+						sucList.add(taskId);
+						suc.put(taskPre, sucList);
+					}else {
+						sucList.add(taskId);
+					}
+				}
+			}
+		}
+		List<Integer> executableTaskIDS = new ArrayList<Integer>();	
+		for(int i=0;i<childSequence.size();i++) {
+			executableTaskIDS.clear();
+			for(int j=0;j<childSequence.size();j++) {
+				int taskId=childSequence.get(j);
+				try {
+					if(preNum[taskId-1]==0) {
+						executableTaskIDS.add(taskId);
+					}
+				} catch (Exception e) {
+					System.out.println("出现"+taskId);
+					e.printStackTrace();
+				}
+			}
+			if (executableTaskIDS.size() == 0){
+				break;
+			}
+			double rand3=Math.random();
+			int A = (int) ( rand3 * executableTaskIDS.size());
+			int currentTaskID = executableTaskIDS.get(A);//优先任务集合中随机选择一个作为当前执行任务
+			_tasks.set(geneIndex1+i, currentTaskID);
+			preNum[currentTaskID-1]=-1;
+			//更新后继
+			List<Integer> sucList=suc.get(currentTaskID);
+			for(int m=0;sucList!=null&&m<sucList.size();m++) {
+				int taskId=sucList.get(m);
+				preNum[taskId-1]--;
+			}
+		}
+	}
+
 	//随机交换
 	private void variableNeighbor_SwapRandom(int taskLength, List<Integer> _tasks) {
 		
