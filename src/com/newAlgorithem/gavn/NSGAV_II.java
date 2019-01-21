@@ -7,7 +7,7 @@ public class NSGAV_II {
 	// 交叉概率
 	public static final double crossoverRate = 0.8;
 	//平衡因子
-	public static final double pr=1;//0.6
+	public static final double pr=0.6;//0.6
     /*// 任务序列变异概率
 	public static final double tMutationRate = 0.15;
 	// 资源序列变异概率

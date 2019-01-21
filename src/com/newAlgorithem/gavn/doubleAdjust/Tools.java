@@ -1,5 +1,6 @@
 package com.newAlgorithem.gavn.doubleAdjust;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -128,7 +129,13 @@ public class Tools {
 		for (int i = 0; i < populationSize; i++) {
 			for (int j = i+1; j < populationSize; j++) {
 
-				int flag=Dominated(individuals[i], individuals[j],project);
+				int flag = 0;
+				try {
+					flag = Dominated(individuals[i], individuals[j],project);
+				} catch (Exception e) {
+					
+					e.printStackTrace();
+				}
 				if (flag == 1) { // 前者支配后者
 					spList.get(i).add(j); // 将个体j加入个体i的支配个体队列
 					np[j]++;  // 支配个体j的个体数+1
@@ -257,11 +264,9 @@ public class Tools {
 	public static int Dominated(Individual individual1, Individual individual2,Case project) {
 		int flag, n, k;
 		flag =  n = k = 0;
-
 		//个体目标函数值
 		double[] obj1=individual1.getObj();
 		double[] obj2=individual2.getObj();
-		
 		for (int i = 0; i < obj1.length; i++) {
 			if (obj1[i] < obj2[i]) {
 				n++;
@@ -555,7 +560,7 @@ public class Tools {
 		List<List<Integer>> indivIndexRank = non_Dominated_Sort(p,le, project);
 		 
 		/*for(int m=0;m<indivIndexRank.size();m++) {*/
-			List<Integer> rank0=indivIndexRank.get(0);
+		List<Integer> rank0=indivIndexRank.get(0);
 		if (rank0.size() != 0) {
 			// 算法求得的最优解集
 			solutions = new Population(rank0.size(),project);
@@ -579,12 +584,13 @@ public class Tools {
 	/**
 	 * 选择种群中个体指定目标函数的最大值
 	 * @param countResult 
+	 * @param ps 
 	 * 
 	 * @param index_objList
 	 * @param m
 	 * @return
 	 */
-	public static void printsolutions(Population solutions,long startTime, List<List<Double>> countResult) {
+	public static void printsolutions(Population solutions,long startTime, List<List<Double>> countResult, PrintStream ps) {
 		long endTime = System.currentTimeMillis();
 		if (solutions.getPopulationsize()>0){
 			Individual[] bestIndividuals = solutions.getPopulation();
@@ -594,7 +600,7 @@ public class Tools {
 			for (int i = 0; i < bestIndividuals.length; i++) {
 				double[] obj = bestIndividuals[i].getObj();
 				betterObjs.add(obj);
-				System.out.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
+				ps.println("项目工期为:" + obj[0] + ":项目成本为:" + obj[1]);
 			}
 			 //计算反转超体积  反转的工期为所有工期之和  反转的成本为工期*最大的薪水
 			Case project=solutions.getPopulation()[0].getProject();
@@ -610,15 +616,18 @@ public class Tools {
 				if(i==0) {
 					hyperVolume+=inversObj.get(i)[0]*inversObj.get(i)[1];
 				}else {
-					hyperVolume+=(inversObj.get(i)[1]-inversObj.get(i-1)[1])*inversObj.get(i)[0];
+					double temp=(inversObj.get(i)[1]-inversObj.get(i-1)[1])*inversObj.get(i)[0];
+					hyperVolume+=temp;
 				}
 			}
 			List<Double> result=new ArrayList<>();
 			result.add(hyperVolume);
 			result.add((double) ((endTime-startTime)/1000));
-			countResult.add(result);
-			System.out.println("超体积:"+hyperVolume);
-			if(countResult.size()==NSGAV_II.RunTime) {
+			synchronized(Tools.class) {
+			   countResult.add(result);//加锁
+			}
+			ps.println("超体积:"+hyperVolume);
+			if(countResult.size()==project.RunTime) {
 				double countHyper=0;
 				double countTime=0;
 				int maxHyperVolumIndex=0;
@@ -631,20 +640,22 @@ public class Tools {
 						maxHyperVolumIndex=i;
 					}
 				}
-				System.out.println("平均超体积:"+countHyper/countResult.size());
-				System.out.println("平均时间:"+countTime/countResult.size());
-				System.out.println(Arrays.toString(countResult.toArray()));
-				System.out.println("最大超体积位置:"+(maxHyperVolumIndex+1)+":最大超体积"+maxHyperVolum);
+				ps.println("平均超体积:"+countHyper/countResult.size());
+				ps.println("平均时间:"+countTime/countResult.size());
+				ps.println(Arrays.toString(countResult.toArray()));
+				ps.println("最大超体积位置:"+(maxHyperVolumIndex+1)+":最大超体积"+maxHyperVolum);
 			}
 			//输出资源技能水平
-			outPutResource(solutions.getPopulation()[0]);
+			/*outPutResource(solutions.getPopulation()[0]);*/
+			ps.println("最大工期:"+MaxDuration);
+			ps.println("最大成本:"+MaxCost);
 			
 		}
 		// 如果没有非支配解
 		else {
-			System.out.println("该算法无法求得最优解");
+			ps.println("该算法无法求得最优解");
 		}
-		System.out.println("共计用时：" + (endTime - startTime) / 1000 + "秒");
+		ps.println("共计用时：" + (endTime - startTime) / 1000 + "秒");
 
 	
 	}
@@ -864,6 +875,37 @@ public class Tools {
 			solutions = new Population(0,project);
 		}
 		return solutions;
+	}
+
+    /*
+     * 移除具有相同目标值的个体
+     */
+	public static Population removeSame(Population solutions) {
+		Map<Double,HashMap<Double,Boolean>> map=new HashMap<Double,HashMap<Double,Boolean>>();//去重
+		Individual[] individuals=solutions.getPopulation();
+		List<Integer> indivList=new ArrayList<>();
+		for(int k=0;k<individuals.length;k++) {
+			   
+				double[] obj= individuals[k].getObj();
+				if(map.get(obj[0])!=null&&map.get(obj[0]).get(obj[1])!=null) {
+					continue;
+				}
+				if(map.get(obj[0])==null) {
+					HashMap<Double,Boolean> map1=new HashMap<Double,Boolean>();
+					map1.put(obj[1], true);
+					map.put(obj[0], map1);
+				}else {
+					map.get(obj[0]).put(obj[1], true);
+				}
+				indivList.add(k);
+			}
+		 Individual[] newIndivs= new Individual[indivList.size()];
+		 for(int i=0;i<indivList.size();i++) {
+			 newIndivs[i]=individuals[indivList.get(i)];
+		 }
+		 Population newPop=new Population(indivList.size(),individuals[0].getProject(),false);
+		 newPop.setPopulation(newIndivs);
+		 return newPop;
 	}
 
 

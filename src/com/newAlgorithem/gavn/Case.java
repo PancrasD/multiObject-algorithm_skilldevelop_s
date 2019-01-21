@@ -42,8 +42,8 @@ public class Case {
 		countsuccessor();
 		//得到每个任务对应可用资源的使用概率
 		//setTaskCapapleResource();
-		setPrePre();
-		setSucSuc();
+	/*	setPrePre();
+		setSucSuc();*/
 		computeBorderValue();
 	}
 

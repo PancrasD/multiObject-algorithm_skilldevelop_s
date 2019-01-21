@@ -9,6 +9,8 @@ import java.util.Map;
 
 
 
+
+
 public class Population {
 
 	private int populationsize;
@@ -40,6 +42,9 @@ public class Population {
 		}
 	}
 
+	public Population(int populationSize2, Case project2, boolean b, int i) {
+		// TODO Auto-generated constructor stub
+	}
 	/**
 	 * 计算给定种群的个体目标函数
 	 * 得到个体目标函数的集合
@@ -217,7 +222,6 @@ public class Population {
 					}
 					newPopulation.setIndividual(total, individuals[FRank.get(k)]);
 					total++;
-					
 				}
 			}else {
 				Population FP = new Population(FRank.size(),project);
@@ -263,9 +267,12 @@ public class Population {
 			indivIndexRank.add(FRank);
 			Rank ++;
 		}
-		if(total<newnum) {
+		while(total<newnum) {
 			newPopulation.setIndividual(total, new Individual(this.project,true));
 			total++;
+		}
+		if(newPopulation.getPopulation()[newPopulation.populationsize-1]==null) {
+			System.out.println("这儿出错");
 		}
 		return newPopulation;
 	}
@@ -353,31 +360,42 @@ public class Population {
 	////遗传算法/////////////////////////////////////////////////////////////////
 	/**
 	 * 使用遗传算法获得下一代种群
+	 * @param v 
 	 * 
 	 * @param project
 	 *            案例集
 	 * @return 下一代种群
 	 */
-	public Population getOffSpring_NSGAV() {
+	public Population getOffSpring_NSGAV(int v) {
 		//computeMax();
-		Population OffSpring = new Population(NSGAV_II.populationSize,project,false);
+		Population OffSpring = new Population(project.getNSGAV_II().populationSize,project,false);
 		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
 		//Tools.setRankAndCrowD(this, project);
 		Tools.setRankAndConsAndHyperVolume(this, project);
 		// 选择出交配池
-		//Population matePool = getMatePool();//1随机 2this相邻
+		Population matePool = getMatePool();//1随机 2this相邻
 		// 将交配池中的个体按指定的概率进行交配
-		Population p1 = this.crossoverPopulaiton(NSGAV_II.crossoverRate);
+		Population p1 = matePool.crossoverPopulaiton(project.getNSGAV_II().crossoverRate,1);
 		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
 		//Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
         //使用变邻搜索  B-VND first-improvement
-		Population p2 = p1.variableNeighborhoodDescent();
+		Population p2 = p1.variableNeighborhoodDescent(1,v);
 		//Population p2 = p1.variableNeighborhoodDescentVP();
 		// 将两个种群合并
+		/*Population p3=p2.extremeSearch();*/
 		Population mergedPopulation = merged(this,p2);
 		// 从混合种群中选择前populationSize个个体作为新一代父代种群
-		OffSpring = mergedPopulation.slectPopulationC(NSGAV_II.populationSize,false);
+		OffSpring = mergedPopulation.slectPopulationC(project.getNSGAV_II().populationSize,false);
 		return OffSpring;
+	}
+	/*
+	 * 选取部分个体进行极端搜索
+	 */
+	private Population extremeSearch() {
+		int numC=5;
+		Population popCost=new Population(numC,project);
+		
+		return null;
 	}
 	/*
 	 * @param  p种群数组
@@ -405,22 +423,22 @@ public class Population {
        //setMaxObj(max);
 	   initialHeuristic().project.setTempObj(max);
 	}
-	//变邻搜索
-	private Population variableNeighborhoodDescent() {
+	//变邻搜索  第一个是
+	private Population variableNeighborhoodDescent(int e, int v) {
 		Population newPopulation = new Population(populationsize,project);
 		for (int i = 0; i < populationsize; i++) {
 			Individual parent = population[i];
-			Individual son = parent.variableNeighborDecent();
+			Individual son = parent.variableNeighborDecent(e,v);
 			newPopulation.setIndividual(i, son);
 		}
 		return newPopulation;
 	}
 	//变邻搜索  保存非支配解
-	private Population variableNeighborhoodDescentVP() {
+	private Population variableNeighborhoodDescentVP(int e) {
 		List<Individual>indivs=new ArrayList<>();
 		for (int i = 0; i < populationsize; i++) {
 			Individual parent = population[i];
-			List<Individual> vs = parent.variableNeighborDecentVP();
+			List<Individual> vs = parent.variableNeighborDecentVP(e);
 			indivs.addAll(vs);
 			//System.out.println(i);
 		}
@@ -457,25 +475,22 @@ public class Population {
 
 	/**
 	 * 单点交叉方法 任务执行链表和资源分配链表使用同一个交叉点，交叉后，子代个体的任务链表仍然是紧前关系可行链表
+	 * @param m 
 	 * 
 	 * @param matePool
 	 *            交配池种群
 	 * @return 返回新一代种群
 	 */
-	public Population crossoverPopulaiton(double crossoverRate) {
+	public Population crossoverPopulaiton(double crossoverRate, int m) {
 		Population newPopulation = new Population(populationsize,project);
 		for (int i = 0; i < populationsize - 1; i += 2) {
 			Individual parent1 = population[i];
 			Individual parent2 = population[i + 1];
 			if (crossoverRate > Math.random()) {
-				
 				// 获取任务链表的交叉点[1,chromosomeLength]
 				int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
-				if(parent1.getChromosome().get(0).size()!=parent2.getChromosome().get(0).size()) {
-					System.out.println("parent1!=parent2");
-				}
-				Individual son1 = parent1.Mating(parent2, swapPoint);
-				Individual son2 = parent2.Mating(parent1, swapPoint);
+				Individual son1 = parent1.Mating(parent2, swapPoint,m);
+				Individual son2 = parent2.Mating(parent1, swapPoint,m);
 				newPopulation.setIndividual(i, son1);
 				newPopulation.setIndividual(i + 1, son2);
 				
@@ -483,6 +498,9 @@ public class Population {
 				newPopulation.setIndividual(i, parent1);
 				newPopulation.setIndividual(i + 1, parent2);				
 			}
+		}
+		if(populationsize%2==1) {
+			newPopulation.setIndividual(populationsize-1, population[populationsize-1]);
 		}
 		return newPopulation;
 	}
@@ -504,7 +522,19 @@ public class Population {
 		}
 		return newPopulation;
 	}
-
+	/*
+	 * 变异 
+	 * @param k 变异类别
+	 */
+	private Population mutationPopulationV(double tMutationRate, double rMutationRate,int k) {
+		Population newPopulation = new Population(populationsize,project);
+		for (int i = 0; i < populationsize; i++) {
+			Individual parent = population[i];
+			Individual son = parent.mutationPopulationV(tMutationRate,rMutationRate,k);
+			newPopulation.setIndividual(i, son);
+		}
+		return newPopulation;
+	}
 
 
 
@@ -814,6 +844,167 @@ public class Population {
 		}
 		return this;
 	}
+	/**
+	 * 使用遗传算法获得下一代种群
+	 * 
+	 * @param project
+	 *            案例集
+	 * @return 下一代种群
+	 */
+	public Population getOffSpring_NSGA() {
+	
+		Population OffSpring = new Population(project.getNSGA_II().getPopulationSize(),project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndCrowD(this, project);
+		
+		// 选择出交配池
+		Population matePool = getMatePool();
 
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(project.getNSGA_II().crossoverRate,2);
+
+		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
+		Population p2 = p1.mutationPopulation(project.getNSGA_II().tMutationRate,project.getNSGA_II().rMutationRate);
+
+		// 将两个种群合并
+		Population mergedPopulation = merged(this,p2);
+
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		OffSpring = mergedPopulation.slectPopulation(project.getNSGA_II().populationSize);
+
+		return OffSpring;
+	}
+	/* 
+	 *  变邻搜索
+	 */
+	public Population getOffSpring_V(int k) {
+		/*Population OffSpring = new Population(project.getNSGAV_II().populationSize,project,false);*/
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndCrowD(this, project);
+		// 选择出交配池
+		Population matePool = getMatePool();
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(project.getNSGAV_II().crossoverRate,1);
+		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
+		Population p2 = p1.mutationPopulationV(0.1,project.getNSGAV_II().rMutationRate,k);//暂定0.1
+		// 将两个种群合并
+		Population mergedPopulation = merged(this,p2);
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		/*Population p3 = mergedPopulation.slectPopulationC(project.getNSGAV_II().populationSize,false);*/
+		Population p3 = mergedPopulation.slectPopulation(project.getNSGAV_II().populationSize);
+		return p3;
+	}
+	public Population getOffSpring_NSGAV_Extreme() {
+		Population OffSpring = new Population(project.getNSGAV_II().populationSize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndConsAndHyperVolume(this, project);
+		// 选择出交配池
+		Population matePool = getMatePool(); 
+
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(project.getNSGAV_II().crossoverRate,3);
+
+		//使用变邻搜索  B-VND first-improvement
+		Population p2 = p1.variableNeighborhoodDescent(3,0);
+		//Population p2 = p1.variableNeighborhoodDescentVP();
+		// 将两个种群合并
+		/*Population p3=p2.extremeSearch();*/
+		Population mergedPopulation = merged(this,p2);
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		OffSpring = mergedPopulation.slectPopulationC(project.getNSGAV_II().populationSize,false);
+
+		return OffSpring;
+	}
+	
+	/*
+	 * 获得帕累托前沿
+	 */
+	public List<Individual> getpareto() {
+		List<Individual> first=new ArrayList<>();
+		Individual[] indivs=this.getPopulation();
+		for(int i=0;i<indivs.length;i++) {
+			if(indivs[i].getNon_dominatedRank()==0) {
+				first.add(new Individual(indivs[i]));
+			}
+		}
+		return first;
+	}
+	/*
+	 * 添加帕累托到种群
+	 */
+	public Population addPareto(List<Individual> ...indivs) {
+		Population OffSpring = new Population(this.populationsize,project,false);
+		Individual[] individuals=this.getPopulation();
+		int newSize=individuals.length;
+		for(int i=0;i<indivs.length;i++) {
+			newSize+=indivs[i].size();
+		}
+		Individual[] combines=new Individual[newSize];
+		int total=0;
+		for(int i=0;i<individuals.length;i++) {
+			combines[total++]=individuals[i];
+		}
+		for(int i=0;i<indivs.length;i++) {
+			List<Individual> indivL=indivs[i];
+			for(int j=0;j<indivL.size();j++) {
+				combines[total++]=indivL.get(j);
+			}
+		}
+		Population mergedPopulation=new Population(newSize,this.getProject());
+		mergedPopulation.setPopulation(combines);
+		OffSpring = mergedPopulation.slectPopulationC(this.populationsize,false);
+		return OffSpring;
+	}
+	
+	
+	/*
+	 * 第二种变异 邻概率  遗传算法
+	 */
+	public Population getOffSpring_V2(int k) {
+		Population OffSpring = new Population(project.getNSGAV_II().populationSize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndCrowD(this, project);
+		// 选择出交配池
+		Population matePool = getMatePool();
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(project.getNSGAV_II().crossoverRate,2);
+		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
+		Population p2 = p1.mutationPopulation(0.6,project.getNSGAV_II().rMutationRate);
+		// 将两个种群合并
+		Population mergedPopulation = merged(this,p2);
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		OffSpring = mergedPopulation.slectPopulation(project.getNSGAV_II().populationSize);
+		return OffSpring;
+	}
+	/*
+	 * 将种群加入另外一种群 
+	 */
+	public Population addPareto(Population paretoPop) {
+		Population mergedPopulation=this.merged(this,paretoPop);
+		Population OffSpring = new Population(project.getNSGAV_II().populationSize,project,false);
+		OffSpring = mergedPopulation.slectPopulation(project.getNSGAV_II().populationSize);
+		return OffSpring;
+	}
+	/*
+	 * 帕累托前沿种群的进化采用邻解结构2 效果好  任务变异概率取0.6
+	 */
+	public Population getOffSpring_Pareto() {
+		Population OffSpring = new Population(this.populationsize,project,false);
+		// 种群进行非支配排序,设置种群中每个个体的非支配等级和拥挤度值
+		Tools.setRankAndCrowD(this, project);
+		// 选择出交配池
+		Population matePool = getMatePool();
+		// 将交配池中的个体按指定的概率进行交配
+		Population p1 = matePool.crossoverPopulaiton(project.getNSGAV_II().crossoverRate,2);
+		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
+		Population p2 = p1.mutationPopulation(0.6,project.getNSGAV_II().rMutationRate);
+		// 将两个种群合并
+		Population mergedPopulation = merged(this,p2);
+		// 从混合种群中选择前populationSize个个体作为新一代父代种群
+		/*Population p=Tools.getbestsolution(mergedPopulation,1, project);//有重复的风险
+*/		OffSpring = mergedPopulation.slectPopulationC(project.getNSGAV_II().populationSize,false);
+		return OffSpring;
+	}
+	
 	
 }

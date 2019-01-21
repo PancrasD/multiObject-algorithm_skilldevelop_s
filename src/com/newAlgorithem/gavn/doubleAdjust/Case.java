@@ -17,13 +17,16 @@ public class Case {
 	private int M;// 案例包含的资源数量
 	private int PR;// 案例包含的紧前关系数量
 	private int K;// 案例包含的技能类型数量
-   
+    private NSGA_II NSGA_II;
+    private  NSGAV_II NSGAV_II;
+    private  NSFFA NSFFA;
 	private List<Task> tasks = new ArrayList<>();//任务数组
 	private List<Resource> resources = new ArrayList<>();//资源数组
 	private List<Integer> characteristics = new ArrayList<>();//特征信息数组[任务数量，资源数量，紧前任务数量，技能种类]
 	private double borderDuration=0;//最大工期 累计加和
 	private double borderCost=0;//最大成本  最大工期*最大薪水
 	private double[] tempObj;//传递参数用的
+	int RunTime;
 	public Case() {
 		caseDefinition();
 	}
@@ -382,5 +385,38 @@ public class Case {
 	public void setTempObj(double[] tempObj) {
 		this.tempObj = tempObj;
 	}
+
+	public NSGA_II getNSGA_II() {
+		return NSGA_II;
+	}
+
+	public void setNSGA_II(NSGA_II nSGA_II) {
+		NSGA_II = nSGA_II;
+	}
+
+	public NSGAV_II getNSGAV_II() {
+		return NSGAV_II;
+	}
+
+	public void setNSGAV_II(NSGAV_II nSGAV_II) {
+		NSGAV_II = nSGAV_II;
+	}
+
+	public int getRunTime() {
+		return RunTime;
+	}
+
+	public void setRunTime(int runTime) {
+		RunTime = runTime;
+	}
+
+	public NSFFA getNSFFA() {
+		return NSFFA;
+	}
+
+	public void setNSFFA(NSFFA nSFFA) {
+		NSFFA = nSFFA;
+	}
+
 
 }

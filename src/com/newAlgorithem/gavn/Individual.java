@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+
+
 public class Individual {
 	// 个体染色体的维数
 	static final int chromosomeLayer = 2;
@@ -90,7 +92,63 @@ public class Individual {
 			chro.add(list1);
 		}
 		this.chromosome = chro;
-		this.obj=son.obj;
+		this.obj=new double[] {son.obj[0],son.obj[1]};
+	}
+	/*
+	 * 需要对染色体资源分配序列进行修正
+	 */
+	public Individual(List<List<Integer>> _chromosome, Case project, int mark) {
+		this.project = project;
+		settaskslist(project);
+		setResourcesList(project);
+		this.chromosome = _chromosome;
+		learnObjCompute(mark);
+	}
+	/*
+     * 修正型计算目标值
+   */
+	private void learnObjCompute(int mark) {
+		List<Integer> taskList = this.chromosome.get(0);
+		List<Integer> resList = this.chromosome.get(1);
+		int[] endtime_res = new int[project.getM()];
+		int workload[]= new int[project.getM()];
+		for (int j = 0; j < endtime_res.length ; j++) {
+			//用于记录每个资源释放时间
+			endtime_res[j] = 0;
+			workload[j]=0;
+		}
+		double rand1=Math.random();
+		for(int i = 0; i <taskList.size(); i++){
+			int tid=taskList.get(i);
+			ITask curTask = taskslist.get(tid-1);
+			int resourceid=resList.get(i);
+			IResource res=resourceslist.get(resourceid-1);
+			boolean is= isSuit(curTask,res);
+			if(!is) {
+				double rand2=Math.random();
+				List<Integer> list = curTask.getresourceIDs();
+				int B = (int) (rand2 * list.size());
+				resourceid = list.get(B);
+				resList.set(i, resourceid);//更新资源 更新染色体
+				res=resourceslist.get(resourceid-1);
+			}
+			this.singleCompute(curTask,res,endtime_res,workload);//动态计算
+		}
+		this.obj=new double[]{this.maxtime, this.cost};
+		
+	}
+    /*
+     * 资源是具有对应要求的技能类型 判断技能水平是否满足要求
+     * @return boolean 
+   */
+	private boolean isSuit(ITask curTask, IResource res) {
+		String skillType=curTask.getSkillType();
+		double requiredLevel=curTask.getSkillLevel();
+		double resLevel=res.getSkillsInfo().get(skillType);
+		if(resLevel>=requiredLevel) {
+			return true;
+		}
+		return false;
 	}
 	private void settaskslist(Case project){
 		List<Task> tasks=project.getTasks();
@@ -173,32 +231,18 @@ public class Individual {
 		for (int i = 0; i < crosspoint;i++){
 			int taskID=taskChrom.get(i);
 			_tasks.add(taskID);
-			try {
-				taskIndex[taskID-1]=1;
-			} catch (Exception e) {
-				System.out.println(taskChrom.size()+' ');
-				System.out.println(taskID);
-				e.printStackTrace();
-			}
+		    taskIndex[taskID-1]=1;
 		}
 		List<Integer> husbandTaskChrom=husband.chromosome.get(0);
 		for (int i = 0; i<husbandTaskChrom.size();i++){
 			int taskID=husbandTaskChrom.get(i);
-			try {
-				if (taskIndex[taskID-1]!=1){
+			if (taskIndex[taskID-1]!=1){
 					_tasks.add(taskID);
 				}
-			} catch (Exception e) {
-				System.out.println(taskChrom.size()+"问题");
-				System.out.println(taskID);
-				e.printStackTrace();
-			}
-		}
-		if(this.chromosome.get(0).size()!=husbandTaskChrom.size()) {
-			System.out.println("异常");
+			
 		}
 		son_chromosome.add(_tasks);
-		Individual son = new Individual(son_chromosome, project);	
+		Individual son = new Individual(son_chromosome, project);//1	
 		return son;
 	}
 	
@@ -690,8 +734,8 @@ public class Individual {
 			int B = (int) (rand2 * list.size());
 			int resourceid = list.get(B);
 			resourceList.add(resourceid);
-			
-			this.singleCompute(resourceid,taskList.get(i),endtime_res,workload);//动态计算
+			IResource res=resourceslist.get(resourceid-1);
+			this.singleCompute(curTask,res,endtime_res,workload);//动态计算
 		}
 		this.obj=new double[]{this.maxtime, this.cost};
 		this.chromosome.add(resourceList);
@@ -709,7 +753,7 @@ public class Individual {
 		}
 	   double rand=Math.random();
 	    int select=0;
-	    if(rand<NSGAV_II.pr) {//平衡加入随机
+	    if(rand<0) {//平衡加入随机NSGAV_II.pr
 	    	/*double rand1=Math.random();
 	    	if(rand1<1) {
 	    		select=0;
@@ -745,8 +789,9 @@ public class Individual {
 			case 3:resourceid=selectResourceB(curTask,endtime_res,workload,0);break;//工期
 			
 			}
+			IResource res=resourceslist.get(resourceid-1);
 			resourceList.add(resourceid);
-			this.singleCompute(resourceid,tid,endtime_res,workload);//动态计算
+			this.singleCompute(curTask,res,endtime_res,workload);//动态计算
 		}
 		this.obj=new double[]{this.maxtime, this.cost};
 		this.chromosome.add(resourceList);
@@ -947,12 +992,12 @@ public class Individual {
 		return resourceid;
 	}
 
-	public void singleCompute(int rid, int tid, int[] endtime_res, int[] workload){
-		ITask task = taskslist.get(tid-1);
-		IResource resource = resourceslist.get(rid-1);
+	public void singleCompute(ITask curTask, IResource res, int[] endtime_res, int[] workload){
+		ITask task = curTask;
+		IResource resource = res;
 	    if(!canInsert(resource, task,workload)){//不存在紧前调度
 			//阶段性计算：更新资源可用时间，更新任务开始结束时间
-			phaseCompute(rid, tid, endtime_res,workload);
+			phaseCompute(curTask, res, endtime_res,workload);
 			//更新技能水平：当前技能表，技能执行时间表	
 			updateSkill(resource, task);
 			//计算目标值： 工期 成本 
@@ -980,9 +1025,11 @@ public class Individual {
 		this.cost +=Math.ceil (realDuration*salary);
 	}
 	
-	public void phaseCompute(int rid, int tid, int[] endtime_res, int[] workload){
+	public void phaseCompute(ITask curTask, IResource res, int[] endtime_res, int[] workload){
 		int endtime = 0;
-		ITask curtask = taskslist.get(tid-1);
+		ITask curtask = curTask;
+		int rid=res.getResourceID();
+		int tid=curTask.getTaskid();
 		String qtype = curtask.getSkillType();
 		IResource resource = resourceslist.get(rid-1);
 		double qinit = resource.getSkillsInfo().get(qtype);
@@ -1266,12 +1313,12 @@ public class Individual {
 		Individual compare=this;
 		//随机序列 1-5
 		List<Integer> sequence=new ArrayList<>();
-		for(int i=0;i<3;i++) {
+		for(int i=0;i<5;i++) {
 			sequence.add(i+1);
 		}
 		Collections.shuffle(sequence);
 		int k=1;//第一个邻结构的序号
-		while(k<=3) {
+		while(k<=5) {
 			Individual son=compare.variableNeighborWithFirst(sequence.get(k-1));//使用随机序列顺序搜索
 			if(Tools.Dominated(son,compare,this.project)==1) {
 				compare=son;
@@ -1319,10 +1366,10 @@ public class Individual {
 		switch(k) {
 		   case 1:  variableNeighbor_NeighborOne(taskLength,_tasks); break;
 		   case 2:  variableNeighbor_NeighborProb(taskLength,_tasks); break;
-		   /*case 3:  variableNeighbor_ForwardInsert(taskLength,_tasks); break;
+		   case 3:  variableNeighbor_ForwardInsert(taskLength,_tasks); break;
 		   case 4:  variableNeighbor_BackWordInsert(taskLength,_tasks); break;
-		   case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;*/
-		   case 3:  this.variableNeighbor_adjustSequence(taskLength,_tasks);break;
+		   case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;
+		  /* case 3:  this.variableNeighbor_adjustSequence(taskLength,_tasks);break;*/
 		}
 		son_chromosome.add(_tasks);
 		Individual son = new Individual(son_chromosome,project);

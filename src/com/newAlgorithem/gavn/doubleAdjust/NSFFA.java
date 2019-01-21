@@ -13,5 +13,13 @@ public class NSFFA {
 	public static int NE = 7;
 	
 	public static int maxGenerations =250;
+	public int RunTime;
+	public int getRunTime() {
+		return RunTime;
+	}
+	public void setRunTime(int runTime) {
+		RunTime = runTime;
+	}
+	
 
 }

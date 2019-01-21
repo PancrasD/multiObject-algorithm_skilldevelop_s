@@ -52,7 +52,14 @@ public class ComputeCoverage {
 	  	   }
 	  	SortByNumber(domi_list2);
 	  	//输出
-	  	File out_f=new File(output);
+	  	output(output,domi_list1,domi_list2);
+	  	
+	}
+	/*
+	 * 输出数据
+	 */
+	private static void output(String output, List<Entry<String, Double>> domi_list1, List<Entry<String, Double>> domi_list2) {
+		File out_f=new File(output);
 	  	if(out_f.exists()) out_f.delete();
 	  	out_f.mkdirs();
 	  	String coverge=output+"/"+"coverage.txt";
@@ -71,7 +78,8 @@ public class ComputeCoverage {
 	  	}catch(Exception e) {
 	  		e.printStackTrace();
 	  	}
-	}
+	
+}
 	//按照文件名编号排序以便输出
 	private static void SortByNumber(List<Entry<String, Double>> domi_list) {
 		Collections.sort(domi_list, new Comparator<Map.Entry<String, Double>>() {

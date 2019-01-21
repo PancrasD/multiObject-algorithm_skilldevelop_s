@@ -13,7 +13,7 @@ import java.util.List;
 
 public class NumericalTest_gvn {
 	public static void main(String[] args) {
-		
+		args[0]="gv";
         if (args.length==1){
             File ff = new File("case_def");
             //获取案例库case_def文件目录
