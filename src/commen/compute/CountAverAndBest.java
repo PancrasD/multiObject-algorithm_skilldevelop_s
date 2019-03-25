@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
@@ -16,15 +15,50 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.junit.Test;
+
 public class CountAverAndBest {
-   public static void main(String[]args) {
-	   String cdic="average/";//子文件夹
-	   String name="NSGA_0121111018_run1";//
+   /*
+    * 计算正交试验得到的试验结果的平均值 便于分析参数组合
+    * @param head 0-5 6-9次组合的文件目录头
+    */
+   @Test
+   public void runExperiment() {
+	   String name[]=new String[9];
+	   String head="NSGAV_H0322094706_";
+	   String cdic="average_GAVN200_200_40_90_9/";//子文件夹
+	   List<Map<String,Double>> all=new ArrayList<>();
+	   for(int i=0;i<5;i++) {
+		   name[i]=head+(i+1);
+		   comput(name[i],cdic,all);
+	   }
+	   head="NSGAV_H0322095207_";
+	   for(int i=5;i<9;i++) {
+		   name[i]=head+(i+1);
+		   comput(name[i],cdic,all);
+	   }
+	   
+   }
+   /*
+    * 计算算法20次试验得到的试验结果的平均指标值
+    * 可以是超体积和MID
+    */
+   @Test
+   public void test() {
+	   List<Map<String,Double>> all=new ArrayList<>();
+	   String name="NSGAV_H0308171112_run1_200";
+	   String cdic="average/反转MID";//子文件夹
+	   comput(name,cdic,all);
+   }
+   private  void computExp(String name) {
+  	   String cdic="average/";//子文件夹
+	   //String name;//
 	   String  dic="data/"+name;
 	   String head=buildFileName();
 	   String out_dic="data/"+cdic+"result"+name+head;
@@ -74,9 +108,71 @@ public class CountAverAndBest {
 	   //总的统计输出
 	   outprintAverage(countresultH,aver_out);
 	   //copyBestToDic(best_out,countresultH,dic,childdicHead);
-	  
-   } 
-     //复制最佳的超体积结果对应的案例到同意文件夹下
+	
+}
+    /*
+     * @param name
+     * @param cdic
+     * @param all 链表 分别对应多次试验 value是一个map  map-key:案例名字 map-value:案例
+     */
+     private static void comput(String name,String cdic, List<Map<String, Double>> all) {
+    	
+  	   //String name;//
+       Map<String, Double>  map=new HashMap<>();
+  	   String  dic="data/"+name;
+  	   String head=buildFileName();
+  	   String out_dic="data/"+cdic+"result"+name+head;
+  	   String aver_out="data/"+cdic+"average"+name+head;
+  	   String best_out="data/"+cdic+"best"+name+head;
+  	   File dic_f=new File(dic);
+  	   String[] childDics=dic_f.list();
+  	   String childdicHead=childDics[0].substring(0, childDics[0].indexOf('_')+1);
+  	   //文件夹排序 按照数字编号 以标识最大超体积文件所在的文件夹位置
+  	   childDics=sortDic(childDics,childdicHead);
+  	   //从案例的运行实验结果读出结果值
+  	   List<Map<String,List<String>>> countAll=new ArrayList<>();
+  	   countAll=countAll(dic,childDics);
+  	   Map<String,List<String>> countH=countAll.get(0);
+  	   Map<String,List<String>> countT=countAll.get(1);
+  	   //计算总的平均
+  	   Map<String,List<Double>> countresultH=new TreeMap<>();
+  	   for(Map.Entry<String, List<String>> entry:countH.entrySet()) {
+  		   String key=entry.getKey();
+  		   List<String> hyper=entry.getValue();
+  		   double sum=0;
+  		   int maxHIndex=0;
+  		   double maxH=Double.parseDouble(hyper.get(maxHIndex));
+  		   for(int m=0;m<hyper.size();m++) {
+  			   sum+=Double.parseDouble(hyper.get(m));
+  			   if(maxH<Double.parseDouble(hyper.get(m))) {
+  				   maxH=Double.parseDouble(hyper.get(m));
+  				   maxHIndex=m;
+  			   }
+  		   }
+  		   double aver=sum/hyper.size();
+  		   List<Double> result=new ArrayList<>();
+  		   result.add(aver);
+  		   map.put(key, aver);
+  		   result.add((double)(maxHIndex));
+  		   result.add(maxH);
+  		   //时间
+  		   List<String> time=countT.get(key);
+  		   double sumT=0;
+  		   for(int m=0;m<time.size();m++) {
+  			   sumT+=Double.parseDouble(time.get(m));
+  		   }
+  		   double averT=sumT/time.size();
+  		   result.add(averT);
+  		   countresultH.put(key, result);
+  	   }
+  	   //outputResult(countH,out_dic);
+  	   //总的统计输出
+  	   all.add(map);
+  	   outprintAverage(countresultH,aver_out);
+  	   //copyBestToDic(best_out,countresultH,dic,childdicHead);
+	
+}
+	//复制最佳的超体积结果对应的案例到同意文件夹下
      private static void copyBestToDic(String best_out, Map<String, List<Double>> countresultH, String dic,String childdicHead) {
     	 
     	 File f=new File(best_out);
@@ -126,7 +222,7 @@ public class CountAverAndBest {
 				read=new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 			    String line=null;
 				while((line=read.readLine())!=null) {
-					if(line.startsWith("超体积")) {
+					if(line.startsWith("反转MID")) {
 						String str[]=line.split(":");
 						List<String> hypervolume=countH.get(list[i]);
 						if(hypervolume==null) {
@@ -242,7 +338,7 @@ public class CountAverAndBest {
               for(int k=0;k<av_list.size();k++) {
   			  write.write(av_list.get(k).getKey()+ " " );
   			  List<Double> result=av_list.get(k).getValue();
-  			  write.write("平均超体积  "+result.get(0)+" "+"最大超体积为  "+result.get(1)+" "+result.get(2)+" "+"平均时间"+result.get(3));
+  			  write.write("平均  "+result.get(0)+" "+"最大  "+result.get(1)+" "+result.get(2)+" "+"平均时间"+result.get(3));
   			  write.newLine();
                 }
               write.close();

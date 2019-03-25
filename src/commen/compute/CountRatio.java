@@ -27,8 +27,8 @@ public class CountRatio {
 	public  static final String GAVN="GAVN";
 	public static void main(String[] args) {
 		String dic="data/";
-		String cdic1="NSGA_0115191617_run1";
-		String cdic2="NSGAV_H0115164214_run1";
+		String cdic1="NSGA_0304105124_run1";
+		String cdic2="NSGAV_H0304162138_run1";
 		Map<String,List<List<Double>>> result1=new TreeMap<>();
 		Map<String,List<List<Double>>> result2=new TreeMap<>();
 		result1=readResult(dic+cdic1,result1);
