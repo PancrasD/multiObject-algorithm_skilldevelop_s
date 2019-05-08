@@ -51,14 +51,14 @@ public class Task implements Cloneable {
 		this.skill=skill;
 		this.skillType=skill.split(":")[0].trim();
 		this.pretasknum = 0;
-		this.skillLevel = Integer.valueOf(skill.split(":")[1])+1;
+		this.skillLevel = Integer.valueOf(skill.split(":")[1]);
 		/*this.standardDuration =duaration*skillLevel;*/
 	}
 	public Task(int taskID,int duaration,String skill,String pretaskIDs){
 		this.taskID=taskID;
 		this.duaration=duaration;
 		this.skill=skill;
-		this.skillLevel = Integer.valueOf(skill.split(":")[1])+1;
+		this.skillLevel = Integer.valueOf(skill.split(":")[1]);
 		this.skillType=skill.split(":")[0].trim();
 		/*this.standardDuration = duaration*skillLevel;*/
 		String[] pre_IDs = pretaskIDs.trim().split(" ");

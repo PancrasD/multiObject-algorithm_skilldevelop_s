@@ -14,7 +14,7 @@ import java.util.List;
 public class NumericalTest_gvn {
 	public static void main(String[] args) {
 		args=args.length==0?new String[1]:args;
-		args[0]="gv";
+		args[0]="g";
         if (args.length==1){
             File ff = new File("case_def");
             //获取案例库case_def文件目录
@@ -276,7 +276,7 @@ public class NumericalTest_gvn {
 				time=(t2-startTime)/1000;
 			}
 			//从最后得到种群中获取最优解集
-			Population solutions = Tools.getbestsolution(P, project,0);
+			Population solutions = Tools.getbestsolution(P,1, project);//Tools.getbestsolution(P, project,0);
 		    //输出最优解集
 			//Tools.printsolutions(solutions,startTime,datafile);	
 			 File f = new File(datafile);

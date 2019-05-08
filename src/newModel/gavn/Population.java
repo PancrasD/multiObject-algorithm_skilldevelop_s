@@ -27,6 +27,9 @@ public class Population {
 		this.project=project;
 		this.populationObj = populationObjCompute(population);
 	}
+	/*
+	 * 初始化建立种群
+	 */
 	public Population(int populationSize, Case project,boolean initial) {
 		this.populationsize = populationSize;
 		this.project = project;
@@ -56,35 +59,7 @@ public class Population {
 		return populationObj;
 	}
 	
-	// 获取种群的个体成员
-	public Individual[] getPopulation() {
-		return this.population;
-	}
-
-	// 获取种群的目标函数集合
-	public List<double[]> getPopulationObj() {
-		return this.populationObj;
-	}
-
-	// 获取种群大小
-	public int size() {
-		return this.populationsize;
-	}
-
-	// 设置种群中的个体
-	public Individual setIndividual(int offset, Individual individual) {
-		return population[offset] = individual;
-	}
-		
 	
-	public int getPopulationsize() {
-		return populationsize;
-	}
-
-	public void setPopulationsize(int populationsize) {
-		this.populationsize = populationsize;
-	}
-
 	public Population merged(Population p1,Population p2){
 		List<Individual> mergedList = new ArrayList<>();
 		for (int i = 0; i < p1.size(); i++) {
@@ -361,7 +336,7 @@ public class Population {
 		// 选择出交配池
 		//Population matePool = getMatePool();//1随机 2this相邻
 		// 将交配池中的个体按指定的概率进行交配
-		Population p1 = this.crossoverPopulaiton(NSGAV_II.crossoverRate);
+		Population p1 = this.crossoverPopulaiton(NSGAV_II.crossoverRate,1);
 		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
 		//Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
         //使用变邻搜索  B-VND first-improvement
@@ -454,9 +429,10 @@ public class Population {
 	 * 
 	 * @param matePool
 	 *            交配池种群
+	 * @param  mark 1-变邻  2 遗传
 	 * @return 返回新一代种群
 	 */
-	public Population crossoverPopulaiton(double crossoverRate) {
+	public Population crossoverPopulaiton(double crossoverRate,int mark) {
 		Population newPopulation = new Population(populationsize,project);
 		for (int i = 0; i < populationsize - 1; i += 2) {
 			Individual parent1 = population[i];
@@ -466,8 +442,8 @@ public class Population {
 				// 获取任务链表的交叉点[1,chromosomeLength]
 				int swapPoint = (int) (Math.random() * parent1.getChromosome().get(0).size());
 				
-				Individual son1 = parent1.Mating(parent2, swapPoint);
-				Individual son2 = parent2.Mating(parent1, swapPoint);
+				Individual son1 = parent1.Mating(parent2, swapPoint,mark);
+				Individual son2 = parent2.Mating(parent1, swapPoint,mark);
 				newPopulation.setIndividual(i, son1);
 				newPopulation.setIndividual(i + 1, son2);
 				
@@ -746,13 +722,7 @@ public class Population {
 		return sum;
 	}
 
-	public Case getProject() {
-		return project;
-	}
 
-	public void setProject(Case project) {
-		this.project = project;
-	}
 
 	public Population getOffSpring_new1() {
 		// TODO Auto-generated method stub
@@ -788,16 +758,7 @@ public class Population {
 		Population pop=new Population(population,project);
 		return pop;
 	}
-	public void setPopulation(Individual[] population) {
-		this.population = population;
-	}
 	
-	public double[] getMaxObj() {
-		return MaxObj;
-	}
-	public void setMaxObj(double[] maxObj) {
-		MaxObj = maxObj;
-	}
 	public Population initialHeuristic() {
 		Individual[] indivs=this.getPopulation();
 		for(int i=0;i<this.getPopulationsize();i++) {
@@ -823,7 +784,7 @@ public class Population {
 		Population matePool = getMatePool();
 
 		// 将交配池中的个体按指定的概率进行交配
-		Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate);
+		Population p1 = matePool.crossoverPopulaiton(NSGA_II.crossoverRate,1);//换成2
 
 		// 将产生的子代种群进行变异（tMutationRate：任务序列变异概率，rMutationRate 资源序列编译概率）
 		Population p2 = p1.mutationPopulation(NSGA_II.tMutationRate,NSGA_II.rMutationRate);
@@ -836,6 +797,51 @@ public class Population {
 
 		return OffSpring;
 	}
+	public Case getProject() {
+		return project;
+	}
+
+	public void setProject(Case project) {
+		this.project = project;
+	}
+	public void setPopulation(Individual[] population) {
+		this.population = population;
+	}
 	
+	public double[] getMaxObj() {
+		return MaxObj;
+	}
+	public void setMaxObj(double[] maxObj) {
+		MaxObj = maxObj;
+	}
+    // 获取种群的个体成员
+	public Individual[] getPopulation() {
+		return this.population;
+	}
+
+	// 获取种群的目标函数集合
+	public List<double[]> getPopulationObj() {
+		return this.populationObj;
+	}
+
+	// 获取种群大小
+	public int size() {
+		return this.populationsize;
+	}
+
+	// 设置种群中的个体
+	public Individual setIndividual(int offset, Individual individual) {
+		return population[offset] = individual;
+	}
+		
+	
+	public int getPopulationsize() {
+		return populationsize;
+	}
+
+	public void setPopulationsize(int populationsize) {
+		this.populationsize = populationsize;
+	}
+
 	
 }

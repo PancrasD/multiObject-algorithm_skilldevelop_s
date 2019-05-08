@@ -19,5 +19,7 @@ public class NSGAV_II {
 	public static final int  neighborN = 5;
 	//局部调整长度
 	public static  final int len=5;
+	//变邻交换概率
+	public static final double neighborP=0.1;
 	
 }

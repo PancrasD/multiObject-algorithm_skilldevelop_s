@@ -436,8 +436,6 @@ public class Tools {
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				int flag=0;
-				int li=npbackup[o1];
-				int l2=npbackup[o2];
 			    if(npbackup[o1]>npbackup[o2]) {
 			    	flag=1;
 			    }else if(npbackup[o1]<npbackup[o2]) {
@@ -553,17 +551,32 @@ public class Tools {
 		Population solutions = null;
 		// P种群进行非支配排序
 		List<List<Integer>> indivIndexRank = non_Dominated_Sort(p,le, project);
-		 
+		Map<Double,HashMap<Double,Boolean>> map=new HashMap<Double,HashMap<Double,Boolean>>();//去重
 		/*for(int m=0;m<indivIndexRank.size();m++) {*/
-			List<Integer> rank0=indivIndexRank.get(0);
+		List<Integer> rank0=indivIndexRank.get(0);
 		if (rank0.size() != 0) {
 			// 算法求得的最优解集
-			solutions = new Population(rank0.size(),project);
+			List<Individual> list=new ArrayList<>();
 			for (int i = 0; i < rank0.size(); i++) {
-				solutions.setIndividual(i, p.getPopulation()[rank0.get(i)]);
+				Individual indiv=p.getPopulation()[rank0.get(i)];
+				double[] obj= indiv.getObj();
+				if(map.get(obj[0])!=null&&map.get(obj[0]).get(obj[1])!=null) {
+					continue;
+				}
+				if(map.get(obj[0])==null) {
+					HashMap<Double,Boolean> map1=new HashMap<Double,Boolean>();
+					map1.put(obj[1], true);
+					map.put(obj[0], map1);
+				}else {
+					map.get(obj[0]).put(obj[1], true);
+				}
+				list.add(indiv);
+			}
+			solutions = new Population(list.size(),project);
+			for (int i = 0; i < list.size(); i++) {
+				solutions.setIndividual(i, list.get(i));
 			}
 			solutions = sortByObj(solutions, 0);
-			
 		}else{
 			solutions = new Population(0,project);
 		}
@@ -571,6 +584,7 @@ public class Tools {
 		}
 		Population mergedPopulation =solutions.merged(pop);
 		return mergedPopulation;	*/
+		
 		return solutions;
 	}
 	

@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import newModel.doubleAdjust.basis.Case;
+import newModel.doubleAdjust.basis.IResource;
+import newModel.doubleAdjust.basis.ITask;
+import newModel.doubleAdjust.basis.Resource;
+import newModel.doubleAdjust.basis.Task;
 
 
 public class Individual {
@@ -32,10 +37,13 @@ public class Individual {
 	private int non_dominatedRank;
 	// 个体的在非支配层中的拥挤度
 	private double crowDistance;
+	// 个体的超体积
 	private double hyperVolume;
+	//案例对象
 	private Case project;
 	private boolean isTeacher = false;
-
+    //hash
+	private int hashCode;
 	/*
 	 * @param  _chromosome 染色体序列
 	 * @param project 案例
@@ -48,7 +56,8 @@ public class Individual {
 		setResourcesList(project);
 		this.chromosome = _chromosome;
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
-		objComputeReselectExtreme();		
+		objComputeReselectExtreme();	
+		Tools.setHashCode(this);
 	}
 		
 
@@ -65,7 +74,52 @@ public class Individual {
 		deciphering(project);
 		//随机产生资源序列，计算目标函数值
 		learnObjCompute(initial);
+		Tools.setHashCode(this);
 	}
+	/*
+	 * 单编码的初始化
+	 */
+	public Individual(Case project, boolean initial,boolean single) {
+		this.project = project;
+		settaskslist(project);
+		setResourcesList(project);
+		//随机产生DNA及任务序列
+		deciphering(project,single);
+		//随机产生资源序列，计算目标函数值
+		learnObjCompute(initial);
+		Tools.setHashCode(this,single);
+	}
+	/*
+	 * 单编码的求解
+	 */
+	public Individual(List<List<Integer>> _chromosome, Case project,boolean single) {
+		this.project = project;
+		settaskslist(project);
+		setResourcesList(project);
+		this.chromosome = _chromosome;
+		objComputeAdjustRandom();
+		Tools.setHashCode(this,single);
+	}
+	/*
+	 * 单资源链表编码下的任务链表
+	 */
+	private void deciphering(Case project, boolean single) {
+		List<Integer> taskList = new ArrayList<Integer>();
+		List<Task> tasks=this.project.getTasks();
+		for(int i=0;i<tasks.size();i++) {
+			if(tasks.get(i).getsuccessortaskIDS().size()>0) {
+				taskList.add(i+1);
+			}
+		}
+		for(int i=0;i<tasks.size();i++) {
+			if(tasks.get(i).getsuccessortaskIDS().size()==0) {
+				taskList.add(i+1);
+			}
+		}
+		this.chromosome.add(taskList);
+	}
+
+
 	/*
 	 * @param indiv 个体实例
 	 * 复制个体
@@ -84,6 +138,7 @@ public class Individual {
 			chro.add(list1);
 		}
 		this.chromosome = chro;
+		this.hashCode=indiv.hashCode;
 		this.obj=new double[] {indiv.obj[0],indiv.obj[1]};
 	}
 
@@ -101,10 +156,11 @@ public class Individual {
 		setResourcesList(project);
 		this.chromosome = _chromosome;
 		switch(mark) {
-			case 1:objComputeAdjustRandom();break;//双链表中的资源序列修正 遗传变邻搜索 可以考虑极端修正
+			case 1:objComputeAdjustRandom();break;//双链表中的资源序列修正 随机修正
 			case 2:objComputeAdjustRandom();break;//双链表中的资源序列修正  遗传算法
-			case 3:objComputeReselectExtreme();break;//极端搜索
+			case 3:objComputeAdjustBasedKnowledge();break;//知识修正objComputeReselectExtreme
 		}
+		Tools.setHashCode(this);
 	}
 	/*
      * 修正型计算目标值
@@ -125,7 +181,8 @@ public class Individual {
 			ITask curTask = taskslist.get(tid-1);
 			int resourceid=resList.get(i);
 			IResource res=resourceslist.get(resourceid-1);
-			boolean is= isSuit(curTask,res);
+			boolean is = isSuit(curTask,res);
+			
 			if(!is) {
 				double rand4=Math.random();
 				List<Integer> list = curTask.getresourceIDs();
@@ -133,6 +190,43 @@ public class Individual {
 				resourceid = list.get(B);
 				resList.set(i, resourceid);//更新资源 更新染色体
 				res=resourceslist.get(resourceid-1);
+			}
+			this.singleCompute(curTask,res,endtime_res,workload);//动态计算
+		}
+		this.obj=new double[]{this.maxtime, this.cost};
+	}
+	/*
+     * 修正型计算目标值
+     */
+	private void objComputeAdjustBasedKnowledge() {
+		
+		List<Integer> taskList = this.chromosome.get(0);
+		List<Integer> resList = this.chromosome.get(1);
+		int[] endtime_res = new int[project.getM()];
+		int workload[]= new int[project.getM()];
+		for (int j = 0; j < endtime_res.length ; j++) {
+			//用于记录每个资源释放时间
+			endtime_res[j] = 0;
+			workload[j]=0;
+		}
+		for(int i = 0; i <taskList.size(); i++){
+			int tid=taskList.get(i);
+			ITask curTask = taskslist.get(tid-1);
+			int resourceid=resList.get(i);
+			IResource res=resourceslist.get(resourceid-1);
+			boolean is= isSuit(curTask,res);
+			if(!is) {
+				// 任务t的可执行资源集
+				Map<Integer,Double> capapleResource = project.getTasks().get(tid-1).getCapaleResource();
+				// 利用轮盘赌法为任务t重新分配资源
+				resourceid= Tools.selectResource(capapleResource);
+				/*
+				double rand4=Math.random();
+				List<Integer> list = curTask.getresourceIDs();
+				int B = (int) (rand4 * list.size());
+				resourceid = list.get(B);
+				resList.set(i, resourceid);//更新资源 更新染色体
+				res=resourceslist.get(resourceid-1);*/
 			}
 			this.singleCompute(curTask,res,endtime_res,workload);//动态计算
 		}
@@ -271,7 +365,7 @@ public class Individual {
 		case 1:{//变邻搜索
 			double prob=Math.random();
 			if(prob<project.getNSGAV_II().resSp) {
-				 son=doubleSearch(_tasks,son_chromosome);//修正选择加极端重新选择 保留较好的个体
+				 son=doubleSearch(_tasks,_resources,son_chromosome);//修正选择加极端重新选择 保留较好的个体
 			}else {
 				 son = new Individual(son_chromosome, project,mark);	
 			 }
@@ -396,7 +490,7 @@ public class Individual {
 		son_chromosome.add(_ress);
 		double prob=Math.random();
 		if(prob<project.getNSGAV_II().resSp) {
-			Individual son=doubleSearch(_tasks,son_chromosome);//
+			Individual son=doubleSearch(_tasks,_ress,son_chromosome);//
 			return son;
 		}
 		Individual son = new Individual(son_chromosome,project,NSGAV_II.MARK);//1.0 随机修正
@@ -406,14 +500,17 @@ public class Individual {
     /*
       * 两轮搜索 返其大者
      */
-	private Individual doubleSearch(List<Integer> _tasks, List<List<Integer>> son_chromosome) {
+	private Individual doubleSearch(List<Integer> _tasks, List<Integer> _ress, List<List<Integer>> son_chromosome) {
 		List<List<Integer>> copy_chromosome=new ArrayList<>();
 		List<Integer> copy_tasks=new ArrayList<>();
+		List<Integer> copy_ress=new ArrayList<>();
 		for(int i=0;i<_tasks.size();i++) {
 			copy_tasks.add(_tasks.get(i));
+			copy_ress.add(_ress.get(i));
 		}
 		copy_chromosome.add(copy_tasks);
-		Individual son1=new Individual(copy_chromosome,project);//一个是补全
+		copy_chromosome.add(copy_ress);
+		Individual son1=new Individual(copy_chromosome,project,3);//一个是补全
 		Individual son2 = new Individual(son_chromosome,project,1);
 		int flag=Tools.Dominated(son1, son2, project);
 		if(flag==1) {
@@ -421,8 +518,8 @@ public class Individual {
 		}else if(flag==2){
 			return son2;
 		}else if(son1.obj[0]*son1.obj[1]>son2.obj[0]*son2.obj[1]) {
-			return son1;
-		}else return son2;
+			return son2;
+		}else return son1;//改变
 	}
 
 	// 获取该个体的染色体结构(taskid)
@@ -803,14 +900,14 @@ public class Individual {
 		}
 	   double rand=Math.random();
 	    int select=0;
-	    if(rand<0.6) {//平衡加入随机project.getNSGAV_II().pr
-	         select=1;//成本&&工期
+	    if(rand<0) {//平衡加入随机project.getNSGAV_II().pr
+	         select=0;//成本&&工期
 		}else {
 			double rand1=Math.random();
-			if(rand1<0.5) {//0.5
-				select=2;//成本
-			}else {
+			if(rand1<1) {//0.5
 				select=3;//工期
+			}else {
+				select=2;//成本
 			}
 		}
 		for(int i = 0; i <taskList.size(); i++){
@@ -1134,16 +1231,8 @@ public class Individual {
 	public boolean updateSkill(IResource resource, ITask task){
 		String qtype = task.getSkillType();
 		double qinit = resource.getSkillsInfo().get(qtype);
-		/*double m = resource.getLearnbility();
-		double dstan = task.getStandardDuration();
-		double M = 0.25;
-		double sstart = Math.pow(((1-M)*qinit)/(1-M*qinit), 1/m);//每次计算 耗费时间
-		double sdura = dstan/(qinit*8);
-		double tmp = Math.pow((sstart+sdura), m);
-		double qfinal = tmp/(M*tmp+1-M);*/
 		//更新当前技能水平表
 		double qfinal=qinit;
-		this.getProject();
 		if(qinit>=Case.getMaxLevel()) {//不再升级
 			
 		}else {
@@ -1152,12 +1241,9 @@ public class Individual {
 			double oldSustain=resource.getSustainTime().get(qtype);
 			double newSustain=excute+oldSustain;
 			double nextLevelTime = 0;
-			try {
-				nextLevelTime = resource.getNextLevelTime().get(qtype)[((int) qinit)];
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			if(newSustain>=nextLevelTime) {
+			nextLevelTime = resource.getNextLevelTime().get(qtype)[((int) qinit)];
+			
+			if(newSustain>=nextLevelTime) {//升级 持有经验时间归0
 				qfinal=qinit+1;
 				resource.putSkillsInfo(qtype, qfinal);
 				resource.putSustainTime(qtype, 0);
@@ -1258,7 +1344,7 @@ public class Individual {
 	 *            另一个个体对象
 	 * @return 返回较好的个体
 	 */
-	public Individual binaryTournament(Individual indiv1, Individual indiv2) {
+	public Individual binaryTournamentForHv(Individual indiv1, Individual indiv2) {
 		Individual individual = indiv1;
 
 		// int flag;
@@ -1287,7 +1373,35 @@ public class Individual {
 		}
 		return individual;
 	}
+	public Individual binaryTournament(Individual indiv1, Individual indiv2) {
+		Individual individual = indiv1;
 
+		// int flag;
+		// flag = Tools.Dominated(indiv1, indiv2);
+		int rank1 = indiv1.getNon_dominatedRank();
+		int rank2 = indiv2.getNon_dominatedRank();
+		if (rank1 < rank2) {
+			individual = indiv1;
+		}
+		if (rank1 > rank2) {
+			individual = indiv2;
+		}
+		if (rank1 == rank2) {
+			if (indiv1.getCrowDistance() < indiv2.getCrowDistance()) {
+				individual = indiv2;
+			}
+			if (indiv1.getCrowDistance()> indiv2.getCrowDistance()) {
+				individual = indiv1;
+			} else {
+				if (Math.random() >= 0.5) {
+					individual = indiv1;
+				} else {
+					individual = indiv2;
+				}
+			}
+		}
+		return individual;
+	}
 	public List<IResource> getResourceslist() {
 		return resourceslist;
 	}
@@ -1426,7 +1540,6 @@ public class Individual {
 				if(flag==1) {
 					compare=son;
 				}
-				k++;
 			}else {
 				k++;
 			}
@@ -1506,7 +1619,7 @@ public class Individual {
 		case 1:{//变邻搜索
 			double prob=Math.random();
 			if(prob<project.getNSGAV_II().resSp) {
-				 son=doubleSearch(_tasks,son_chromosome);//修正选择加极端重新选择 保留较好的个体
+				 son=doubleSearch(_tasks,_ress,son_chromosome);//修正选择加极端重新选择 保留较好的个体
 			}else {
 				 son = new Individual(son_chromosome, project,mark);	
 			 }
@@ -1664,7 +1777,7 @@ public class Individual {
         * 含资源序列的相邻交换   概率决定
      */
 	private void variableNeighbor_NeighborProb(int taskLength, List<Integer> _tasks, List<Integer> _ress) {
-		double neighborP=taskLength<=100?0.05:0.1;//步长0.03:0.015 
+		double neighborP=taskLength<=100?0.05:0.05;//步长0.03:0.015 
 		for (int geneIndex = 0; geneIndex < taskLength - 1; geneIndex++) {
 			if (neighborP > Math.random()) {
 				int taskGene1=_tasks.get(geneIndex);
@@ -1917,9 +2030,23 @@ public class Individual {
 			}
 		}
 	}
- 
-	
 
 
+	public int getHashCode() {
+		return hashCode;
+	}
 
+
+	public void setHashCode(int hashCode) {
+		this.hashCode = hashCode;
+	}
+   @Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Individual)) {
+			return false;
+		}
+
+		Individual individual = (Individual)o;
+		return this.hashCode == individual.getHashCode();
+	}
 }

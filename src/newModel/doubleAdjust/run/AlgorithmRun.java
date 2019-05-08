@@ -1,4 +1,4 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.run;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,16 +11,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import newModel.doubleAdjust.Individual;
+import newModel.doubleAdjust.NSFFA;
+import newModel.doubleAdjust.Population;
+import newModel.doubleAdjust.Tools;
+import newModel.doubleAdjust.algorithm.NTGA;
+import newModel.doubleAdjust.algorithm.QGA;
+import newModel.doubleAdjust.algorithm.ReinForcementLearning;
+import newModel.doubleAdjust.basis.Case;
 
 
-public class Algorithm implements Runnable{
+
+public class AlgorithmRun implements Runnable{
 	String[] fl;
 	ConcurrentHashMap<String, List<List<Double>>> countR;
 	Case para;
 	String arg;
 	String dic;
 	String case_def;
-	public Algorithm(String[] fl,String dic,String case_def,ConcurrentHashMap<String, List<List<Double>>> countR,Case para,String arg) {
+	public AlgorithmRun(String[] fl,String dic,String case_def,ConcurrentHashMap<String, List<List<Double>>> countR,Case para,String arg) {
 		this.fl=fl;
 		this.dic=dic;
 		this.case_def=case_def;
@@ -39,7 +48,11 @@ public class Algorithm implements Runnable{
 				}
                	String _fn = case_def+ "/" + fl[i];
                	String _fo = dic+"//NSGAVH_"+fl[i]+".txt";
-               	NSGAV_D_R_algorithm(_fn,_fo,countResult,para);
+               	//NSGAV_D_R_algorithm(_fn,_fo,countResult,para);
+               	QGA qga=new QGA(_fn,_fo,countResult,para);
+               	qga.schedule();
+               	//NSGAV_D_R_Sub_algorithm(_fn,_fo,countResult,para);
+               	//NSGAV_algorithm(_fn,_fo,countResult,para);
            }
 		}
 		else if(arg.equals("g")) {
@@ -53,7 +66,32 @@ public class Algorithm implements Runnable{
 				}
               	 NSGA_algorithm(_fn,_fo,countResult,para);
               }
-		}else if(arg.equals("h")) {
+		}if(arg.equals("ntga")) {
+			for(int i = 0; i<fl.length; i++){
+              	String _fn =  case_def+"/" + fl[i];
+              	String _fo = dic+"/NTGA_"+fl[i]+".txt";
+              	List<List<Double>>countResult=countR.get(fl[i]);
+				if(countResult==null) {
+					countResult=new ArrayList<>();
+					countR.put(fl[i], countResult);
+				}
+              	 NTGA ntga=new NTGA(_fn,_fo,countResult,para);
+              	 ntga.schedule();
+              }
+		}if(arg.equals("rl")) {
+			for(int i = 0; i<fl.length; i++){
+              	String _fn =  case_def+"/" + fl[i];
+              	String _fo = dic+"/RL_"+fl[i]+".txt";
+              	List<List<Double>>countResult=countR.get(fl[i]);
+				if(countResult==null) {
+					countResult=new ArrayList<>();
+					countR.put(fl[i], countResult);
+				}
+				ReinForcementLearning rl=new ReinForcementLearning(_fn,_fo,countResult,para);
+              	rl.schedule();
+              }
+		}
+		else if(arg.equals("h")) {
 			for(int i = 0; i<fl.length; i++){
 				List<List<Double>>countResult=countR.get(fl[i]);
 				if(countResult==null) {
@@ -67,7 +105,7 @@ public class Algorithm implements Runnable{
 		}else if(arg.equals("f")) {
 			for(int i = 0; i<fl.length; i++){
            	 String _fn =  "case_def/" + fl[i];
-           	 String _fo = "data/NSFFA_"+fl[i]+".txt";
+           	 String _fo = "data1.0/NSFFA_"+fl[i]+".txt";
            	 List<List<Double>>countResult=countR.get(fl[i]);
 					if(countResult==null) {
 						countResult=new ArrayList<>();
@@ -78,6 +116,7 @@ public class Algorithm implements Runnable{
 		}
 		
 	}
+
 	/*
 	 * 使用超启发式算法进行进化
 	 */
@@ -130,59 +169,38 @@ public class Algorithm implements Runnable{
 		     }       	
 	}
 	public  void NSGAV_D_R_algorithm(String casefile,String datafile, List<List<Double>> countResult,Case para){
-	       //记录开始计算的时间，用于统计本算法的总时间
-			long startTime = System.currentTimeMillis();
 			// 创建案例类对象
 			Case project = new Case(casefile);
 			project.setNSGAV_II(para.getNSGAV_II());
 			project.setRunTime(para.RunTime);
+			Case project1=new Case(project);
 			// 初始化种群
+			long startTime = System.currentTimeMillis();
 			Population P1 = new Population(project.getNSGAV_II().populationSize,project,true);
-			Population P2 = new Population(project.getNSGAV_II().populationSize,project,true);/*
-			Population P3 = new Population(project.getNSGAV_II().populationSize,project,true);
-			Population P4 = new Population(project.getNSGAV_II().populationSize,project,true);
-			Population P5 = new Population(project.getNSGAV_II().populationSize,project,true);*/
-			/*Population P6 = new Population(project.getNSGAV_II().populationSize,project,true);*/
-			/*int generationCount = 0; 
-	        //循环迭代 算法指定的次  ,数
-			while (generationCount < NSGAV_II.maxGenerations ) {
-				P = P.getOffSpring_NSGAV();
-				generationCount++;
-			}*/
-			long time=0;
-			long t2 = 0;
-			while (time < 30 ) {
+			Population P2 = new Population(project1.getNSGAV_II().populationSize,project1,true);
+			
+			int count=0;
+			while (count < 100000 ) {
 				int k1=(int) (Math.random()*5);
 				int k2=(int) (Math.random()*5);
-				P1 = P1.getOffSpring_V(k1);;//先去掉k 作为先导V
-				P2 = P2.getOffSpring_V(k2);;
-				/*P3 = P3.getOffSpring_NSGAV(3);
-				P4 = P4.getOffSpring_NSGAV(4);
-				P5 = P5.getOffSpring_NSGAV(5);*/
-				/*P6=P6.getOffSpring_NSGAV_Extreme();*/
+				P1 = P1.getOffSpring_V(k1);
+				P2 = P2.getOffSpring_V(k2);
 				List<Individual> indivs1=P1.getpareto();
-				/*List<Individual> indivs2=P2.getpareto();
-				List<Individual> indivs3=P3.getpareto();
-				List<Individual> indivs4=P4.getpareto();
-				List<Individual> indivs5=P5.getpareto();*/
-				List<Individual> indivs6=P2.getpareto();
-				/*P1=P1.addPareto(indivs2,indivs3,indivs4,indivs5,indivs6);
-				P2=P2.addPareto(indivs1,indivs3,indivs4,indivs5,indivs6);
-				P3=P3.addPareto(indivs1,indivs2,indivs4,indivs5,indivs6);
-				P4=P4.addPareto(indivs1,indivs2,indivs3,indivs5,indivs6);
-				P5=P5.addPareto(indivs1,indivs2,indivs3,indivs4,indivs6);
-				P6=P6.addPareto(indivs1,indivs2,indivs3,indivs4,indivs5);*/
-				P1=P1.addPareto(indivs6);
+				//P1=P1.getGuide(indivs1);
+				List<Individual> indivs2=P2.getpareto();
+				//P2=P2.getGuide(indivs6);
+				P1=P1.addPareto(indivs2);
 				P2=P2.addPareto(indivs1);
-				t2=System.currentTimeMillis();
-				time=(t2-startTime)/1000;
+				count+=(P1.getPopulationsize()*2+P2.getPopulationsize()*2+project.getCount()+project1.getCount());
+				project.setCount(0);
+				project1.setCount(0);
 			}
+			long endTime = System.currentTimeMillis();
 			//从最后得到种群中获取最优解集
-			//Population solutions =Tools.getbestsolution(P,project, 0);//输出rank为0  减少一次非支配排序
-			// 将两个种群合并
-			Population mergedPopulation =P1.merged(P1,P2);
-			mergedPopulation=mergedPopulation.slectPopulation(P1.getPopulationsize());
+			Population mergedPopulation =Tools.merged(P1,P2);
+			//mergedPopulation=mergedPopulation.slectPopulation(P1.getPopulationsize());//最多100
 			Population solutions = Tools.getbestsolution(mergedPopulation,1, project);
+			solutions=Tools.removeSame(solutions);//去重
 		    //输出最优解集
 			File f = new File(datafile);
 			PrintStream ps = null;
@@ -192,7 +210,53 @@ public class Algorithm implements Runnable{
 			   FileOutputStream fos = new FileOutputStream(f);
 			   ps = new PrintStream(fos);
 			   //输出最优解集
-			   Tools.printsolutions(solutions,startTime,countResult,ps);			   
+			   Tools.printsolutions(solutions,endTime-startTime,countResult,ps);			   
+			 } catch (IOException e) {
+				e.printStackTrace();
+			 }  finally {
+		        if(ps != null) 	ps.close();
+		     }       	
+	}
+	public  void NSGAV_D_R_Sub_algorithm(String casefile,String datafile, List<List<Double>> countResult,Case para){
+	      
+			// 创建案例类对象
+			Case project = new Case(casefile);
+			project.setNSGAV_II(para.getNSGAV_II());
+			project.setRunTime(para.RunTime);
+			Case project1=new Case(project);
+			// 初始化种群
+			long startTime = System.currentTimeMillis();
+			Population P1 = new Population(project.getNSGAV_II().populationSize,project,true);
+			Population P2 = new Population(project1.getNSGAV_II().populationSize,project1,true);
+			int count=0;
+			while (count < 100000 ) {
+				int k1=(int) (Math.random()*5);
+				int k2=(int) (Math.random()*5);
+				P1 = P1.getOffSpring_V_Sub(k1);
+				P2 = P2.getOffSpring_V_Sub(k2);
+				List<Individual> indivs1=P1.getpareto();
+				List<Individual> indivs2=P2.getpareto();
+				P1=P1.addPareto(indivs2);
+				P2=P2.addPareto(indivs1);
+				count+=(P1.getPopulationsize()*2+P2.getPopulationsize()*2+project.getCount()+project1.getCount());
+				project.setCount(0);
+				project1.setCount(0);
+			}
+			long endTime = System.currentTimeMillis();
+			//从最后得到种群中获取最优解集
+			Population mergedPopulation =Tools.merged(P1,P2);
+			Population solutions = Tools.getbestsolution(mergedPopulation,1, project);
+			solutions=Tools.removeSame(solutions);//去重
+		    //输出最优解集
+			File f = new File(datafile);
+			PrintStream ps = null;
+			 try {
+			   if (f.exists()) f.delete();
+			   f.createNewFile();
+			   FileOutputStream fos = new FileOutputStream(f);
+			   ps = new PrintStream(fos);
+			   //输出最优解集
+			   Tools.printsolutions(solutions,endTime-startTime,countResult,ps);			   
 			 } catch (IOException e) {
 				e.printStackTrace();
 			 }  finally {
@@ -200,9 +264,10 @@ public class Algorithm implements Runnable{
 		     }       	
 	}
 	/*@param caseFile:案例读取目录
-	 * @param dataFile:案例计算结果写入目录
+	 *@param dataFile:案例计算结果写入目录
+	 *  加强学习搜索
 	 */
-	public  void NSGAV_D_algorithm(String casefile,String datafile, List<List<Double>> countResult,Case para){
+	public  void NSGAV_D_S_algorithm(String casefile,String datafile, List<List<Double>> countResult,Case para){
 	       //记录开始计算的时间，用于统计本算法的总时间
 			long startTime = System.currentTimeMillis();
 			// 创建案例类对象
@@ -212,20 +277,8 @@ public class Algorithm implements Runnable{
 			// 初始化种群
 			Population P1 = new Population(project.getNSGAV_II().populationSize,project,true);
 			Population P2 = new Population(project.getNSGAV_II().populationSize,project,true);
-			/*Population P3 = new Population(project.getNSGAV_II().populationSize,project,true);
-			Population P4 = new Population(project.getNSGAV_II().populationSize,project,true);
-			Population P5 = new Population(project.getNSGAV_II().populationSize,project,true);*/
-			/*Population P6 = new Population(project.getNSGAV_II().populationSize,project,true);*/
-			
-			/*int generationCount = 0; 
-	        //循环迭代 算法指定的次  ,数
-			while (generationCount < NSGAV_II.maxGenerations ) {
-				P = P.getOffSpring_NSGAV();
-				generationCount++;
-			}*/
 			long time=0;
 			long t2 = 0;
-			
 			List<Individual> indivs1_s=P1.getpareto();
 			List<Individual> indivs2_s=P2.getpareto();
 			double hyper1_s=computeHyper(indivs1_s,project);
@@ -243,22 +296,11 @@ public class Algorithm implements Runnable{
 				prob[i]=1.0/5;
 			}
 			while (time < 30 ) {
-				/*int k1=(int) (Math.random()*5);//k1 k2加入直达
-				int k2=(int) (Math.random()*5);*/
 				int k1=selectSearch(prob,searchList);
 				int k2=selectSearch(prob,searchList);
 				boolean isAllTurn=updateMark(k1,k2,mark);
 				P1 = P1.getOffSpring_V(k1);
-				//k=k==5?1:k+1;
 				P2 = P2.getOffSpring_V(k2);
-				/*P1 = P1.getOffSpring_V(3);
-				P1 = P1.getOffSpring_V(4);
-				P1 = P1.getOffSpring_V(5);*/
-				/*P1 = P1.getOffSpring_V(5);*/
-				/*P3 = P3.getOffSpring_V(3);
-				P4 = P4.getOffSpring_V(4);
-				P5 = P5.getOffSpring_V(5);*/
-				/*P6=P6.getOffSpring_NSGAV_Extreme();*/
 				List<Individual> indivs1=P1.getpareto();
 				List<Individual> indivs2=P2.getpareto();
 				double hyper1=computeHyper(indivs1,project);
@@ -272,26 +314,14 @@ public class Algorithm implements Runnable{
 				}
 				hyper1_s=hyper1;
 				hyper2_s=hyper2;
-				/*List<Individual> indivs3=P3.getpareto();
-				List<Individual> indivs4=P4.getpareto();
-				List<Individual> indivs5=P5.getpareto();*/
 				Population paretoPop=combinePop(project,indivs1,indivs2);
 				Population paretoPopPop=paretoPop.getOffSpring_Pareto();
-				/*Population p=Tools.getbestsolution(paretoPopPop,1, project);*/
-				/*List<Individual> indivs6=P6.getpareto();*/
 				P1=P1.addPareto(paretoPopPop);
 				P2=P2.addPareto(paretoPopPop);
-				/*P3=P3.addPareto(paretoPopPop);
-				P4=P4.addPareto(paretoPopPop);
-				P5=P5.addPareto(paretoPopPop);*/
-				/*P6=P6.addPareto(indivs1,indivs2,indivs3,indivs4,indivs5);*/
-				/*P1=P1.addPareto(indivs2);
-				P2=P2.addPareto(indivs1);*/
 				t2=System.currentTimeMillis();
 				time=(t2-startTime)/1000;
 			}
 			//从最后得到种群中获取最优解集
-			//Population solutions =Tools.getbestsolution(P,project, 0);//输出rank为0  减少一次非支配排序
 			// 将两个种群合并
 			Population mergedPopulation =P1.merged(P1,P2);
 			mergedPopulation=mergedPopulation.slectPopulation(P1.getPopulationsize());//暂时去掉重复防止
@@ -440,12 +470,12 @@ public class Algorithm implements Runnable{
 	}
 	public  void NSGA_algorithm(String casefile,String datafile,List<List<Double>> countResult,Case para){
 	       //记录开始计算的时间，用于统计本算法的总时间
-			long startTime = System.currentTimeMillis();
 			// 创建案例类对象
 			Case project = new Case(casefile);
 			project.setNSGA_II(para.getNSGA_II());//赋予参数
 			project.setRunTime(para.RunTime);
 			// 初始化种群
+			long startTime = System.currentTimeMillis();
 			Population P = new Population(project.getNSGA_II().populationSize,project,true);
 			/*int generationCount = 0;
 	        //循环迭代 算法指定的次数
@@ -455,11 +485,15 @@ public class Algorithm implements Runnable{
 			}*/
 			long time=0;
 			long t2 = 0;
-			while (time <30 ) {
+			//int generationCount = 0;
+			int count=0;
+			while (count<100000 ) {//time <30
 				P = P.getOffSpring_NSGA();
-				t2=System.currentTimeMillis();
-				time=(t2-startTime)/1000;
+				//t2=System.currentTimeMillis();
+				count+=2*project.getNSGA_II().populationSize;
+				//time=(t2-startTime)/1000;
 			}
+			long endTime = System.currentTimeMillis();
 			//从最后得到种群中获取最优解集
 			Population solutions = Tools.getbestsolution(P, 1,project);
 			Population solutionsD=Tools.removeSame(solutions);
@@ -473,7 +507,7 @@ public class Algorithm implements Runnable{
 			   FileOutputStream fos = new FileOutputStream(f);
 			   ps = new PrintStream(fos);
 			   //输出最优解集
-			   Tools.printsolutions(solutionsD,startTime,countResult,ps);			   
+			   Tools.printsolutions(solutionsD,endTime-startTime,countResult,ps);			   
 			 } catch (IOException e) {
 				e.printStackTrace();
 			 }  finally {

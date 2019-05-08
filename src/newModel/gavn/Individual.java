@@ -34,16 +34,12 @@ public class Individual {
 	private double hyperVolume;
 	private Case project;
 	private boolean isTeacher = false;
-	public Individual(List<List<Integer>> _chromosome,List<List<Double>> _chromosomemDNA,Case project) {
-		// 创建个体的染色体
-		this.project = project;
-		settaskslist(project);
-		setResourcesList(project);
-		this.chromosome = _chromosome;
-		//计算个体的目标函数值，输出计算了起停时间的任务对象list
-		learnObjCompute();		
-	}
 	
+	/*
+	 * 解析染色体 求解资源序列及目标值
+	 * @param _chromosome 染色体链表
+	 * @param project 案例
+	 */
 	public Individual(List<List<Integer>> _chromosome,Case project) {
 		// 创建个体的染色体
 		this.project = project;
@@ -53,21 +49,11 @@ public class Individual {
 		//计算个体的目标函数值，输出计算了起停时间的任务对象list
 		learnObjCompute();		
 	}
-		
-	//
-	public Individual(Case project) {
-		this.project = project;
-		settaskslist(project);
-		setResourcesList(project);
-		//随机产生DNA及任务序列
-		deciphering( project);
-		//随机产生资源序列，计算目标函数值
-		learnObjCompute();
-		//计算个体的目标函数值，输出计算了起停时间的任务对象list
-		/*objCompute(project);*/
-
-	}
-    //初始化建立 资源random
+    /*
+     * 初始化建立个体  资源random选择
+     * @param project 案例对象
+     * @param initial  boolean  表示初始化
+     */
 	public Individual(Case project, boolean initial) {
 		this.project = project;
 		settaskslist(project);
@@ -77,14 +63,17 @@ public class Individual {
 		//随机产生资源序列，计算目标函数值
 		learnObjCompute(initial);
 	}
-	//复制个体
-	public Individual(Individual son) {
-		this.project = son.project;
+	/*
+	 * @param  indiv  复制的个体 
+	 * 复制个体
+	 */
+	public Individual(Individual indiv) {
+		this.project = indiv.project;
 		settaskslist(project);
 		setResourcesList(project);
 		List<List<Integer>> chro=new ArrayList<>();
-		for(int i=0;i<son.chromosome.size();i++) {
-			List<Integer> list=son.chromosome.get(i);
+		for(int i=0;i<indiv.chromosome.size();i++) {
+			List<Integer> list=indiv.chromosome.get(i);
 			List<Integer> list1=new ArrayList<>();
 			for(int j=0;list!=null&&j<list.size();j++) {
 				list1.add(list.get(j));
@@ -92,7 +81,7 @@ public class Individual {
 			chro.add(list1);
 		}
 		this.chromosome = chro;
-		this.obj=new double[] {son.obj[0],son.obj[1]};
+		this.obj=new double[] {indiv.obj[0],indiv.obj[1]};
 	}
 	/*
 	 * 需要对染色体资源分配序列进行修正
@@ -102,11 +91,27 @@ public class Individual {
 		settaskslist(project);
 		setResourcesList(project);
 		this.chromosome = _chromosome;
-		learnObjCompute(mark);
+		switch(mark) {
+		case 1:learnGAVN();break;
+		case 2:learnNSGA();break;
+		}
+	}
+	
+	/*
+	 * 遗传变邻的目标函数值求解
+	 */
+	private void learnGAVN() {
+		learnObjCompute();
+	}
+	/*
+	 * 非支配排序遗传算法的目标函数求解
+	 */
+	private void learnNSGA() {
+		learnObjCompute(false);
 	}
 	/*
      * 修正型计算目标值
-   */
+    */
 	private void learnObjCompute(int mark) {
 		List<Integer> taskList = this.chromosome.get(0);
 		List<Integer> resList = this.chromosome.get(1);
@@ -222,7 +227,7 @@ public class Individual {
 		return smells[rank.get(0).get(0)];
 	}
 	//交配生子
-	public Individual Mating(Individual husband, int crosspoint) {
+	public Individual Mating(Individual husband, int crosspoint, int mark) {
 
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
 		List<Integer> _tasks = new ArrayList<>();
@@ -239,19 +244,19 @@ public class Individual {
 			if (taskIndex[taskID-1]!=1){
 					_tasks.add(taskID);
 				}
-			
 		}
 		son_chromosome.add(_tasks);
-		Individual son = new Individual(son_chromosome, project);//1	
+		Individual son=null;
+		switch(mark) {
+		case 1: son = new Individual(son_chromosome, project,1);break;//1 变邻交叉
+		case 2: son = new Individual(son_chromosome, project,2);break;//2遗传的
+		}
 		return son;
 	}
 	
 	//个体变异
 	public Individual mutationPopulation(double tMutationRate,double rMutationRate) {
 		List<List<Integer>> son_chromosome = new ArrayList<List<Integer>>();
-
-		List<List<Double>> son_chromosomeDNA = new ArrayList<List<Double>>();
-		
 		List<Integer> _tasks = new ArrayList<>();
 		/*List<Integer> _resources = new ArrayList<>();*/
 		/*List<Double> _resourcesdna = new ArrayList<>();*/
@@ -307,15 +312,11 @@ public class Individual {
 			while (true) {
 				int index_t_2 = (int) (Math.random() * chromosomeLength);
 				if (index_t_2 != (chromosomeLength - 1)) {
-					
 					int taskID1 = _tasks.get(index_t_2);
 					int taskID2 = _tasks.get(index_t_2 + 1);
-
 					Task task1 = project.getTasks().get(taskID1 - 1);
 					Task task2 = project.getTasks().get(taskID2 - 1);
-
 					if (!project.isPredecessor(task1, task2)) {
-						// 
 						_tasks.set(index_t_2, taskID2);
 						_tasks.set(index_t_2 + 1, taskID1);
 						break;
@@ -358,7 +359,7 @@ public class Individual {
 			
 		}*/
 		
-		Individual son = new Individual(son_chromosome,son_chromosomeDNA,project);	
+		Individual son = new Individual(son_chromosome,project,1);	
 
 		return son;
 	}
@@ -734,6 +735,9 @@ public class Individual {
 		this.chromosome.add(resourceList);
 		
 	}
+	/*
+	 * 目标函数计算 包含资源序列的计算 资源搜索策略设计为极端
+	 */
 	public void learnObjCompute() {
 		List<Integer> resourceList = new ArrayList<Integer>();
 		List<Integer> taskList = this.chromosome.get(0);
@@ -993,7 +997,12 @@ public class Individual {
 		}
 		return resourceid;
 	}
-
+    /*
+     * @param curTask 当前任务
+     * @param res 分派的资源
+     * @param endtime_res 临时结束时间数组
+     * 计算给当前任务分配当前资源后时间的更新及技能及目标值的更新
+     */
 	public void singleCompute(ITask curTask, IResource res, int[] endtime_res, int[] workload){
 		ITask task = curTask;
 		IResource resource = res;
@@ -1015,7 +1024,12 @@ public class Individual {
 		//计算目标值： 工期 成本 
 		aimCompute(task, resource,endtime_res);
 	}
-	//每次遍历 花费时间  直接将改变endTime的资源同maxTime对比
+	/*
+	 * @param curTask 当前任务
+     * @param curResource 分派的资源
+     * @param endtime_res 临时结束时间数组
+     * 计算目标值的更新
+	 */
 	public void aimCompute(ITask curTask, IResource curResource, int[] endtime_res){
 		/*for(int i=0;i<endtime_res.length;i++) {
 			if(this.maxtime<endtime_res[i]){
@@ -1030,7 +1044,12 @@ public class Individual {
 		double salary = curResource.getSalary();
 		this.cost +=Math.ceil (realDuration*salary);
 	}
-	
+	/*
+	 * @param curTask 当前任务
+     * @param res 分派的资源
+     * @param endtime_res 临时结束时间数组
+	 * 计算任务时间的更新
+	 */
 	public void phaseCompute(ITask curTask, IResource res, int[] endtime_res, int[] workload){
 		int endtime = 0;
 		ITask curtask = curTask;
@@ -1066,7 +1085,11 @@ public class Individual {
 		//workload[rid-1]+=(int)taskslist.get(tid-1).getStandardDuration()/qinit;
 		//更新累计时间
 	}
-	
+	/*
+	 * @param task 当前任务
+     * @param resource 分派的资源
+	 * 更新技能
+	 */
 	public boolean updateSkill(IResource resource, ITask task){
 		String qtype = task.getSkillType();
 		double qinit = resource.getSkillsInfo().get(qtype);
@@ -1113,7 +1136,9 @@ public class Individual {
 		return false;
 	}
 	
-	//紧前调度  是否可以左移调度 ？ 但是未将时间表排序判断   
+	/*
+	 * 紧前调度  是否可以左移调度 ？ 但是未将时间表排序判断   
+	 */
 	public boolean canInsert(IResource resource, ITask task, int[] workload){
 		@SuppressWarnings("rawtypes")
 		String skillType = task.getSkillType();
@@ -1147,15 +1172,6 @@ public class Individual {
 		}
 		return false;
 	}
-
-	public Case getProject() {
-		return project;
-	}
-
-	public void setProject(Case project) {
-		this.project = project;
-	}
-
 
 	/**
 	 * 二元锦标赛选择方法，参数为两个个体对象
@@ -1192,46 +1208,7 @@ public class Individual {
 		}
 		return individual;
 	}
-
-	public List<IResource> getResourceslist() {
-		return resourceslist;
-	}
-
-	public void setResourceslist(List<IResource> resourceslist) {
-		this.resourceslist = resourceslist;
-	}
-
-	public int getMaxtime() {
-		return maxtime;
-	}
-
-	public void setMaxtime(int maxtime) {
-		this.maxtime = maxtime;
-	}
-
-	public double getCost() {
-		return cost;
-	}
-
-	public void setCost(double cost) {
-		this.cost = cost;
-	}
-
-	public boolean isTeacher() {
-		return isTeacher;
-	}
-
-	public void setChromosome(List<List<Integer>> chromosome) {
-		this.chromosome = chromosome;
-	}
 	
-    public int[] getHeuristics() {
-		return heuristics;
-	}
-
-	public void setHeuristics(int[] heuristics) {
-		this.heuristics = heuristics;
-	}
 
 	//使用低水平启发式算法初始化
 	public void initialHeuristic() {
@@ -1296,15 +1273,7 @@ public class Individual {
 
 	private void swapRandom() {
 	}
-
-	public double getHyperVolume() {
-		return hyperVolume;
-	}
-
-	public void setHyperVolume(double hyperVolume) {
-		this.hyperVolume = hyperVolume;
-	}
-    
+	
 	//个体变邻搜索
 	public Individual variableNeighborDecent() {
 		Individual compare=this;
@@ -1365,11 +1334,11 @@ public class Individual {
 		   case 2:  variableNeighbor_NeighborProb(taskLength,_tasks); break;
 		   case 3:  variableNeighbor_ForwardInsert(taskLength,_tasks); break;
 		   case 4:  variableNeighbor_BackWordInsert(taskLength,_tasks); break;
-		   case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;
-		  /* case 3:  this.variableNeighbor_adjustSequence(taskLength,_tasks);break;*/
+		   /*case 5:  variableNeighbor_SwapRandom(taskLength,_tasks); break;*/
+		   case 5:  this.variableNeighbor_adjustSequence(taskLength,_tasks);break;
 		}
 		son_chromosome.add(_tasks);
-		Individual son = new Individual(son_chromosome,project);
+		Individual son = new Individual(son_chromosome,project,1);
 		return son;
 	}
 	/*
@@ -1409,13 +1378,8 @@ public class Individual {
 			executableTaskIDS.clear();
 			for(int j=0;j<childSequence.size();j++) {
 				int taskId=childSequence.get(j);
-				try {
-					if(preNum[taskId-1]==0) {
-						executableTaskIDS.add(taskId);
-					}
-				} catch (Exception e) {
-					System.out.println("出现"+taskId);
-					e.printStackTrace();
+				if(preNum[taskId-1]==0) {
+					executableTaskIDS.add(taskId);
 				}
 			}
 			if (executableTaskIDS.size() == 0){
@@ -1481,74 +1445,90 @@ public class Individual {
 		}
 	}
 
-	//随机向后插入
+	/*
+	 * @param  taskLength 任务序列长度
+	 * @param _tasks 复制的任务序列及新的任务序列
+	 * 随机向后插入
+	 */
 	private void variableNeighbor_BackWordInsert(int taskLength, List<Integer> _tasks) {
 		while(true) {
-			int geneIndex1=(int)(Math.random()*(taskLength-1));
-			int geneIndex2=(int)(Math.random()*(taskLength-1));
+			int geneIndex1=(int)(Math.random()*(taskLength));
+			int geneIndex2=(int)(Math.random()*(taskLength));
 			while(geneIndex1==geneIndex2) {
-				geneIndex2=(int)(Math.random()*(taskLength-1));
+				geneIndex2=(int)(Math.random()*(taskLength));
 			} 
-			if(geneIndex1>geneIndex2) {
+			if(geneIndex1>geneIndex2) {//geneIndex1在前
 				int a=geneIndex1;
 				geneIndex1=geneIndex2;
 				geneIndex2=a;
 			}
 			int taskGene1=_tasks.get(geneIndex1);//	ID
-			Task t1 = project.getTasks().get(taskGene1 - 1);
-			List<Integer> sucsuc=t1.getSucSucIDS();
-			boolean can=true;
-			for(int m=geneIndex1+1;m<=geneIndex2;m++) {
-				int taskId=_tasks.get(m);
-				if(sucsuc.contains(taskId)) {
-					can=false;
+			/*int resGene1=_ress.get(geneIndex1);*/
+			int insertPos = geneIndex1;
+			for(int i=geneIndex1+1;i<=geneIndex2;i++) {
+				int taskId=_tasks.get(i);
+				List<Integer> preList=taskslist.get(taskId-1).getPredecessorIDs();
+				if(preList.contains(taskGene1)) {
+					insertPos=i;
 					break;
 				}
 			}
-			if(can) {
-				_tasks.add(geneIndex2, taskGene1);
+			if(insertPos!=geneIndex1+1) {
+				_tasks.add(insertPos, taskGene1);
+				/*_ress.add(insertPos, resGene1);*/
 				_tasks.remove(geneIndex1);
+				/*_ress.remove(geneIndex1);*/
 				break;
 			}
     	}
 	}
 
-	// 随机向前插入
+	/* 
+	 * @param  taskLength 任务序列长度
+	 * @param _tasks 复制的任务序列及新的任务序列
+	 * 随机向前插入
+	 */
     private void variableNeighbor_ForwardInsert(int taskLength, List<Integer> _tasks) {
     	while(true) {
-			int geneIndex1=(int)(Math.random()*(taskLength-1));
-			int geneIndex2=(int)(Math.random()*(taskLength-1));
+    		int geneIndex1=(int)(Math.random()*(taskLength));
+			int geneIndex2=(int)(Math.random()*(taskLength));
 			while(geneIndex1==geneIndex2) {
-				geneIndex2=(int)(Math.random()*(taskLength-1));
+				geneIndex2=(int)(Math.random()*(taskLength));
 			} 
-			if(geneIndex1<geneIndex2) {
+			if(geneIndex1<geneIndex2) {//geneIndex1在后
 				int a=geneIndex1;
 				geneIndex1=geneIndex2;
 				geneIndex2=a;
 			}
 			int taskGene1=_tasks.get(geneIndex1);//	ID
-			Task t1 = project.getTasks().get(taskGene1 - 1);
-			List<Integer> prepre=t1.getPrePreIDs();
-			boolean can=true;
-			for(int m=geneIndex2;m<geneIndex1;m++) {
-				int taskId=_tasks.get(m);
-				if(prepre.contains(taskId)) {
-					can=false;
+			/*int resGene1=_ress.get(geneIndex1);*/
+			List<Integer> preList=taskslist.get(taskGene1-1).getPredecessorIDs();
+			int insertPos = geneIndex1;
+			for(int i=geneIndex1-1;i>=geneIndex2;i--) {
+				int taskId=_tasks.get(i);
+				if(preList.contains(taskId)) {
+					insertPos=i+1;
 					break;
 				}
 			}
-			if(can) {
+			if(insertPos!=geneIndex1) {
 				_tasks.remove(geneIndex1);
-				_tasks.add(geneIndex2, taskGene1);
+				/*_ress.remove(geneIndex1);*/
+				_tasks.add(insertPos, taskGene1);
+				/*_ress.add(insertPos, resGene1);*/
 				break;
 			}
     	}
 		
 	}
-	//相邻交换概率决定
+	/*
+	 * @param  taskLength 任务序列长度
+	 * @param _tasks 复制的任务序列及新的任务序列
+	 * 相邻交换概率决定
+	 */
 	private void variableNeighbor_NeighborProb(int taskLength, List<Integer> _tasks) {
 		for (int geneIndex = 0; geneIndex < taskLength - 1; geneIndex++) {
-			if (0.1 > Math.random()) {
+			if (NSGAV_II.neighborP > Math.random()) {
 				int taskGene1=_tasks.get(geneIndex);
 				int taskGene2=_tasks.get(geneIndex+1);
 				Task t1 = project.getTasks().get(taskGene1 - 1);
@@ -1561,7 +1541,11 @@ public class Individual {
 			}
 		}
 	}
-    //相邻交换一次
+    /*
+     * @param  taskLength 任务序列长度
+	 * @param _tasks 复制的任务序列及新的任务序列
+     * 相邻交换一次
+     */
 	private void variableNeighbor_NeighborOne(int taskLength, List<Integer> _tasks) {
 		while(true) {
 			int geneIndex=(int)(Math.random()*(taskLength-1));
@@ -1577,4 +1561,59 @@ public class Individual {
 			}
 		}
 	}
+	public Case getProject() {
+		return project;
+	}
+
+	public void setProject(Case project) {
+		this.project = project;
+	}
+
+	public List<IResource> getResourceslist() {
+		return resourceslist;
+	}
+
+	public void setResourceslist(List<IResource> resourceslist) {
+		this.resourceslist = resourceslist;
+	}
+
+	public int getMaxtime() {
+		return maxtime;
+	}
+
+	public void setMaxtime(int maxtime) {
+		this.maxtime = maxtime;
+	}
+
+	public double getCost() {
+		return cost;
+	}
+
+	public void setCost(double cost) {
+		this.cost = cost;
+	}
+
+	public boolean isTeacher() {
+		return isTeacher;
+	}
+
+	public void setChromosome(List<List<Integer>> chromosome) {
+		this.chromosome = chromosome;
+	}
+	
+    public int[] getHeuristics() {
+		return heuristics;
+	}
+
+	public void setHeuristics(int[] heuristics) {
+		this.heuristics = heuristics;
+	}
+	public double getHyperVolume() {
+		return hyperVolume;
+	}
+
+	public void setHyperVolume(double hyperVolume) {
+		this.hyperVolume = hyperVolume;
+	}
+    
 }

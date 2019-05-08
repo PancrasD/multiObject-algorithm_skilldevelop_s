@@ -23,7 +23,6 @@ public class IResource {
 		//key:技能类型  value:在当前技能水平累计时间
 		private HashMap<String,Double> sustainTime=new HashMap<>();
 		
-		@SuppressWarnings("null")
 		public IResource(Resource resource){
 			this.resourceID=resource.getResourceID();
 			this.skils=resource.getSkils();

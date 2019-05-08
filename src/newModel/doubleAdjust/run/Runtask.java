@@ -1,4 +1,6 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.run;
+
+import newModel.doubleAdjust.basis.Case;
 
 public class Runtask implements Runnable {
 	String arg;

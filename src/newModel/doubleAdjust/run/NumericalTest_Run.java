@@ -1,4 +1,4 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.run;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import newModel.doubleAdjust.basis.Case;
 
 
 public class NumericalTest_Run {
@@ -23,18 +25,56 @@ public class NumericalTest_Run {
             }
             ConcurrentHashMap<String, List<List<Double>>> countR=new ConcurrentHashMap<String,List<List<Double>>>();
     		if (args.trim().toLowerCase().equals("gv")){
-    			ExecutorService exec=Executors.newFixedThreadPool(5);
+    			ExecutorService exec=Executors.newFixedThreadPool(2);
     			String head=buildFileName();
-    			for(int j = 0; j < para.getNSGAV_II().RunTime; j++){
-    				String dic = "data/NSGAV_H"+head+"_"+ Thread.currentThread().getName()+"/nsgah_"+j;
+    			for(int j = 0; j < para.getRunTime(); j++){
+    				String dic = "data1.0/NSGAV_H"+head+"_"+ Thread.currentThread().getName()+"/nsgah_"+j;
 	   				File f=new File(dic);
 	               	if(f.exists()) {
 	               		 f.delete();
 	               	}
 	               	f.mkdirs();
-	               	Algorithm algorithm=new Algorithm(fl, dic, case_def, countR, para, args);
+	               	AlgorithmRun algorithm=new AlgorithmRun(fl, dic, case_def, countR, para, args);
 	               	/*Thread thread =new Thread(algorithm);
 	               	thread.start();;*/
+	               exec.execute(algorithm);
+    			}
+    			exec.shutdown();
+                /*System.out.println(fl.length +"个案例遗传变邻算法计算完成"); */
+                return;
+                
+    		}
+    		if (args.trim().toLowerCase().equals("ntga")){
+    			ExecutorService exec=Executors.newFixedThreadPool(2);
+    			String head=buildFileName();
+    			for(int j = 0; j < para.getRunTime();j++){
+    				String dic = "data1.0/NTGA_"+head+"_"+ Thread.currentThread().getName()+"/ntgah_"+j;
+	   				File f=new File(dic);
+	               	if(f.exists()) {
+	               		 f.delete();
+	               	}
+	               	f.mkdirs();
+	               	AlgorithmRun algorithm=new AlgorithmRun(fl, dic, case_def, countR, para, args);
+	               
+	               exec.execute(algorithm);
+    			}
+    			exec.shutdown();
+                /*System.out.println(fl.length +"个案例遗传变邻算法计算完成"); */
+                return;
+                
+    		}
+    		if (args.trim().toLowerCase().equals("rl")){
+    			ExecutorService exec=Executors.newFixedThreadPool(1);
+    			String head=buildFileName();
+    			for(int j = 0; j < para.getRunTime();j++){
+    				String dic = "data1.0/RL_"+head+"_"+ Thread.currentThread().getName()+"/rl_"+j;
+	   				File f=new File(dic);
+	               	if(f.exists()) {
+	               		 f.delete();
+	               	}
+	               	f.mkdirs();
+	               	AlgorithmRun algorithm=new AlgorithmRun(fl, dic, case_def, countR, para, args);
+	               
 	               exec.execute(algorithm);
     			}
     			exec.shutdown();
@@ -52,7 +92,7 @@ public class NumericalTest_Run {
 	               		 f.delete();
 	               	 }
 	               	 f.mkdirs();
-	               	 Algorithm algorithm=new Algorithm(fl, dic, case_def, countR, para, args);
+	               	 AlgorithmRun algorithm=new AlgorithmRun(fl, dic, case_def, countR, para, args);
 	               	 exec.execute(algorithm);
     			}
     			exec.shutdown();
@@ -63,13 +103,13 @@ public class NumericalTest_Run {
     			String head=buildFileName();
     			ExecutorService exec=Executors.newFixedThreadPool(5);
     			for(int j = 0; j < para.getNSGA_II().RunTime; j++){
-    				 String dic = "data/NSGA_"+head+"_"+ Thread.currentThread().getName()+"/nsga_"+j;
+    				 String dic = "data1.0/NSGA_"+head+"_"+ Thread.currentThread().getName()+"/nsga_"+j;
 	   				 File f=new File(dic);
 	               	 if(f.exists()) {
 	               		 f.delete();
 	               	 }
 	               	 f.mkdirs();
-	               	 Algorithm algorithm=new Algorithm(fl, dic, case_def, countR, para, args);
+	               	 AlgorithmRun algorithm=new AlgorithmRun(fl, dic, case_def, countR, para, args);
 	               	 exec.execute(algorithm);
     			}
     			exec.shutdown();

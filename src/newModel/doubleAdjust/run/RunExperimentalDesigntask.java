@@ -1,16 +1,20 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.run;
 
-public class RuntaskExperimentalDesign implements Runnable {
+import newModel.doubleAdjust.basis.Case;
+
+public class RunExperimentalDesigntask implements Runnable {
 	String arg;
 	Case para;
-	public RuntaskExperimentalDesign(Case project, String arg) {
+	String head;
+	public RunExperimentalDesigntask(Case project, String arg,String head) {
 		this.para=project;
 		this.arg=arg;
+		this.head=head;
 	}
 	@Override
 	public void run() {
 		NumericalTest_RunExperimentalDesign numerical=new NumericalTest_RunExperimentalDesign();
-		numerical.runNumerical(arg, para);
+		numerical.runNumerical(arg, para,head);
 	}
 
 }
