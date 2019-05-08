@@ -1,4 +1,4 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.basis;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,11 +8,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import newModel.doubleAdjust.Individual;
+import newModel.doubleAdjust.NSFFA;
+import newModel.doubleAdjust.NSGAV_II;
+import newModel.doubleAdjust.NSGA_II;
+import newModel.doubleAdjust.algorithm.NTGA;
 
 
 public class Case {
@@ -28,19 +35,48 @@ public class Case {
     private NSGA_II NSGA_II;
     private  NSGAV_II NSGAV_II;
     private  NSFFA NSFFA;
+    private   Parameter parameter;
 	private List<Task> tasks = new ArrayList<>();//任务数组
 	private List<Resource> resources = new ArrayList<>();//资源数组
 	private List<Integer> characteristics = new ArrayList<>();//特征信息数组[任务数量，资源数量，紧前任务数量，技能种类]
 	private double borderDuration=0;//最大工期 累计加和
 	private double borderCost=0;//最大成本  最大工期*最大薪水
 	private double[] tempObj;//传递参数用的
-	int RunTime;//运行次数
+	public int RunTime;//运行次数
 	//技能对应的标准任务的时间表  key:技能类型   value:进化时间表
 	private HashMap<String,Double[]> TestQuesttionMap=new HashMap<>();
 	//临界因子 key:技能类型  value:临界因子
 	private HashMap<String,Double> borderValueMap=new HashMap<>();
+	List<Individual> pareto=new ArrayList<>();
+	private int count;//计数进化
+	public static int sub=5;//划分区间数
+	// 存储状态-动作对Q值，存在25种状态，每种状态对应5种可选操作
+	double[][] q_value = new double[25][3];
+	// 存储相应状态下动作的选择概率
+	double[][] probility = new double[25][3];
+	double[]perfectPoint=new double[2];
 	public Case() {
 		caseDefinition();
+	}
+	//浅复制project
+	public Case(Case project) {
+			this.N=project.N;
+			this.M=project.M;
+			this.PR=project.PR;
+			this.K=project.K;
+			this.NSGAV_II=project.NSGAV_II;
+			this.NSGA_II=project.NSGA_II;
+			this.parameter=project.parameter;
+			this.tasks=project.tasks;
+			this.characteristics=project.characteristics;
+			this.resources=project.resources;
+			this.borderCost=project.borderCost;
+			this.borderDuration=project.borderDuration;
+			this.RunTime=project.RunTime;
+			this.TestQuesttionMap=project.TestQuesttionMap;
+			this.borderValueMap=project.borderValueMap;
+			this.perfectPoint=project.perfectPoint;
+			initQ_P();
 	}
 
 	public Case(String defFile) {
@@ -58,13 +94,38 @@ public class Case {
 		//得到每个任务的紧后任务集合
 		countsuccessor();
 		//得到每个任务对应可用资源的使用概率
-		//setTaskCapapleResource();
+		setTaskCapapleResource();
 		/*setPrePre();
 		setSucSuc();*/
 		computeBorderValue();
+		initQ_P();
+		computePerfectPoint();
 	}
-
-
+	/*
+	 * 计算最好点
+	 */
+	private void computePerfectPoint() {
+		List<Task> tasks=this.tasks;
+		double duration=0;
+		for(int i=0;i<tasks.size();) {
+			
+		}
+		double cost=0;
+		
+	}
+	/*
+	 * 初始化Q值和P值
+	 */
+	private void initQ_P() {
+		for(int i=0;i<probility.length;i++) {
+			Arrays.fill(probility[i], 1.0/probility[i].length);
+		}
+		
+	}
+   
+	/*
+          * 计算最坏值
+     */
 	private void computeBorderValue() {
 		double MaxDuration=0;
 		double MaxCost=0;
@@ -516,6 +577,13 @@ public class Case {
 		NSFFA = nSFFA;
 	}
 
+
+	public Parameter getParameter() {
+		return parameter;
+	}
+	public void setParameter(Parameter parameter) {
+		this.parameter = parameter;
+	}
 	public static int getMaxLevel() {
 		return MaxLevel;
 	}
@@ -548,5 +616,30 @@ public class Case {
 		PATH = pATH;
 	}
 
+	public List<Individual> getPareto() {
+		return pareto;
+	}
+
+	public void setPareto(List<Individual> pareto) {
+		this.pareto = pareto;
+	}
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
+	}
+	public double[][] getQ_value() {
+		return q_value;
+	}
+	public void setQ_value(double[][] q_value) {
+		this.q_value = q_value;
+	}
+	public double[][] getProbility() {
+		return probility;
+	}
+	public void setProbility(double[][] probility) {
+		this.probility = probility;
+	}
 
 }

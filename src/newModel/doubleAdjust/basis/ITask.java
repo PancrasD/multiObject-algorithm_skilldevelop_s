@@ -1,4 +1,4 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.basis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class ITask {
 	private String skillType;
 	private double skillLevel;
 	private List<Integer> predecessorIDs = new  ArrayList<>();
-	private List<Integer> resourceIDs ;
+	private List<Integer> resourceIDs ;//能够执行当前任务的资源List
 	
 	public ITask(Task task){
 		taskid = task.getTaskID();

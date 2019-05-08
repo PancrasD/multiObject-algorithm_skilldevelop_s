@@ -1,4 +1,4 @@
-package newModel.doubleAdjust;
+package newModel.doubleAdjust.basis;
 
 import java.util.HashMap;
 
