@@ -1,4 +1,4 @@
-package commen.compute;
+package commen.compute.run;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -65,8 +65,6 @@ public class ComputeMeasureMax {
 						}
 					}
 				}
-			   
-				//map.put(list[i].substring(list[i].indexOf('_')+1, list[i].length()-1), datas);
 			   }catch(Exception e) {
 				   e.printStackTrace();
 			   }

@@ -6,11 +6,12 @@ import newModel.doubleAdjust.Individual;
 import newModel.doubleAdjust.Population;
 import newModel.doubleAdjust.Tools;
 import newModel.doubleAdjust.basis.Case;
+import newModel.doubleAdjust.basis.Parameter;
 import newModel.doubleAdjust.operator.KnowledgeSearch;
 import newModel.doubleAdjust.operator.SmellSearch;
 
 public class NSFFA extends Algorithm{
-	public NSFFA(String _fn, String _fo, List<List<Double>> countResult, Case para) {
+	public NSFFA(String _fn, String _fo, List<List<Double>> countResult, Parameter para) {
 		super(_fn, _fo, countResult, para);
 	}
 

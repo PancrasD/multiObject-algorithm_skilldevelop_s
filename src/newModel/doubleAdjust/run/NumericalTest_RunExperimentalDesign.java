@@ -14,7 +14,6 @@ import newModel.doubleAdjust.Individual;
 import newModel.doubleAdjust.NSFFA;
 import newModel.doubleAdjust.Population;
 import newModel.doubleAdjust.TLBO;
-import newModel.doubleAdjust.TLBOF;
 import newModel.doubleAdjust.Tools;
 import newModel.doubleAdjust.basis.Case;
 
@@ -391,43 +390,7 @@ public class NumericalTest_RunExperimentalDesign {
 		     }       	
 	}
 
-	//教学算法用于操作序列搜索  使用果蝇算法用于资源序列搜索
-	public  void algorithm_new1(String casefile, String datafile, List<List<Double>> countResult) {
-		 //记录开始计算的时间，用于统计本算法的总时间
-		long startTime = System.currentTimeMillis();
-		// 创建案例类对象
-		Case project = new Case(casefile);
-		// 初始化种群
-		Population P = new Population(TLBOF.populationSize,project,true);
-		P=P.initialHeuristic();
-		int generationCount = 0;
-		//List<Integer> best=P.getPopulation().
-        //循环迭代 算法指定的次数
-		while (generationCount < TLBOF.maxGenerations ) {
-			P = P.getOffSpring_new1();
-			generationCount++;
-		}
-		//获取前两层的精英个体的操作序列 进行资源搜索 种群扩充 以增加最优种群的多样性
-		//Population elite = Tools.getbestsolution(P,2,project);	
-		Population expandPop=P.serchMoreSpaceByRes(TLBOF.s1);
-		//从最后得到种群中获取最优解集
-		Population solutions = Tools.getbestsolution(expandPop,1, project);		
-		File f = new File(datafile);
-		PrintStream ps = null;
-		try {
-		   if (f.exists()) f.delete();
-		   f.createNewFile();
-		   FileOutputStream fos = new FileOutputStream(f);
-		   ps = new PrintStream(fos);
-		  /* System.setOut(ps);*/
-		   //输出最优解集
-		   Tools.printsolutions(solutions,startTime,countResult,ps);			   
-		 } catch (IOException e) {
-			e.printStackTrace();
-		 }  finally {
-	        if(ps != null) 	ps.close();
-	     }
-	}
+	
 	public  void NSFFA_algorithm(String casefile,String datafile, List<List<Double>> countResult){
 	       //记录开始计算的时间，用于统计本算法的总时间
 			long startTime = System.currentTimeMillis();

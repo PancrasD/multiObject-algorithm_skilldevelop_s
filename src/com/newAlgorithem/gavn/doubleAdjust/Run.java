@@ -3,7 +3,7 @@ package com.newAlgorithem.gavn.doubleAdjust;
 public class Run {
 
 	public static void main(String[] args) {
-		String arg="g";
+		String arg="gv";
 		run(arg);
       
 	}

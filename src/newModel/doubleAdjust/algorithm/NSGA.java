@@ -16,7 +16,7 @@ import newModel.doubleAdjust.operator.SingleListMutation;
 
 public class NSGA extends Algorithm{
 	
-	public NSGA(String _fn, String _fo, List<List<Double>> countResult, Case para) {
+	public NSGA(String _fn, String _fo, List<List<Double>> countResult, Parameter para) {
 		super(_fn, _fo, countResult, para);
 	}
 
@@ -144,7 +144,33 @@ public class NSGA extends Algorithm{
 
 	@Override
 	public void schedule() {
-		// TODO Auto-generated method stub
+		// 创建案例类对象
+		Case project = new Case(casefile);
+		project.setParameter(para);
+		project.setRunTime(para.getRunTime());
+		// 初始化种群
+		long startTime = System.currentTimeMillis();
+		Population P1 = new Population(project.getParameter().getPopulationSize(),project,true,true);
+		Population pp=evolve(P1);
+		long endTime = System.currentTimeMillis();
+		//从最后得到种群中获取最优解集
+		Population pop=new Population(pp.getProject().getPareto().size(),project);
+		pop.setPopulation(Tools.getArray(pp.getProject().getPareto()));
+		Population solutions = Tools.getbestsolution(pop,1, project);
+		solutions=Tools.removeSame(solutions);//去重
+	    //输出最优解集
+		Tools.outputSolution(solutions,endTime-startTime,datafile,countResult);
 		
+	}
+    /*
+     * 进化种群
+     */
+	private Population evolve(Population P1) {
+		int count=0;
+		while (count < 100000 ) {
+			P1=getOffSpring_singleList(P1);
+			count+=P1.getPopulationsize()*2;
+		}
+		return P1;
 	}
 }

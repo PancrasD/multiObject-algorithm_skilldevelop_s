@@ -995,7 +995,7 @@ public class Individual {
 	public void singleCompute(ITask curTask, IResource res, int[] endtime_res, int[] workload){
 		ITask task = curTask;
 		IResource resource = res;
-	    if(!canInsert(resource, task,workload)){//不存在紧前调度
+	    /*if(!canInsert(resource, task,workload)){//不存在紧前调度
 			//阶段性计算：更新资源可用时间，更新任务开始结束时间
 			phaseCompute(curTask, res, endtime_res,workload);
 			//更新技能水平：当前技能表，技能执行时间表	
@@ -1006,12 +1006,12 @@ public class Individual {
 			//仅更新目标值和任务开始结束时间，不更新技能is wrong   需要更新该资源分配的任务的完成时间和资源技能
 			//updateResourceAnd
 			aimCompute(task, resource,endtime_res);//左移调度下移动插入点的技能必须高于任务的所需技能  采用资源更新
-		} 
-	/*	phaseCompute(rid, tid, endtime_res,workload);
+		}*/ 
+		phaseCompute(curTask, res, endtime_res,workload);
 		//更新技能水平：当前技能表，技能执行时间
 		updateSkill(resource, task);
 		//计算目标值： 工期 成本 
-		aimCompute(task, resource,endtime_res);*/
+		aimCompute(task, resource,endtime_res);
 	}
 	//每次遍历 花费时间  直接将改变endTime的资源同maxTime对比
 	public void aimCompute(ITask curTask, IResource curResource, int[] endtime_res){

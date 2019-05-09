@@ -121,6 +121,7 @@ public class SmellSearch {
 					}
 					offspringChromosome.add(list);
 				}
+				
 				// 随机选择任务序列中的某个位置  对1个任务的资源重新选择 
 				int index_t_1 = (int) (Math.random() * offspringChromosome.get(0).size());
 				

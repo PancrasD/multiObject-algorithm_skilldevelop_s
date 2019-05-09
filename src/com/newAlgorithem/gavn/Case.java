@@ -1,7 +1,9 @@
 package com.newAlgorithem.gavn;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -24,11 +26,13 @@ public class Case {
 	private double borderDuration=0;//最大工期 累计加和
 	private double borderCost=0;//最大成本  最大工期*最大薪水
 	private double[] tempObj;//传递参数用的
+	private HashMap<String,List<Double>> map=new HashMap<>();
 	public Case() {
 		caseDefinition();
 	}
 
 	public Case(String defFile) {
+		//readSkillFile();
 		readCaseDef(defFile);
 		this.N = characteristics.get(0);
 		this.M = characteristics.get(1);
@@ -45,8 +49,41 @@ public class Case {
 	/*	setPrePre();
 		setSucSuc();*/
 		computeBorderValue();
+		
 	}
 
+
+	private void readSkillFile() {
+		String path="case_q/q.txt";
+		File f=new 	File(path);
+		BufferedReader reader=null;
+		try {
+			 reader=new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		String line=null;
+		int k=1;
+		HashMap<String,List<Double>> temp=new HashMap<>();
+		try {
+			while((line=reader.readLine())!=null) {
+				if(line.startsWith("执行时间")) {
+					String mes[]=line.split(":");
+					String timeStr[]=mes[1].split("\\s+");
+					List<Double> time=new ArrayList<>();
+					for(int i=0;i<timeStr.length;i++) {
+						String t=timeStr[i].trim();
+						time.add(Double.valueOf(t));
+					}
+					temp.put("Q"+k, time);
+					k++;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.setMap(temp);
+	}
 
 	private void computeBorderValue() {
 		double MaxDuration=0;
@@ -382,5 +419,14 @@ public class Case {
 	public void setTempObj(double[] tempObj) {
 		this.tempObj = tempObj;
 	}
+
+	public HashMap<String, List<Double>> getMap() {
+		return map;
+	}
+
+	public void setMap(HashMap<String, List<Double>> map) {
+		this.map = map;
+	}
+	
 
 }

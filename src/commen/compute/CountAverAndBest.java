@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import org.junit.Test;
 
 public class CountAverAndBest {
+	public static  String para;
    /*
     * 计算正交试验得到的试验结果的平均值 便于分析参数组合
     * @param head 0-5 6-9次组合的文件目录头
@@ -31,18 +32,20 @@ public class CountAverAndBest {
    @Test
    public void runExperiment() {
 	   String name[]=new String[9];
-	   String head="NSGAV_H0322094706_";
-	   String cdic="average_GAVN200_200_40_90_9/";//子文件夹
+	   String head="NSGAV_H0401100250_";
+	   String cdic="正交//average_GAVN200_200_40_90_9/";//子文件夹
+	   CountAverAndBest.para="超体积";
 	   List<Map<String,Double>> all=new ArrayList<>();
 	   for(int i=0;i<5;i++) {
 		   name[i]=head+(i+1);
 		   comput(name[i],cdic,all);
 	   }
-	   head="NSGAV_H0322095207_";
+	   head="NSGAV_H0401100752_";
 	   for(int i=5;i<9;i++) {
 		   name[i]=head+(i+1);
 		   comput(name[i],cdic,all);
 	   }
+	   
 	   
    }
    /*
@@ -52,8 +55,9 @@ public class CountAverAndBest {
    @Test
    public void test() {
 	   List<Map<String,Double>> all=new ArrayList<>();
-	   String name="NSGAV_H0308171112_run1_200";
-	   String cdic="average/反转MID";//子文件夹
+	   String name="NSGAV_H0329104318_run1";
+	   CountAverAndBest.para="反转MID";
+	   String cdic="average/MID";//子文件夹
 	   comput(name,cdic,all);
    }
    private  void computExp(String name) {
@@ -222,7 +226,7 @@ public class CountAverAndBest {
 				read=new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 			    String line=null;
 				while((line=read.readLine())!=null) {
-					if(line.startsWith("反转MID")) {
+					if(line.startsWith(CountAverAndBest.para)) {
 						String str[]=line.split(":");
 						List<String> hypervolume=countH.get(list[i]);
 						if(hypervolume==null) {

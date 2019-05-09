@@ -32,7 +32,6 @@ public class Individual {
 	
 	private int maxtime = 0;
 	private double cost = 0.0;
-    private int[] heuristics=new int[New1.heuristics];
 	// 个体在种群中的非支配等级
 	private int non_dominatedRank;
 	// 个体的在非支配层中的拥挤度
@@ -297,9 +296,7 @@ public class Individual {
 		
 		son_chromosome.add(_tasks);
 		son_chromosomeDNA.add(_taskdna);
-		//使用果蝇算法  气味搜索和视觉搜索Smell-based search and vision-based search
-		Individual[] smells=Smell_basedSearch(TLBOF.s,son_chromosome,project);
-		Individual son = vision_basedSearch(smells,project);
+		Individual son = new Individual(son_chromosome,project,1);
 		return son;
 	}
 	
@@ -364,7 +361,7 @@ public class Individual {
 		switch(mark) {
 		case 1:{//变邻搜索
 			double prob=Math.random();
-			if(prob<project.getNSGAV_II().resSp) {
+			if(prob<project.getParameter().getResSpp()) {
 				 son=doubleSearch(_tasks,_resources,son_chromosome);//修正选择加极端重新选择 保留较好的个体
 			}else {
 				 son = new Individual(son_chromosome, project,mark);	
@@ -437,7 +434,7 @@ public class Individual {
 		}
 		son_chromosome.add(_tasks);
 		son_chromosome.add(_resources);
-		Individual son = new Individual(son_chromosome,project,NSGA_II.MARK);	
+		Individual son = new Individual(son_chromosome,project,1);//1 是mark
 		return son;
 	}
 	   /*
@@ -489,7 +486,7 @@ public class Individual {
 		son_chromosome.add(_tasks);
 		son_chromosome.add(_ress);
 		double prob=Math.random();
-		if(prob<project.getNSGAV_II().resSp) {
+		if(prob<project.getParameter().getResSpp()) {
 			Individual son=doubleSearch(_tasks,_ress,son_chromosome);//
 			return son;
 		}
@@ -1434,31 +1431,8 @@ public class Individual {
 		this.chromosome = chromosome;
 	}
 	
-    public int[] getHeuristics() {
-		return heuristics;
-	}
-
-	public void setHeuristics(int[] heuristics) {
-		this.heuristics = heuristics;
-	}
-
-	//使用低水平启发式算法初始化
-	public void initialHeuristic() {
-		int[] heuristics=new int[New1.heuristics];
-		for(int i=0;i<New1.heuristics;i++) {
-			heuristics[i]=(new Random()).nextInt(4)+1;
-		}
-		this.setHeuristics(heuristics);
-	    //使用低水平启发式算法初始化
-		for(int i=0;i<heuristics.length;i++) {
-			switch(heuristics[i]) {
-			  case 1:this.swapNeighbor();break;
-			  case 2:this.insertForward();break;
-			  case 3:this.insertBackward();break;
-			  case 4:this.swapRandom();break;
-			}
-		}
-	}
+ 
+	
 
 	private void swapNeighbor() {
 		List<List<Integer>> offspringchromosome=new ArrayList<>();

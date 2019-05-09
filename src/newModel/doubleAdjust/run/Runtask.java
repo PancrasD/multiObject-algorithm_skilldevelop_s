@@ -1,12 +1,13 @@
 package newModel.doubleAdjust.run;
 
 import newModel.doubleAdjust.basis.Case;
+import newModel.doubleAdjust.basis.Parameter;
 
 public class Runtask implements Runnable {
 	String arg;
-	Case para;
-	public Runtask(Case project, String arg) {
-		this.para=project;
+	Parameter para;
+	public Runtask(Parameter parameter, String arg) {
+		this.para=parameter;
 		this.arg=arg;
 	}
 	@Override

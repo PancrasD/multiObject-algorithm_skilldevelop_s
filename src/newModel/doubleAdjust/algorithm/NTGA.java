@@ -1,6 +1,7 @@
 package newModel.doubleAdjust.algorithm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import newModel.doubleAdjust.Individual;
@@ -13,10 +14,11 @@ import newModel.doubleAdjust.operator.Mutation;
 import newModel.doubleAdjust.operator.Select;
 import newModel.doubleAdjust.operator.SingleListCrossOver;
 import newModel.doubleAdjust.operator.SingleListMutation;
+import newModel.doubleAdjust.util.Util;
 
 public class NTGA extends Algorithm{
 	
-	public NTGA(String _fn, String _fo, List<List<Double>> countResult, Case para) {
+	public NTGA(String _fn, String _fo, List<List<Double>> countResult, Parameter para) {
 		super(_fn, _fo, countResult, para);
 	}
 
@@ -28,7 +30,7 @@ public class NTGA extends Algorithm{
 	public void schedule() {
 		// 创建案例类对象
 		Case project = new Case(casefile);
-		project.setParameter(para.getParameter());
+		project.setParameter(para);
 		project.setRunTime(para.getRunTime());
 		// 初始化种群
 		long startTime = System.currentTimeMillis();

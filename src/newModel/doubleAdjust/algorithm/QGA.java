@@ -8,12 +8,13 @@ import newModel.doubleAdjust.Individual;
 import newModel.doubleAdjust.Population;
 import newModel.doubleAdjust.Tools;
 import newModel.doubleAdjust.basis.Case;
+import newModel.doubleAdjust.basis.Parameter;
 import newModel.gavn.NSFFA;
 
 public class QGA extends Algorithm{
 	//计算临界值
 	double[] bound=new double[2];
-	public QGA(String _fn, String _fo, List<List<Double>> countResult, Case para) {
+	public QGA(String _fn, String _fo, List<List<Double>> countResult, Parameter para) {
 		super(_fn, _fo, countResult, para);
 		initBound();
 	}
@@ -30,7 +31,7 @@ public class QGA extends Algorithm{
 	public  void schedule() {
 		// 创建案例类对象
 		Case project = new Case(casefile);
-		project.setNSGAV_II(para.getNSGAV_II());
+		project.setParameter(para);
 		project.setRunTime(para.getRunTime());
 		Case project1=new Case(project);//复制一个project 
 		// 初始化种群
@@ -52,11 +53,11 @@ public class QGA extends Algorithm{
 	public  void scheduleSingle() {
 		// 创建案例类对象
 		Case project = new Case(casefile);
-		project.setNSGAV_II(para.getNSGAV_II());
+		project.setParameter(para);
 		project.setRunTime(para.getRunTime());
 		// 初始化种群
 		long startTime = System.currentTimeMillis();
-		Population P1 = new Population(project.getNSGAV_II().populationSize,project,true);
+		Population P1 = new Population(project.getParameter().getPopulationSize(),project,true);
 		Population pp=evolve(P1);
 		long endTime = System.currentTimeMillis();
 		//从最后得到种群中获取最优解集

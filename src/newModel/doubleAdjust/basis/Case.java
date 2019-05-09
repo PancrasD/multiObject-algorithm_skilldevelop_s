@@ -99,7 +99,7 @@ public class Case {
 		setSucSuc();*/
 		computeBorderValue();
 		initQ_P();
-		computePerfectPoint();
+		//computePerfectPoint();
 	}
 	/*
 	 * 计算最好点
