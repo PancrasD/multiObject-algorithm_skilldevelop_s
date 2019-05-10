@@ -94,20 +94,21 @@ public class SMSEMOA extends Algorithm{
 		CrossOver crossOver=new SingleListCrossOver();
 		Mutation mutation =new SingleListMutation();
 		Select select=new Select();
+		Case project=p.getProject();
 		int tour=2;
 	    int count=0;
 	    double crossoverRate=1;
 	    double mutationRate=0.005;
 	    Individual firstChild;
-	    Case project=p.getProject();
 	    while (count< populationSize) {
 	    	population=p.getPopulation();
-	    	firstParent=select.selectTournament(population,nonDominated,tour);//2 为tournamentSize
+	    	firstParent=select.selectTournament(population,nonDominated,tour);//TODO select need  add crowdistance
 			secondParent=select.selectTournament(population,nonDominated,tour);
 			List<Individual> childs=crossOver.crossOver(firstParent,secondParent,crossoverRate);
 			firstChild=mutation.mutation(childs.get(0),mutationRate);// TODO just consider one child
 			Population combinePop=combine(p,firstChild);
 			p=reduce(combinePop);
+			count++;
 	    }
 	    Tools.updatePareto(project,p);
 		return p;
@@ -129,9 +130,10 @@ public class SMSEMOA extends Algorithm{
 		int minIndix=-1;
 		double minHyperVolume=Double.MAX_VALUE;
 		for(int i=0;i<lastFront.size();i++) {
-			if(minHyperVolume<population[lastFront.get(i)].getHyperVolume()) {
-				minHyperVolume=population[lastFront.get(i)].getHyperVolume();
-				minIndix=lastFront.get(i);
+			int n=lastFront.get(i);
+			if(minHyperVolume>population[n].getHyperVolume()) {
+				minHyperVolume=population[n].getHyperVolume();
+				minIndix=n;
 			}
 		}
 		Individual[] reducePop=new Individual[population.length-1];
@@ -139,7 +141,8 @@ public class SMSEMOA extends Algorithm{
 		int count=0;
 		for(int i=0;i<population.length;i++) {
 			if(i!=minIndix) {
-				reducePop[count++]=population[i];
+				reducePop[count]=population[i];
+				count++;
 			}
 		}
 		Population reducePopulation=new Population(reducePop.length,project);

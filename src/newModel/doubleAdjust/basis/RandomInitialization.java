@@ -10,8 +10,8 @@ public class RandomInitialization implements Initialization {
 		String type=para.getType();
 		Population population=null;
 		switch(type) {
-		case "single":population=initialize_single(project);
-		case "double":population=initialize_double(project);
+		case "single":population=initialize_single(project);break;
+		case "double":population=initialize_double(project);break;
 		}
 		return population;
 	}

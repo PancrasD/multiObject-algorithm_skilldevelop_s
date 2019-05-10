@@ -39,8 +39,8 @@ public class HypervolumeContributionFitnessEvaluator implements FitnessEvaluator
 		double min_1=indivsList.get(len-1).getObj()[1];
 		double distanceTemp_0=max_0-min_0;
 		double distanceTemp_1=max_1-min_1;
-		indivsList.get(0).setHyperVolume(Double.MAX_VALUE);
-		indivsList.get(indivsList.size()-1).setHyperVolume(Double.MAX_VALUE);
+		indivsList.get(0).setHyperVolume(1000);
+		indivsList.get(indivsList.size()-1).setHyperVolume(1000);
 		for(int i=1;i<indivsList.size()-1;i++) {
 			Individual last=indivsList.get(i-1);
 			Individual next=indivsList.get(i+1);
