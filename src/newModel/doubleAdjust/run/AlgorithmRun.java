@@ -16,6 +16,7 @@ import newModel.doubleAdjust.algorithm.NSGA;
 import newModel.doubleAdjust.algorithm.NTGA;
 import newModel.doubleAdjust.algorithm.QGA;
 import newModel.doubleAdjust.algorithm.ReinForcementLearning;
+import newModel.doubleAdjust.algorithm.SMSEMOA;
 import newModel.doubleAdjust.basis.Case;
 import newModel.doubleAdjust.basis.Parameter;
 
@@ -55,6 +56,7 @@ public class AlgorithmRun implements Runnable{
 			case  "ntga":algorithem=new NTGA(_fn,_fo,countResult,para);break;
 			case "rl":algorithem=new ReinForcementLearning(_fn,_fo,countResult,para);break;
 			case "nsffa":algorithem=new NSFFA(_fn,_fo,countResult,para);break;
+			case "smsemoa":algorithem=new SMSEMOA(_fn,_fo,countResult,para);break;
 			}
 			algorithem.schedule();
           }

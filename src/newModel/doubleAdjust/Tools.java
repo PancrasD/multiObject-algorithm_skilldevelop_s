@@ -383,8 +383,6 @@ public class Tools {
 			crowMap.put(index_objList.get(i).getKey(), crowding[i]);
 			
 		}
-//		crowMap = sortBycrowd(crowMap);
-
 		return crowMap;
 	}
 	public static Map<Integer, Double> hyperVolumeCompute(Map<Integer, double[]> indexAndObj) {

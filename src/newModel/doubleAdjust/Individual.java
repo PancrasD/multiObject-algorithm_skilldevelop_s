@@ -1,5 +1,6 @@
 package newModel.doubleAdjust;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import newModel.doubleAdjust.basis.Case;
 import newModel.doubleAdjust.basis.IResource;
@@ -43,6 +43,7 @@ public class Individual {
 	private boolean isTeacher = false;
     //hash
 	private int hashCode;
+	private  Map<String, Object> attributes;
 	/*
 	 * @param  _chromosome 染色体序列
 	 * @param project 案例

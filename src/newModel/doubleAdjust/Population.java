@@ -35,6 +35,7 @@ public class Population {
 		this.populationObj = populationObjCompute(population);
 	}
 	public Population(int populationSize, Case project,boolean initial) {
+		
 		this.populationsize = populationSize;
 		this.project = project;
 		this.population = new Individual[populationSize];
@@ -55,7 +56,6 @@ public class Population {
 				Individual individual = new Individual(project,initial,single);
 				this.population[i] = individual;
 			}
-			//this.populationObj = populationObjCompute(this.population);
 		}
 	}
 

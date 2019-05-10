@@ -25,7 +25,7 @@ public class NSGA extends Algorithm{
 		// TODO Auto-generated constructor stub
 	}
 
-
+  
 	public Population getOffSpring(Population p,String type,int neighborType) {
 		if(type.equals("single")) {
 			return getOffSpring_singleList( p);
@@ -69,7 +69,6 @@ public class NSGA extends Algorithm{
 		    Individual secondParent;
 		    Individual firstChild;
 		    Individual secondChild;
-		    List<List<Integer>> children;
 		    Individual[] population=p.getPopulation();
 		    int populationSize=population.length;
 		    CrossOver crossOver=new SingleListCrossOver();
@@ -79,7 +78,7 @@ public class NSGA extends Algorithm{
 			double crossoverRate=1;
 			double mutationRate=0.005;
 		    while (newPopulation.size() < populationSize) {
-		    	firstParent=select.selectTournament(population,nonDominated,tour);//6 为tournamentSize
+		    	firstParent=select.selectTournament(population,nonDominated,tour);//2 为tournamentSize
 				secondParent=select.selectTournament(population,nonDominated,tour);
 				List<Individual> childs=crossOver.crossOver(firstParent,secondParent,crossoverRate);//交叉率1
 				firstChild=mutation.mutation(childs.get(0),mutationRate);//变异率0.005
