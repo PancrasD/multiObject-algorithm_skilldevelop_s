@@ -104,8 +104,8 @@ public class SMSEMOA extends Algorithm{
 	    	population=p.getPopulation();
 	    	firstParent=select.selectTournament(population,nonDominated,tour);//2 为tournamentSize
 			secondParent=select.selectTournament(population,nonDominated,tour);
-			List<Individual> childs=crossOver.crossOver(firstParent,secondParent,crossoverRate);//交叉率1
-			firstChild=mutation.mutation(childs.get(0),mutationRate);//变异率0.005
+			List<Individual> childs=crossOver.crossOver(firstParent,secondParent,crossoverRate);
+			firstChild=mutation.mutation(childs.get(0),mutationRate);// TODO just consider one child
 			Population combinePop=combine(p,firstChild);
 			p=reduce(combinePop);
 	    }
@@ -115,7 +115,7 @@ public class SMSEMOA extends Algorithm{
 	/*
 	 * 移除r
 	 */
-	private Population reduce(Population combinePop) {
+	private Population reduce(Population combinePop) {// TODO reduce whether better 
 		Case project=combinePop.getProject();
 		Individual[] population=combinePop.getPopulation();
 		List<Integer> lastFront=getLastFront(combinePop);

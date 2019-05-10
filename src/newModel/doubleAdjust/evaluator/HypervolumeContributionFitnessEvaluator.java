@@ -12,7 +12,7 @@ import newModel.doubleAdjust.Tools;
 public class HypervolumeContributionFitnessEvaluator implements FitnessEvaluator{
 
 	@Override
-	public void evaluate(Population population) {
+	public void evaluate(Population population) {// TODO compute is right 
 		Individual[] indivs=population.getPopulation();
 		List<Individual> indivsList=Tools.getList(indivs);
 		

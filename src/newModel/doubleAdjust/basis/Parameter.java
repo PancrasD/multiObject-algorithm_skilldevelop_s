@@ -59,6 +59,17 @@ public class Parameter {
     	this.type=type;
     	this.RunTime=RunTime;
 	}
+	//SMSEMOA
+	public Parameter(int populationSize, double crossoverRate, int tour, double rMutationRate, String type,
+			String mode, int RunTime) {
+		this.populationSize=populationSize;
+    	this.crossoverRate=crossoverRate;
+    	this.rMutationRate=rMutationRate;
+    	this.tour=tour;
+    	this.type=type;
+    	this.mode=mode;
+    	this.RunTime=RunTime;
+	}
 	public int getPopulationSize() {
 		return populationSize;
 	}

@@ -6,7 +6,7 @@ import newModel.doubleAdjust.basis.Parameter;
 public class Run {
 
 	public static void main(String[] args) {
-		String arg="rl";
+		String arg="smsemoa";
 		run(arg);
       
 	}
@@ -97,8 +97,10 @@ public class Run {
 		 int populationSize=100;//
 		 double crossoverRate= 1;
 		 int tour= 2;//0.15
-		 double rMutationRate= 0.005;// 0.01-0.03-0.05
-		 Parameter parameter=new Parameter(populationSize,crossoverRate,tour,rMutationRate,RunTime);
+		 double rMutationRate= 0.005;
+		 String type="single";//编码
+		 String mode="two";//种群
+		 Parameter parameter=new Parameter(populationSize,crossoverRate,tour,rMutationRate,type,mode,RunTime);
 		
 		 Runtask task=new Runtask(parameter,arg);
 		 Thread thread=new Thread(task);
